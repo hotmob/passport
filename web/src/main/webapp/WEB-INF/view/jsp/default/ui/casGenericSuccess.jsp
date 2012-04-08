@@ -1,0 +1,2 @@
+<%@ page import="com.ammob.passport.webapp.util.PropertyUtil" %>
+<% response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);response.setHeader("Location", PropertyUtil.getString("login.success.default.target.url", "/home")); %>

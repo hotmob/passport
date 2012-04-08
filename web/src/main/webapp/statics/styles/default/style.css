@@ -1,0 +1,130 @@
+/* Style Sheet
+ * Use for: http://passport.766.com
+ * Created: 2010-12-13
+ * Update:  2012-01-12
+ * Author: yangmi
+ */
+
+/* =======css reset======= */
+body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, a, em, font, img, strong, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, table, tbody, tfoot, thead, tr, th, td{ padding: 0; margin: 0;}
+table { border-collapse:collapse; border-spacing:0;}
+fieldset, img { border:0;}
+button,input,select,textarea{ font-size:12px;}
+ol,ul,li{ list-style:none}
+h1, h2, h3, h4, h5, h6 { font-size:100%;}
+
+/* =======public======= */
+/* base */
+body{ background:#fff; color:#444; text-align:center; font-size:12px; line-height:18px; font-family:Arial, Verdana, SimSun, sans-serif; }
+td { font-size:12px; line-height:160%;}
+a{ color:#444; text-decoration:none;}
+a:hover{ color:#ff6600; text-decoration:underline;}
+.clear { clear:both; height:0px; font-size:0; overflow:hidden;}
+.color_dark{ color:#898989}
+.wrapper{ width:960px; margin:60px auto; text-align:left; }
+.footer{ line-height:28px; color:#555; text-align:center; clear:both; padding:15px 0; border-top:1px solid #e7e7e7; width:900px; margin:30px auto;}
+.footer a{color:#555}
+ 
+ /* ===login=== */
+.sidebar{ width:592px; float:left; margin-top:20px}
+.side_bg1{ background:url(../../images/sidebar.jpg); width:557px; height:429px; overflow:hidden; }
+.login_con{ background:url(../../images/content.gif) no-repeat; width:337px; height:395px; float:left; position:relative; margin-top:20px}
+.login_con h3{ padding:15px 0 16px 0; text-align:center; font-size:16px;}
+.login{ position:relative; height:295px;}
+.login ul li{ clear:both; padding:15px 0 15px 0px; height:27px; line-height:26px; overflow:hidden}
+.login label,.login input{ float:left; }
+.login label{ width:75px; text-align:right; font-size:14px; line-height:34px;}
+	
+.plubic_input1{ float:left; width:180px; height:24px; padding:2px 4px; line-height:24px; color:#aaa; overflow:hidden; display:inline; border:1px solid #ddd; border-top:1px solid #aaa; border-left:1px solid #aaa; font-size:12px;}
+.plubic_input2{ width:78px; height:24px; padding:2px 4px; line-height:24px; color:#aaa; overflow:hidden; border:1px solid #ddd; border-top:1px solid #aaa; border-left:1px solid #aaa; font-size:16px; font-family:Arial, Helvetica, sans-serif; }
+.plubic_input_on{ color:#444; }
+.text_password{ font-family:Arial}
+.error_tips{position:absolute; color:red; left:105px; top:150px; *top:140px}
+
+.login .checkbox{ padding-left:94px; }
+.login .checkbox a{ color:#55769f}
+.login .checkbox input{ margin:7px 0 0 15px; *margin:2px 0 0 10px; display:inline; }
+.login .checkbox label.checkbox{ text-align:left; padding-left:5px; width:110px; color:#555; font-size:12px; line-height:26px;}
+.login ul li.btn_login{ padding:0 0 0 75px; height:60px }
+
+.login_cooperate{ padding:10px 0 0 8px; border-top:1px solid #e8e8e8; margin:0 12px;}
+.login_cooperate h4{ font-weight:100; padding:0 0 10px;}
+.login_cooperate ul li{ width:32px; height:32px; float:left; margin:0 10px 0 0; display:inline;background-repeat:no-repeat;}	
+.login_cooperate ul li a{ width:32px; height:32px; display:block;}
+.login_cooperate ul li a img{display:none;}
+.login_cooperate ul li button{background: #FFFFFF;border-width:0px;background-repeat:no-repeat;border-style:none;}
+
+/* ===reg=== */
+.reg_con{border:1px solid #e4e4e4; width:900px; min-height:490px; padding-bottom:20px; background:url(../../images/reg_bg.gif) no-repeat right bottom; margin:0 auto; position:relative;}
+.reg_tit{border-bottom:1px solid #e8e8e8; margin:15px 15px 20px; background:url(../../images/reg_tit.gif) no-repeat; height:44px; text-indent:-999em;}
+.reg_con ul li{ clear:both; padding:12px 0 12px 100px; height:26px; line-height:26px; overflow:hidden}
+.reg_con label,.reg_con input{ float:left; }
+.reg_con label{ width:84px; text-align:right; font-size:14px; line-height:30px;}
+.reg_tips{ padding:2px 0 0 10px; float:left; width:380px;}
+.avilid {float:left; height:26px; line-height:26px; padding:0 0 0 2px; width:100px;}
+.input_checkbox { margin:9px 6px 0 0; *margin:4px 6px 0 -5px; display:inline; }
+.reg_con .btn_con{padding-left:184px;}
+.reg_con .btn_con a{ color:#54759e}
+.btn_reg2{ width:103px; height:34px; background:url(../../images/btn.gif) no-repeat 0 -68px; margin:0 15px 0 0; padding:0; border:0; cursor:pointer;}
+.reg_con .checkbox{ width:300px; text-align:left; font-size:12px;}
+.reg_con .checkbox a{ color:#54759e}
+.reg_con .service_con{padding-left:184px; height:200px; padding-top:0}
+.service_txt{border:1px solid #aaa; border-bottom:1px solid #ddd; border-right:1px solid #ddd; background:#f6f6f6;width:400px; height:200px; overflow-y:scroll; padding:5px;}
+.service_txt h3{ text-align:center; font-size:12px;}
+.service_txt p{text-indent:2em;}
+
+/* ===hint=== */
+.hint_con{border:1px solid #e4e4e4; width:900px; min-height:490px; padding-bottom:20px; background:url(../../images/reg_bg.gif) no-repeat right bottom; margin:0 auto; position:relative;}
+.hint_con ul{ padding:80px 0 0 0;}
+.hint_con ul li{ clear:both; padding:12px 0 12px 100px; height:26px; line-height:26px;}
+.hint_con label,.hint_con input{ float:left; }
+.hint_con label{ width:84px; text-align:right; font-size:14px; line-height:30px;}
+.reg_tips{ padding:2px 0 0 10px; float:left; width:380px;}
+.avilid {float:left; height:26px; line-height:26px; padding:0 0 0 2px; width:100px;}
+.input_checkbox { margin:9px 6px 0 0; *margin:4px 6px 0 -5px; display:inline; }
+.hint_con .btn_con{padding-left:184px;}
+.hint_con .btn_con a{ color:#54759e}
+.btn_reg2{ width:103px; height:34px; background:url(../../images/btn.gif) no-repeat 0 -68px; margin:0 15px 0 0; padding:0; border:0; cursor:pointer;}
+.hint_con .checkbox{ width:300px; text-align:left; font-size:12px;}
+.hint_con .checkbox a{ color:#54759e}
+.hint_con .service_con{padding-left:184px; height:200px; padding-top:0}
+.service_txt{border:1px solid #aaa; border-bottom:1px solid #ddd; border-right:1px solid #ddd; background:#f6f6f6;width:400px; height:200px; overflow-y:scroll; padding:5px;}
+.service_txt h3{ text-align:center; font-size:12px;}
+.service_txt p{text-indent:2em;}
+
+/* ===bang ding=== */
+.bangding_tit{font-size:14px; font-weight:700; padding:30px 0 15px 128px;}
+.userinfo{ background:#f9f9f9; border:1px solid #e4e4e4; color:#637a99; padding:15px 25px; margin:15px; height:80px;}
+.userinfo img{ border:1px solid #cecece;}
+.userinfo dt{ font-size:14px; font-weight:700; padding:5px 0 8px}
+.userinfo .pic{ float:left; padding-right:15px;}
+.btn_bang{ width:103px; height:34px; background:url(../../images/btn.gif) no-repeat 0 -102px; margin:0 15px 0 0; padding:0; border:0; cursor:pointer;}
+
+/* ===get_password=== */
+.get_password_tit{border-bottom:1px solid #e8e8e8; margin:15px 15px 20px; background:url(../../images/reg_tit.gif) no-repeat 0 -44px; height:44px; text-indent:-999em;}
+.steps_tips{ color:#a9a9a9; position:absolute; right:20px; top:28px;}
+.steps_tips strong{ color:#777}
+.btn_submit{ width:103px; height:34px; background:url(../../images/btn.gif) no-repeat 0 -136px; margin:0 15px 0 0; padding:0; border:0; cursor:pointer;}
+.send_success{ color:#047e01; border-bottom:1px dotted #e4e4e4; padding:30px 0 50px; text-align:center; font-size:14px; margin:0 15px;}
+.send_success a{ color:#54759e; text-decoration:underline;}
+.send_helps{padding:223px 0 0 30px;}
+.send_helps h4{background:url(../../images/icon_tips.gif) no-repeat left center; padding:0 0 0 20px; margin-bottom:10px; }
+.send_helps p{ padding:0 0 0 20px;}
+.send_helps p a{ color:#54759e}
+.send_success_tips{padding:5px 0; color:#aaa; background:#f1f1f1; border:1px solid #e1e1e1; width:160px; text-align:center; position:absolute; left:390px; top:260px}
+.succed_tips_last{background:url(../../images/icon_success.gif) no-repeat 250px 40px; padding:55px 0 0 350px; height:80px}
+.succed_tips_last h4{ font-size:16px; color:#2c7206; font-weight:100; padding-bottom:10px;}
+.succed_tips_last p{ color:#a9a9a9}
+.succed_tips_last p a{ color:#54759e}
+
+/* ===logined=== */
+.login_con a{ color:#54759e;}
+.logined{ padding:15px 20px 0; height:60px;}
+.logined img{ border:1px solid #cecece;}
+.logined dt{ padding:0 0 8px}
+.logined dt span{ color:#9b9b9b;}
+.logined .pic{ float:left; padding-right:12px;}
+.login_manage{ padding:24px 8px; border-bottom:1px solid #e8e8e8; margin:0 12px;}
+.login_manage h4{ font-weight:100; margin-bottom:5px;}
+.login_record{ padding:7px 20px 0; line-height:18px;}
+.login_record h4{ font-weight:100; margin-bottom:5px;}

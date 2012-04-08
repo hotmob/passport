@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+    <sec:http pattern="/statics/**" security="none"/>
+    <sec:http pattern="/40**" security="none"/>
+    <sec:http pattern="/app/error**" security="none"/>
+    <sec:http pattern="/app/serviceValidate" security="none"/>
+    <sec:http pattern="/app/validate" security="none"/>
+    <sec:http pattern="/app/proxy" security="none"/>
+    <sec:http pattern="/app/proxyValidate" security="none"/>
+    <sec:http pattern="/app/samlValidate" security="none"/>
+    <sec:http pattern="/app/logout" security="none"/>
+    
+    <sec:http pattern="/app/login**" security="none"/>
+    <sec:http pattern="/app/captcha**" security="none"/>
+    <sec:http pattern="/app/openid/**" security="none"/>
+    
+    <sec:http entry-point-ref="casProcessingFilterEntryPoint" auto-config="true" >
+        <sec:intercept-url pattern="/app/admin/**" access="ROLE_ADMIN"/>
+        <sec:intercept-url pattern="/app/hint**" access="ROLE_ANONYMOUS,ROLE_ADMIN,ROLE_USER"/>
+        <sec:intercept-url pattern="/app/signup**" access="ROLE_ANONYMOUS,ROLE_ADMIN,ROLE_USER"/>
+        <sec:intercept-url pattern="/app/signup/**" access="ROLE_ANONYMOUS,ROLE_ADMIN,ROLE_USER"/>
+        <sec:intercept-url pattern="/app/signin**" access="ROLE_ANONYMOUS,ROLE_ADMIN,ROLE_USER"/>
+        <sec:intercept-url pattern="/app/signin/**" access="ROLE_ANONYMOUS,ROLE_ADMIN,ROLE_USER"/>
+        <sec:intercept-url pattern="/app/connect**" access="ROLE_ANONYMOUS,ROLE_ADMIN,ROLE_USER"/>
+        <sec:intercept-url pattern="/app/connect/**" access="ROLE_ANONYMOUS,ROLE_ADMIN,ROLE_USER"/>
+        <sec:intercept-url pattern="/app/**" access="ROLE_ADMIN,ROLE_USER"/>
+        <sec:custom-filter ref="casAuthenticationFilter" after="CAS_FILTER" />
+    </sec:http>
+
+    <sec:authentication-manager alias="casAuthenticationManager" >
+        <sec:authentication-provider ref="casAuthenticationProvider"  />
+    </sec:authentication-manager>
+
+    <!-- <sec:global-method-security>
+        <sec:protect-pointcut expression="execution(* *..service.UserManager.getUsers(..))" access="ROLE_ADMIN"/>
+        <sec:protect-pointcut expression="execution(* *..service.UserManager.removeUser(..))" access="ROLE_ADMIN"/>
+    </sec:global-method-security> -->
+    
+    <bean id="casProcessingFilterEntryPoint" class="org.springframework.security.cas.web.CasAuthenticationEntryPoint"
+        p:loginUrl="/login" p:serviceProperties-ref="serviceProperties" />
+        
+    <bean id="serviceProperties" class="org.springframework.security.cas.ServiceProperties"
+        p:service="${cas.securityContext.serviceProperties.service}" p:sendRenew="false" />
+        
+    <bean id="casAuthenticationFilter" class="org.springframework.security.cas.web.CasAuthenticationFilter"
+        p:authenticationManager-ref="casAuthenticationManager" p:filterProcessesUrl="/j_acegi_cas_security_check">
+        <property name="authenticationSuccessHandler">
+            <bean class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler"  p:defaultTargetUrl="${login.success.default.target.url}" />
+        </property>
+        <property name="authenticationFailureHandler">
+            <bean class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+                <constructor-arg index="0" value="/error" />
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="casAuthenticationProvider" class="org.springframework.security.cas.authentication.CasAuthenticationProvider" p:serviceProperties-ref="serviceProperties"  
+        p:key="e37f4b31-0c45-11dd-bd0b-0800200c9a66" p:userDetailsService-ref="ldapUserDetailsManager">
+        <property name="ticketValidator">
+            <bean class="org.jasig.cas.client.validation.Saml11TicketValidator">
+                <constructor-arg index="0" value="${cas.securityContext.ticketValidator.casServerUrlPrefix}" />
+            </bean>
+        </property>
+    </bean>
+    
+    <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder" p:encodeHashAsBase64="true" />
+    <bean id="textEncryptor" class="org.springframework.security.crypto.encrypt.Encryptors" factory-method="noOpText" />
+</beans>

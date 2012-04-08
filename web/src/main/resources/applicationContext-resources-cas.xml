@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p" 
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+                        http://www.springframework.org/schema/util 
+                        http://www.springframework.org/schema/util/spring-util-3.0.xsd
+                        http://www.springframework.org/schema/aop 
+                        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+    <aop:aspectj-autoproxy />
+    <bean id="servicesManager" class="org.jasig.cas.services.DefaultServicesManagerImpl" >
+        <constructor-arg index="0" ref="serviceRegistryDao" />
+    </bean>
+    <!-- Declare the TimingAspect that we want to weave into the other beans defined. -->
+    <bean id="timingAspect" class="org.perf4j.log4j.aop.TimingAspect" />
+    <!-- Job to periodically reload services from service registry. This job is needed for a clustered CAS environment since 
+        service changes in one CAS node are not known to the other until a reload. -->
+    <bean id="serviceRegistryReloaderJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"
+        p:targetObject-ref="servicesManager" p:targetMethod="reload" />
+    <bean id="periodicServiceRegistryReloaderTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean"
+        p:jobDetail-ref="serviceRegistryReloaderJobDetail" p:startDelay="120000" p:repeatInterval="120000" />
+    <bean id="httpClient" class="org.jasig.cas.util.HttpClient" p:readTimeout="5000" p:connectionTimeout="5000" />
+    <bean id="persistentIdGenerator" class="org.jasig.cas.authentication.principal.ShibbolethCompatiblePersistentIdGenerator" p:salt="casrocks" />
+    <!-- CentralAuthenticationService -->
+    <bean id="centralAuthenticationService" class="org.jasig.cas.CentralAuthenticationServiceImpl"
+        p:ticketGrantingTicketExpirationPolicy-ref="grantingTicketExpirationPolicy" p:serviceTicketExpirationPolicy-ref="serviceTicketExpirationPolicy"
+        p:authenticationManager-ref="authenticationManager" p:ticketGrantingTicketUniqueTicketIdGenerator-ref="ticketGrantingTicketUniqueIdGenerator"
+        p:ticketRegistry-ref="ticketRegistry" p:servicesManager-ref="servicesManager" p:persistentIdGenerator-ref="persistentIdGenerator"
+        p:uniqueTicketIdGeneratorsForService-ref="uniqueIdGeneratorsMap" />
+    <bean id="proxy10Handler" class="org.jasig.cas.ticket.proxy.support.Cas10ProxyHandler" />
+    <bean id="proxy20Handler" class="org.jasig.cas.ticket.proxy.support.Cas20ProxyHandler" p:httpClient-ref="httpClient"
+        p:uniqueTicketIdGenerator-ref="proxy20TicketUniqueIdGenerator" />
+    <!-- ADVISORS -->
+    <bean id="advisorAutoProxyCreator" class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
+    <bean id="validationAnnotationBeanPostProcessor" class="org.jasig.cas.util.CustomBeanValidationPostProcessor"
+        p:afterInitialization="true" />
+    <!-- The scheduler bean wires up any triggers that define scheduled tasks -->
+    <bean id="scheduler" class="com.ammob.passport.webapp.spring.AutowiringSchedulerFactoryBean" />
+
+    <!-- ********************************************** argumentExtractorsConfiguration.xml ********************************************** -->
+    <bean id="casArgumentExtractor" class="org.jasig.cas.web.support.CasArgumentExtractor" p:httpClient-ref="httpClient" />
+    <bean id="samlArgumentExtractor" class="org.jasig.cas.web.support.SamlArgumentExtractor" p:httpClient-ref="httpClient" />
+    <bean id="openIdArgumentExtractor" class="org.jasig.cas.support.openid.web.support.OpenIdArgumentExtractor" />
+    <util:list id="argumentExtractors">
+        <ref bean="casArgumentExtractor" />
+        <ref bean="samlArgumentExtractor" />
+        <ref bean="openIdArgumentExtractor" />
+    </util:list>
+
+    <!-- ********************************************** ticketExpirationPolicies.xml ********************************************** -->
+    <!-- Expiration policies -->
+    <bean id="serviceTicketExpirationPolicy" class="org.jasig.cas.ticket.support.MultiTimeUseOrTimeoutExpirationPolicy">
+        <!-- This argument is the number of times that a ticket can be used before its considered expired. -->
+        <constructor-arg index="0" value="1" />
+        <!-- This argument is the time a ticket can exist before its considered expired. -->
+        <constructor-arg index="1" value="10000" />
+    </bean>
+    <bean id="grantingTicketExpirationPolicy" class="org.jasig.cas.ticket.support.TimeoutExpirationPolicy">
+        <!-- This argument is the time a ticket can exist before its considered expired. -->
+        <constructor-arg index="0" value="7200000" />
+    </bean>
+
+    <!-- ********************************************** ticketGrantingTicketCookieGenerator.xml ********************************************** -->
+    <bean id="ticketGrantingTicketCookieGenerator" class="org.jasig.cas.web.support.CookieRetrievingCookieGenerator"
+        p:cookieSecure="false" p:cookieMaxAge="-1" p:cookieName="tgt" p:cookiePath="/authentication" />
+
+    <!-- ********************************************** ticketRegistry.xml ********************************************** -->
+    <!-- Ticket Registry -->
+    <bean id="ticketRegistry" class="org.jasig.cas.ticket.registry.DefaultTicketRegistry" />
+
+    <!--Quartz -->
+    <!-- TICKET REGISTRY CLEANER -->
+    <bean id="ticketRegistryCleaner" class="org.jasig.cas.ticket.registry.support.DefaultTicketRegistryCleaner"
+        p:ticketRegistry-ref="ticketRegistry" />
+
+    <bean id="jobDetailTicketRegistryCleaner" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"
+        p:targetObject-ref="ticketRegistryCleaner" p:targetMethod="clean" />
+
+    <bean id="triggerJobDetailTicketRegistryCleaner" class="org.springframework.scheduling.quartz.SimpleTriggerBean"
+        p:jobDetail-ref="jobDetailTicketRegistryCleaner" p:startDelay="20000" p:repeatInterval="5000000" />
+
+    <!-- ********************************************** uniqueIdGenerators.xml ********************************************** -->
+    <!-- ID Generators -->
+    <bean id="ticketGrantingTicketUniqueIdGenerator" class="org.jasig.cas.util.DefaultUniqueTicketIdGenerator">
+        <constructor-arg index="0" type="int" value="50" />
+        <constructor-arg index="1" value="${host.name}" />
+    </bean>
+
+    <bean id="serviceTicketUniqueIdGenerator" class="org.jasig.cas.util.DefaultUniqueTicketIdGenerator">
+        <constructor-arg index="0" type="int" value="20" />
+        <constructor-arg index="1" value="${host.name}" />
+    </bean>
+
+    <bean id="loginTicketUniqueIdGenerator" class="org.jasig.cas.util.DefaultUniqueTicketIdGenerator">
+        <constructor-arg index="0" type="int" value="30" />
+    </bean>
+
+    <bean id="proxy20TicketUniqueIdGenerator" class="org.jasig.cas.util.DefaultUniqueTicketIdGenerator">
+        <constructor-arg index="0" type="int" value="20" />
+        <constructor-arg index="1" value="${host.name}" />
+    </bean>
+
+    <bean id="samlServiceTicketUniqueIdGenerator" class="org.jasig.cas.util.SamlCompliantUniqueTicketIdGenerator">
+        <constructor-arg index="0" value="https://localhost:8443" />
+    </bean>
+
+    <util:map id="uniqueIdGeneratorsMap">
+        <entry key="org.jasig.cas.authentication.principal.SimpleWebApplicationServiceImpl" value-ref="serviceTicketUniqueIdGenerator" />
+        <entry key="org.jasig.cas.support.openid.authentication.principal.OpenIdService" value-ref="serviceTicketUniqueIdGenerator" />
+        <entry key="org.jasig.cas.authentication.principal.SamlService" value-ref="samlServiceTicketUniqueIdGenerator" />
+        <entry key="org.jasig.cas.authentication.principal.GoogleAccountsService" value-ref="serviceTicketUniqueIdGenerator" />
+    </util:map>
+    
+    <!-- ********************************************** warnCookieGenerator.xml ********************************************** -->
+    <bean id="warnCookieGenerator" class="org.jasig.cas.web.support.CookieRetrievingCookieGenerator"
+        p:cookieSecure="false"
+        p:cookieMaxAge="-1"
+        p:cookieName="CASPRIVACY"
+        p:cookiePath="/authentication" />
+
+    <!-- ********************************************** deployerConfigContext.xml ********************************************** -->
+    <bean id="authenticationManager" class="org.jasig.cas.authentication.AuthenticationManagerImpl">
+        <property name="credentialsToPrincipalResolvers">
+            <list>
+                <bean class="org.jasig.cas.support.openid.authentication.principal.OpenIdCredentialsToPrincipalResolver" />
+                <bean class="org.jasig.cas.authentication.principal.CredentialsToLDAPAttributePrincipalResolver" >
+                    <!-- The Principal resolver form the credentials -->
+                    <property name="credentialsToPrincipalResolver">
+                        <bean class="org.jasig.cas.authentication.principal.UsernamePasswordCredentialsToPrincipalResolver" />
+                    </property>
+                    <!-- The query made to find the Principal ID. "%u" will be replaced by the resolved Principal -->
+                    <property name="filter" value="(|(mail=%u)(cn=%u))" />
+                    <!-- The attribute used to define the new Principal ID -->
+                    <property name="principalAttributeName" value="cn" />
+                    <property name="searchBase" value="${ldap.users.search.dn}" />
+                    <property name="contextSource" ref="contextSource" />
+                    <property name="attributeRepository" ref="personAttributeRepository" />
+                </bean>
+            </list>
+        </property>
+        <property name="authenticationHandlers">
+            <list>
+                <bean class="org.jasig.cas.support.openid.authentication.handler.support.OpenIdCredentialsAuthenticationHandler" p:ticketRegistry-ref="ticketRegistry" />
+                <bean class="org.jasig.cas.authentication.handler.support.HttpBasedServiceCredentialsAuthenticationHandler" p:httpClient-ref="httpClient" />
+                <bean class="org.jasig.cas.adaptors.ldap.BindLdapAuthenticationHandler" >
+                    <property name="contextSource" ref="contextSource" />
+                    <property name="searchContextSource" ref="contextSource" />
+                    <property name="filter" value="(|(mail=%u)(cn=%u))" />
+                    <property name="searchBase" value="${ldap.users.search.dn}" />
+                    <property name="ignorePartialResultException" value="yes" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="serviceRegistryDao" class="org.jasig.cas.services.InMemoryServiceRegistryDaoImpl">
+        <property name="registeredServices">
+            <list>
+                <bean class="org.jasig.cas.services.RegisteredServiceImpl">
+                    <property name="id" value="0" />
+                    <property name="name" value="HTTP" />
+                    <property name="description" value="Allows HTTP Urls" />
+                    <property name="serviceId" value="http://**" />
+                    <property name="evaluationOrder" value="10000001" />
+                </bean>
+            </list>
+        </property>
+    </bean>
+</beans>
