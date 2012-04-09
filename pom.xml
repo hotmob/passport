@@ -467,7 +467,7 @@
 		<jdbc.driverClassName>com.mysql.jdbc.Driver</jdbc.driverClassName>
 		<jdbc.url>jdbc:mysql://mysql.766app.com/${db.name}?createDatabaseIfNotExist=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=utf-8&amp;amp;autoReconnect=true</jdbc.url>
 		<jdbc.username>root</jdbc.username>
-		<jdbc.password></jdbc.password>
+		<jdbc.password>123456</jdbc.password>
 		<!-- <ldap.url>ldap://120.33.33.198:389/</ldap.url>
 		<ldap.password>uDAapwhm04ih</ldap.password> -->
 		<ldap.url>ldap://ldap.766app.com:389/</ldap.url>

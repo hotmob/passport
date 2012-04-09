@@ -1,5 +1,7 @@
 package com.ammob.passport.webapp.form;
 
+import org.springframework.social.connect.UserProfile;
+
 import com.ammob.passport.model.User;
 
 /**
@@ -8,6 +10,7 @@ import com.ammob.passport.model.User;
  * @author Mob
  */
 public class SignupForm extends User  {
+	
 	private static final long serialVersionUID = 1L;
 	private String service;
 	private String captcha;
@@ -16,7 +19,7 @@ public class SignupForm extends User  {
 	 * Default constructor - creates a new instance with no values set.
 	 */
 	public SignupForm() {
-		
+		setEnabled(true);
 	}
 	
 	/**
@@ -41,5 +44,13 @@ public class SignupForm extends User  {
 
 	public String getCaptcha() {
 		return captcha;
+	}
+	
+	public static SignupForm fromProviderUser(UserProfile providerUser) {
+		SignupForm form = new SignupForm();
+		form.setFirstName(providerUser.getFirstName());
+		form.setLastName(providerUser.getLastName());
+		form.setUsername(providerUser.getUsername());
+		return form;
 	}
 }

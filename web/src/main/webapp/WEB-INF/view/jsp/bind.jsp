@@ -18,15 +18,15 @@
     </spring:bind>
     <div class="separator"></div>
     <div class="reg_con">
-        <div class="userinfo">
-            <dl>
-                <dd class="pic"><img src="/statics/images/userface.gif"></dd>
-                <dt>Hi, hotmob</dt>
-                <dd><fmt:message key="bind.message"><fmt:param value="QQ" /></fmt:message></dd>
-            </dl>
-        </div>
-        <div class="bangding_tit"><fmt:message key="bind.heading"/></div>
         <form:form  id="signupForm" commandName="signupForm" method="post" onsubmit="return validateSignupForm(this)">
+	        <div class="userinfo">
+	            <dl>
+	                <dd class="pic"><img src="/statics/images/userface.gif"></dd>
+	                <dt>Hi, ${signupForm.firstName}${signupForm.lastName}</dt>
+	                <dd><fmt:message key="bind.message"><fmt:param value="QQ" /></fmt:message></dd>
+	            </dl>
+	        </div>
+	        <div class="bangding_tit"><fmt:message key="bind.heading"/></div>
             <ul>
                 <li>
                     <label class="desc" for="username"><fmt:message key="label.username"/><fmt:message key="label.double.colon"/></label>
@@ -42,6 +42,16 @@
                     <div class="reg_tips">
                         <form:errors id="password1TipError" path="password" cssClass="onError" />
                         <span id="password1Tip" class="onShow"><fmt:message key="signup.help.password"/></span>
+                    </div>
+                </li>
+                <li>
+                    <label class="desc" for="captcha"><fmt:message key="label.captcha"/><fmt:message key="label.double.colon"/></label>
+                    <form:input path="captcha" id="captcha"  cssClass="plubic_input2" tabindex="5" />
+                    <div class="reg_tips">
+                        <span class="avilid"><img id="captchaImg" src="captcha.jpg" ></span>
+                        <form:errors id="captchaTipError" path="captcha" cssClass="onError" />
+                        <span id="captchaTip">&nbsp;<fmt:message key="signup.help.captcha.tipinfo"/></span>&nbsp;
+                        <a href="javascript:;" onClick="captchaImg.src='captcha.jpg?'+new Date().getTime()"><fmt:message key="signup.help.captcha.replace"/></a> 
                     </div>
                 </li>
                 <li class="btn_con">

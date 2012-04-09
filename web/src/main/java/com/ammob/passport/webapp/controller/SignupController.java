@@ -2,10 +2,10 @@ package com.ammob.passport.webapp.controller;
 
 import com.ammob.passport.Constants;
 import com.ammob.passport.service.RoleManager;
-import com.ammob.passport.enumerate.StateEnum;
-import com.ammob.passport.exception.UserExistsException;
 import com.ammob.passport.webapp.form.SignupForm;
 import com.ammob.passport.webapp.util.RequestUtil;
+import com.ammob.passport.enumerate.StateEnum;
+import com.ammob.passport.exception.UserExistsException;
 
 import org.jasig.cas.CentralAuthenticationService;
 import org.jasig.cas.authentication.principal.UsernamePasswordCredentials;
@@ -14,11 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.CookieGenerator;
 
@@ -64,8 +68,20 @@ public class SignupController extends BaseFormController {
 
 	@ModelAttribute
 	@RequestMapping(method = RequestMethod.GET, params =  {"bind","callBack!=2"})
-	public ModelAndView showBindForm() {
-		ModelAndView mav = new ModelAndView("bind", "signupForm",  new SignupForm(true));
+	public ModelAndView showBindForm(HttpServletRequest request, WebRequest webRequest) {
+		Locale locale = request.getLocale();
+		SignupForm signupForm = null;
+		Connection<?> connection = ProviderSignInUtils.getConnection(webRequest);
+		if (connection != null) {
+			signupForm = SignupForm.fromProviderUser(connection.fetchUserProfile());
+			saveMessage(request, getText("user.bound", signupForm.getUsername(), locale));
+			saveMessage(request, getText("user.bound.tip", signupForm.getUsername(), locale));
+			this.saveMessage(request, "Your " + StringUtils.capitalize(connection.getKey().getProviderId()) + " account is not associated with a Spring Social Showcase account. If you're new, please sign up." + signupForm.getFirstName());
+			//request.setAttribute("message",  new Message(MessageType.INFO, "Your " + StringUtils.capitalize(connection.getKey().getProviderId()) + " account is not associated with a Spring Social Showcase account. If you're new, please sign up."), WebRequest.SCOPE_REQUEST);
+		} else {
+			signupForm = new SignupForm(true);
+		}
+		ModelAndView mav = new ModelAndView("bind", "signupForm",  signupForm);
 		return mav;
 	}
 	
