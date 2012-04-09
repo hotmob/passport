@@ -62,7 +62,7 @@
     <bean id="simpleUrlHandlerMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
         <property name="mappings">
             <props>
-				<prop key="/app/logout">
+               <prop key="/app/logout">
                     logoutController
                 </prop>
                 <prop key="/app/serviceValidate">

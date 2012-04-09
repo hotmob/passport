@@ -19,7 +19,7 @@
     </logger>
 
     <logger name="org.springframework.social">
-        <level value="DEBUG"/>
+        <level value="INFO"/>
     </logger>
     
     <!-- 3rdparty Loggers -->
