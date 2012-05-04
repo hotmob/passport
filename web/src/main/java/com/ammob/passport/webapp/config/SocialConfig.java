@@ -70,11 +70,9 @@ public class SocialConfig {
 	@Scope(value="request", proxyMode=ScopedProxyMode.INTERFACES)	
 	public ConnectionRepository connectionRepository() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		System.out.println("--------------------- connectionRepository ");
 		if (authentication == null) {
 			throw new IllegalStateException("Unable to get a ConnectionRepository: no user signed in");
 		}
-		System.out.println("--------------------- authentication : [" + authentication.getName() + "]");
 		return usersConnectionRepository().createConnectionRepository(authentication.getName());
 	}
 

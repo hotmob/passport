@@ -21,12 +21,23 @@
         <form:form  id="signupForm" commandName="signupForm" method="post" onsubmit="return validateSignupForm(this)">
 	        <div class="userinfo">
 	            <dl>
-	                <dd class="pic"><img src="/statics/images/userface.gif"></dd>
+	                <dd class="pic">
+	                   <c:choose>
+	                       <c:when test="${not empty signupForm.avataUrl}">
+	                           <img src="${signupForm.avataUrl}">
+	                       </c:when>
+	                       <c:otherwise>
+	                           <img src="/statics/images/userface.gif">
+	                       </c:otherwise>
+	                   </c:choose>
+	                </dd>
 	                <dt>Hi, ${signupForm.firstName}${signupForm.lastName}</dt>
-	                <dd><fmt:message key="bind.message"><fmt:param value="QQ" /></fmt:message></dd>
+	                <dd><fmt:message key="bind.message"><fmt:param value="${signupForm.providerId}" /></fmt:message></dd>
+	                <dd><fmt:message key="bind.showMore"/></dd>
 	            </dl>
 	        </div>
 	        <div class="bangding_tit"><fmt:message key="bind.heading"/></div>
+	        <div class="bind_tit_info"><fmt:message key="bind.heading.info"/></div>
             <ul>
                 <li>
                     <label class="desc" for="username"><fmt:message key="label.username"/><fmt:message key="label.double.colon"/></label>

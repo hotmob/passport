@@ -67,20 +67,30 @@ public class SignupController extends BaseFormController {
 	}
 
 	@ModelAttribute
-	@RequestMapping(method = RequestMethod.GET, params =  {"bind","callBack!=2"})
+	@RequestMapping(method = RequestMethod.GET, params =  {"bind","type!=766"})
 	public ModelAndView showBindForm(HttpServletRequest request, WebRequest webRequest) {
 		Locale locale = request.getLocale();
 		SignupForm signupForm = null;
 		Connection<?> connection = ProviderSignInUtils.getConnection(webRequest);
 		if (connection != null) {
 			signupForm = SignupForm.fromProviderUser(connection.fetchUserProfile());
+			signupForm.setAvataUrl(connection.getImageUrl());
+			signupForm.setProviderId(StringUtils.capitalize(connection.getKey().getProviderId()));
 			saveMessage(request, getText("user.bound", signupForm.getUsername(), locale));
-			saveMessage(request, getText("user.bound.tip", signupForm.getUsername(), locale));
-			this.saveMessage(request, "Your " + StringUtils.capitalize(connection.getKey().getProviderId()) + " account is not associated with a Spring Social Showcase account. If you're new, please sign up." + signupForm.getFirstName());
-			//request.setAttribute("message",  new Message(MessageType.INFO, "Your " + StringUtils.capitalize(connection.getKey().getProviderId()) + " account is not associated with a Spring Social Showcase account. If you're new, please sign up."), WebRequest.SCOPE_REQUEST);
+			saveMessage(request, getText("user.bound.tip", signupForm.getProviderId(), locale));
 		} else {
 			signupForm = new SignupForm(true);
 		}
+		ModelAndView mav = new ModelAndView("bind", "signupForm",  signupForm);
+		return mav;
+	}
+	
+	@RequestMapping(method = RequestMethod.POST, params =  {"bind"})
+	public ModelAndView onBindSubmit(SignupForm signupForm, BindingResult errors,
+			WebRequest request, HttpServletResponse response)
+					throws Exception {
+		
+		ProviderSignInUtils.handlePostSignUp(signupForm.getUsername(), request);
 		ModelAndView mav = new ModelAndView("bind", "signupForm",  signupForm);
 		return mav;
 	}

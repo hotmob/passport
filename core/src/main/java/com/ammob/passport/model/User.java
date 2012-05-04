@@ -75,6 +75,7 @@ public class User extends BaseObject implements Serializable, UserDetails {
 	private String userId;                        	// 用户身份证号码
 	private String bloodType;                 	// 用户血型
 	private String ethnicity;                    	// 用户种族
+	private String avataUrl;
 	private Set<String> state = new HashSet<String>(); // 状态, 1: 邮箱已验证
     
     
@@ -494,10 +495,15 @@ public class User extends BaseObject implements Serializable, UserDetails {
 	
 	@Transient
 	public String getAvataUrl() {
-		String result = null;
-		if(StringUtils.hasText(uuid)){
-			result =  uuid.replaceAll("-", "/");
+		if(!StringUtils.hasText(this.avataUrl)) {
+			if(StringUtils.hasText(this.uuid)){
+				this.avataUrl =  this.uuid.replaceAll("-", "/");
+			}
 		}
-		return result;
+		return this.avataUrl;
+	}
+
+	public void setAvataUrl(String avataUrl) {
+		this.avataUrl = avataUrl;
 	}
 }

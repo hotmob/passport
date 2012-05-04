@@ -13,6 +13,7 @@ public class SignupForm extends User  {
 	
 	private static final long serialVersionUID = 1L;
 	private String service;
+	private String providerId;
 	private String captcha;
 	
 	/**
@@ -46,11 +47,20 @@ public class SignupForm extends User  {
 		return captcha;
 	}
 	
+	public String getProviderId() {
+		return providerId;
+	}
+
+	public void setProviderId(String providerId) {
+		this.providerId = providerId;
+	}
+	
 	public static SignupForm fromProviderUser(UserProfile providerUser) {
 		SignupForm form = new SignupForm();
 		form.setFirstName(providerUser.getFirstName());
 		form.setLastName(providerUser.getLastName());
 		form.setUsername(providerUser.getUsername());
+		form.setEmail(providerUser.getEmail());
 		return form;
 	}
 }

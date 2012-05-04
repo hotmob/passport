@@ -93,7 +93,9 @@ a:hover{ color:#ff6600; text-decoration:underline;}
 .service_txt p{text-indent:2em;}
 
 /* ===bang ding=== */
-.bangding_tit{font-size:14px; font-weight:700; padding:30px 0 15px 128px;}
+.bangding_tit{ font-size:14px; font-weight:700; padding:30px 0 15px 128px;}
+.bind_tit_info{ font-size:12px; padding:0 0 0 128px;}
+.bind_tit_info{ color:#666666}
 .userinfo{ background:#f9f9f9; border:1px solid #e4e4e4; color:#637a99; padding:15px 25px; margin:15px; height:80px;}
 .userinfo img{ border:1px solid #cecece;}
 .userinfo dt{ font-size:14px; font-weight:700; padding:5px 0 8px}
