@@ -86,13 +86,17 @@ public class SignupController extends BaseFormController {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, params =  {"bind"})
-	public ModelAndView onBindSubmit(SignupForm signupForm, BindingResult errors,
+	public String onBindSubmit(SignupForm signupForm, BindingResult errors,
 			WebRequest request, HttpServletResponse response)
 					throws Exception {
-		
-		ProviderSignInUtils.handlePostSignUp(signupForm.getUsername(), request);
-		ModelAndView mav = new ModelAndView("bind", "signupForm",  signupForm);
-		return mav;
+		if(bindTicketGrantingTicket(signupForm.getUsername(), signupForm.getPassword(), response)) {
+			ProviderSignInUtils.handlePostSignUp(signupForm.getUsername(), request);
+			System.out.println("绑定成功++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+			return "redirect:/";
+		}
+		System.out.println("绑定失败-------------------------------------------------------------------------------------------");
+		// TODO 开始注册步骤
+		return "signup";
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
@@ -160,17 +164,19 @@ public class SignupController extends BaseFormController {
      * @param loginPassword the user login password. 
      * @param response      the HttpServletResponse object. 
      */  
-    protected void bindTicketGrantingTicket(String loginName, String loginPassword, HttpServletResponse response) {
+    protected boolean bindTicketGrantingTicket(String loginName, String loginPassword, HttpServletResponse response) {
         try {
             UsernamePasswordCredentials credentials = new UsernamePasswordCredentials();
             credentials.setUsername(loginName);
             credentials.setPassword(loginPassword);
             String ticketGrantingTicket = centralAuthenticationService.createTicketGrantingTicket(credentials);
             ticketGrantingTicketCookieGenerator.addCookie(response, ticketGrantingTicket);
+            return true;
         } catch (TicketException te) {
         	log.error("Validate the loginname " + loginName + " and loginPassword " + loginPassword + " failure, can't bind the TGT!", te);
         } catch (Exception e){
         	log.error("bindTicketGrantingTicket has exception.", e);
         }
+        return false;
     }
 }
