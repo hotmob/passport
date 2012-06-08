@@ -5,9 +5,6 @@ import com.ammob.passport.model.Role;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.List;
-
 import static org.junit.Assert.*;
 
 public class RoleDaoTest extends BaseDaoTestCase {
@@ -29,12 +26,11 @@ public class RoleDaoTest extends BaseDaoTestCase {
     @Test
     public void testUpdateRole() throws Exception {
         Role role = dao.getRoleByName("ROLE_USER");
+        log.debug(role);
         role.setDescription("test descr");
+
         dao.save(role);
-        flush();
-        
-        role = dao.getRoleByName("ROLE_USER");
-        assertEquals("test descr", role.getDescription());
+        assertEquals(role.getDescription(), "test descr");
     }
 
     @Test
@@ -42,24 +38,19 @@ public class RoleDaoTest extends BaseDaoTestCase {
         Role role = new Role("testrole");
         role.setDescription("new role descr");
         dao.save(role);
-        flush();
-        
+        //setComplete(); // change behavior from rollback to commit
+        //endTransaction();
+
+        //startNewTransaction();
         role = dao.getRoleByName("testrole");
         assertNotNull(role.getDescription());
 
         dao.removeRole("testrole");
-        flush();
+        //setComplete();
+        //super.endTransaction(); // deletes role from database
 
+        //super.startNewTransaction();
         role = dao.getRoleByName("testrole");
         assertNull(role);
-    }
-
-    @Test
-    public void testFindByNamedQuery() {
-        HashMap<String, Object> queryParams = new HashMap<String, Object>();
-        queryParams.put("name", Constants.USER_ROLE);
-        List<Role> roles = dao.findByNamedQuery("findRoleByName", queryParams);
-        assertNotNull(roles);
-        assertTrue(roles.size() > 0);
     }
 }

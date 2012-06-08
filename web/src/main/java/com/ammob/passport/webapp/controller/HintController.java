@@ -1,9 +1,10 @@
 package com.ammob.passport.webapp.controller;
 
 import com.ammob.passport.Constants;
-import com.ammob.passport.model.User;
+import com.ammob.passport.enumerate.AttributeEnum;
 import com.ammob.passport.webapp.form.HintForm;
 
+import org.jasig.services.persondir.IPersonAttributes;
 import org.springframework.mail.MailException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
@@ -82,17 +83,17 @@ public class HintController extends BaseFormController {
 		switch(hintForm.getStep()) {
 		case 0:
 			try {
-				User user = this.getUserManager().getMemberByUsernameOrEmail(hintForm.getUsername());
+				IPersonAttributes user = this.getUserManager().getPersonAttributes(hintForm.getUsername());
 				hintForm.setStep(1);
-				hintForm.setUsername(user.getUsername());
-				hintForm.setEmail(user.getEmail());
+				hintForm.setUsername(user.getAttributeValue(AttributeEnum.USER_USERNAME.getValue()).toString());
+				hintForm.setEmail(user.getAttributeValue(AttributeEnum.USER_EMAIL.getValue()).toString());
 		        Locale locale = request.getLocale();
 		        message.setSubject(getText("hint.email.subject", locale));
 				try {
 					String unixTimestamp = String.valueOf(System.currentTimeMillis());
 					String authCode = "";//AuthCode.authcodeEncode(user.getUsername().concat(unixTimestamp), Constants.SECURITY_SUPERVISION_CODE);// TODO
 					log.info(authCode);
-					String url = "http://passport.766.com/hint?username=" + user.getUsername() + "&timestamp=" + unixTimestamp + "&authcode=" + URLEncoder.encode(authCode, "UTF-8");// RequestUtil.getAppURL(request);
+					String url = "http://passport.766.com/hint?username=" + hintForm.getUsername() + "&timestamp=" + unixTimestamp + "&authcode=" + URLEncoder.encode(authCode, "UTF-8");// RequestUtil.getAppURL(request);
 					sendUserMessage(hintForm, authCode, url);
 					//saveMessage(request, this.getText("hint.sent", new Object[] { user.getUsername(), user.getEmail() }, locale));
 				} catch (MailException me) {

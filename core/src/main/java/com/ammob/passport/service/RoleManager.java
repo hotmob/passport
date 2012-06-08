@@ -14,7 +14,7 @@ public interface RoleManager extends GenericManager<Role, Long> {
     /**
      * {@inheritDoc}
      */
-    List getRoles(Role role);
+    List<Role> getRoles(Role role);
 
     /**
      * {@inheritDoc}

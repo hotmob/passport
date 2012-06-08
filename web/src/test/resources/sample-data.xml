@@ -6,7 +6,7 @@
         <column>password</column>
         <column>first_name</column>
         <column>last_name</column>
-        <column>address</column>
+        <column>postal_address</column>
         <column>city</column>
         <column>country</column>
         <column>email</column>
@@ -22,11 +22,11 @@
         <column>credentials_expired</column>
         <row>
             <value description="id">-1</value>
-            <value description="username">user</value>
-            <value description="password">12dea96fec20593566ab75692c9949596833adc9</value>
+            <value description="username">mupeng</value>
+            <value description="password">12dea96fec20593</value>
             <value description="first_name">Tomcat</value>
             <value description="last_name">User</value>
-            <value description="address"></value>
+            <value description="postal_address"></value>
             <value description="city">Denver</value>
             <value description="country">US</value>
             <value description="email">matt_raible@yahoo.com</value>
@@ -43,11 +43,11 @@
         </row>
         <row>
             <value description="id">-2</value>
-            <value description="username">admin</value>
-            <value description="password">d033e22ae348aeb5660fc2140aec35850c4da997</value>
+            <value description="username">hotmob</value>
+            <value description="password">d033e22ae348aeb</value>
             <value description="first_name">Matt</value>
             <value description="last_name">Raible</value>
-            <value description="address"></value>
+            <value description="postal_address"></value>
             <value description="city">Denver</value>
             <value description="country">US</value>
             <value description="email">matt@raibledesigns.com</value>

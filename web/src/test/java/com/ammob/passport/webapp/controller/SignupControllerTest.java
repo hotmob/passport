@@ -29,7 +29,7 @@ public class SignupControllerTest extends BaseControllerTestCase {
     @Test
     public void testSignupUser() throws Exception {
         MockHttpServletRequest request = newPost("/signup.html");
-        request.addParameter(Constants.SECURITY_SUPERVISION_CODE, "");
+        request.addParameter(Constants.SECURITY_SUPERVISION_CODE, "test");
         
         Address address = new Address();
         address.setCity("Denver");
@@ -39,7 +39,7 @@ public class SignupControllerTest extends BaseControllerTestCase {
 
         SignupForm user = new SignupForm(true);
         user.setAddress(address);
-        String time = String.valueOf(System.currentTimeMillis());
+        String time = String.valueOf(System.currentTimeMillis()).substring(2);
         user.setUsername("self".concat(time));
         user.setPassword("Password1");
         user.setConfirmPassword("Password1");
@@ -48,6 +48,7 @@ public class SignupControllerTest extends BaseControllerTestCase {
         user.setEmail(time.concat("self-registered@raibledesigns.com"));
         user.setWebsite("http://raibledesigns.com");
         user.setPasswordHint("Password is one with you.");
+        user.setCaptcha("test");
 
         HttpServletResponse response = new MockHttpServletResponse();
 
@@ -62,6 +63,7 @@ public class SignupControllerTest extends BaseControllerTestCase {
 
         // verify an account information e-mail was sent
         wiser.stop();
+        
         assertTrue(wiser.getMessages().size() == 1);
 
         // verify that success messages are in the request

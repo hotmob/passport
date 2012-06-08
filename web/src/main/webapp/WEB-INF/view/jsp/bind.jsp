@@ -6,26 +6,19 @@
 </head>
 <body id="signup" />
 <div class="main wrapper">
-    <spring:bind path="signupForm.*">
-        <c:if test="${not empty status.errorMessages}">
-            <div class="alert alert-error fade in">
-                <a href="#" data-dismiss="alert" class="close">&times;</a>
-                <c:forEach var="error" items="${status.errorMessages}">
-                    <c:out value="${error}" escapeXml="false"/><br/>
-                </c:forEach>
-            </div>
-        </c:if>
-    </spring:bind>
     <div class="separator"></div>
     <div class="reg_con">
         <form:form  id="signupForm" commandName="signupForm" method="post" onsubmit="return validateSignupForm(this)">
 	        <div class="userinfo">
 	            <dl>
-	                <dd class="pic">
+	                <dd class="avatar">
 	                   <c:choose>
 	                       <c:when test="${not empty signupForm.avataUrl}">
 	                           <img src="${signupForm.avataUrl}">
 	                       </c:when>
+	                       <c:when test="${not empty avataUrl}">
+                               <img src="${avataUrl}">
+                           </c:when>
 	                       <c:otherwise>
 	                           <img src="/statics/images/userface.gif">
 	                       </c:otherwise>
@@ -53,16 +46,6 @@
                     <div class="reg_tips">
                         <form:errors id="password1TipError" path="password" cssClass="onError" />
                         <span id="password1Tip" class="onShow"><fmt:message key="signup.help.password"/></span>
-                    </div>
-                </li>
-                <li>
-                    <label class="desc" for="captcha"><fmt:message key="label.captcha"/><fmt:message key="label.double.colon"/></label>
-                    <form:input path="captcha" id="captcha"  cssClass="plubic_input2" tabindex="5" />
-                    <div class="reg_tips">
-                        <span class="avilid"><img id="captchaImg" src="captcha.jpg" ></span>
-                        <form:errors id="captchaTipError" path="captcha" cssClass="onError" />
-                        <span id="captchaTip">&nbsp;<fmt:message key="signup.help.captcha.tipinfo"/></span>&nbsp;
-                        <a href="javascript:;" onClick="captchaImg.src='captcha.jpg?'+new Date().getTime()"><fmt:message key="signup.help.captcha.replace"/></a> 
                     </div>
                 </li>
                 <li class="btn_con">

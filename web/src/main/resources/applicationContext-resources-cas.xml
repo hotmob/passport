@@ -36,19 +36,16 @@
         p:uniqueTicketIdGenerator-ref="proxy20TicketUniqueIdGenerator" />
     <!-- ADVISORS -->
     <bean id="advisorAutoProxyCreator" class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
-    <bean id="validationAnnotationBeanPostProcessor" class="org.jasig.cas.util.CustomBeanValidationPostProcessor"
-        p:afterInitialization="true" />
+    <bean id="validationAnnotationBeanPostProcessor" class="org.jasig.cas.util.CustomBeanValidationPostProcessor" p:afterInitialization="true" />
     <!-- The scheduler bean wires up any triggers that define scheduled tasks -->
     <bean id="scheduler" class="com.ammob.passport.webapp.spring.AutowiringSchedulerFactoryBean" />
 
     <!-- ********************************************** argumentExtractorsConfiguration.xml ********************************************** -->
     <bean id="casArgumentExtractor" class="org.jasig.cas.web.support.CasArgumentExtractor" p:httpClient-ref="httpClient" />
     <bean id="samlArgumentExtractor" class="org.jasig.cas.web.support.SamlArgumentExtractor" p:httpClient-ref="httpClient" />
-    <bean id="openIdArgumentExtractor" class="org.jasig.cas.support.openid.web.support.OpenIdArgumentExtractor" />
     <util:list id="argumentExtractors">
         <ref bean="casArgumentExtractor" />
         <ref bean="samlArgumentExtractor" />
-        <ref bean="openIdArgumentExtractor" />
     </util:list>
 
     <!-- ********************************************** ticketExpirationPolicies.xml ********************************************** -->
@@ -59,29 +56,34 @@
         <!-- This argument is the time a ticket can exist before its considered expired. -->
         <constructor-arg index="1" value="10000" />
     </bean>
-    <bean id="grantingTicketExpirationPolicy" class="org.jasig.cas.ticket.support.TimeoutExpirationPolicy">
-        <!-- This argument is the time a ticket can exist before its considered expired. -->
-        <constructor-arg index="0" value="7200000" />
-    </bean>
+	<bean id="grantingTicketExpirationPolicy" class="org.jasig.cas.ticket.support.RememberMeDelegatingExpirationPolicy">
+		<property name="sessionExpirationPolicy">
+			<bean class="org.jasig.cas.ticket.support.TimeoutExpirationPolicy">
+				<constructor-arg index="0" value="7200000" /><!-- 2 Hour -->
+			</bean>
+		</property>
+		<property name="rememberMeExpirationPolicy">
+			<bean class="org.jasig.cas.ticket.support.TimeoutExpirationPolicy">
+				<constructor-arg index="0" value="604800000" /><!-- 7 Days -->
+			</bean>
+		</property>
+</bean>
 
     <!-- ********************************************** ticketGrantingTicketCookieGenerator.xml ********************************************** -->
     <bean id="ticketGrantingTicketCookieGenerator" class="org.jasig.cas.web.support.CookieRetrievingCookieGenerator"
-        p:cookieSecure="false" p:cookieMaxAge="-1" p:cookieName="tgt" p:cookiePath="/authentication" />
+        p:cookieSecure="false" p:cookieMaxAge="-1" p:cookieName="AuthTGC" p:cookiePath="/" />
 
     <!-- ********************************************** ticketRegistry.xml ********************************************** -->
-    <!-- Ticket Registry -->
-    <bean id="ticketRegistry" class="org.jasig.cas.ticket.registry.DefaultTicketRegistry" />
-
+	<!-- Ticket Registry -->
+	<bean id="ticketRegistry" class="org.jasig.cas.ticket.registry.JpaTicketRegistry" />
     <!--Quartz -->
     <!-- TICKET REGISTRY CLEANER -->
-    <bean id="ticketRegistryCleaner" class="org.jasig.cas.ticket.registry.support.DefaultTicketRegistryCleaner"
-        p:ticketRegistry-ref="ticketRegistry" />
-
-    <bean id="jobDetailTicketRegistryCleaner" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"
-        p:targetObject-ref="ticketRegistryCleaner" p:targetMethod="clean" />
-
-    <bean id="triggerJobDetailTicketRegistryCleaner" class="org.springframework.scheduling.quartz.SimpleTriggerBean"
-        p:jobDetail-ref="jobDetailTicketRegistryCleaner" p:startDelay="20000" p:repeatInterval="5000000" />
+    <bean id="ticketRegistryCleaner" class="org.jasig.cas.ticket.registry.support.DefaultTicketRegistryCleaner" p:ticketRegistry-ref="ticketRegistry" p:lock-ref="cleanerLock" />
+	<bean id="cleanerLock" class="org.jasig.cas.ticket.registry.support.JpaLockingStrategy" p:uniqueId="${host.name}" p:applicationId="cas-ticket-registry-cleaner" />
+	<bean id="ticketRegistryCleanerJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"
+		p:targetObject-ref="ticketRegistryCleaner" p:targetMethod="clean" />
+	<bean id="periodicTicketRegistryCleanerTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean" p:jobDetail-ref="ticketRegistryCleanerJobDetail" 
+	    p:startDelay="20000" p:repeatInterval="1800000" />
 
     <!-- ********************************************** uniqueIdGenerators.xml ********************************************** -->
     <!-- ID Generators -->
@@ -110,7 +112,6 @@
 
     <util:map id="uniqueIdGeneratorsMap">
         <entry key="org.jasig.cas.authentication.principal.SimpleWebApplicationServiceImpl" value-ref="serviceTicketUniqueIdGenerator" />
-        <entry key="org.jasig.cas.support.openid.authentication.principal.OpenIdService" value-ref="serviceTicketUniqueIdGenerator" />
         <entry key="org.jasig.cas.authentication.principal.SamlService" value-ref="samlServiceTicketUniqueIdGenerator" />
         <entry key="org.jasig.cas.authentication.principal.GoogleAccountsService" value-ref="serviceTicketUniqueIdGenerator" />
     </util:map>
@@ -119,22 +120,19 @@
     <bean id="warnCookieGenerator" class="org.jasig.cas.web.support.CookieRetrievingCookieGenerator"
         p:cookieSecure="false"
         p:cookieMaxAge="-1"
-        p:cookieName="CASPRIVACY"
-        p:cookiePath="/authentication" />
+        p:cookieName="AuthPrivacy"
+        p:cookiePath="/" />
 
     <!-- ********************************************** deployerConfigContext.xml ********************************************** -->
     <bean id="authenticationManager" class="org.jasig.cas.authentication.AuthenticationManagerImpl">
         <property name="credentialsToPrincipalResolvers">
             <list>
-                <bean class="org.jasig.cas.support.openid.authentication.principal.OpenIdCredentialsToPrincipalResolver" />
+                <bean class="org.jasig.cas.authentication.principal.HttpBasedServiceCredentialsToPrincipalResolver" />
                 <bean class="org.jasig.cas.authentication.principal.CredentialsToLDAPAttributePrincipalResolver" >
-                    <!-- The Principal resolver form the credentials -->
                     <property name="credentialsToPrincipalResolver">
                         <bean class="org.jasig.cas.authentication.principal.UsernamePasswordCredentialsToPrincipalResolver" />
                     </property>
-                    <!-- The query made to find the Principal ID. "%u" will be replaced by the resolved Principal -->
                     <property name="filter" value="(|(mail=%u)(cn=%u))" />
-                    <!-- The attribute used to define the new Principal ID -->
                     <property name="principalAttributeName" value="cn" />
                     <property name="searchBase" value="${ldap.users.search.dn}" />
                     <property name="contextSource" ref="contextSource" />
@@ -144,29 +142,48 @@
         </property>
         <property name="authenticationHandlers">
             <list>
-                <bean class="org.jasig.cas.support.openid.authentication.handler.support.OpenIdCredentialsAuthenticationHandler" p:ticketRegistry-ref="ticketRegistry" />
                 <bean class="org.jasig.cas.authentication.handler.support.HttpBasedServiceCredentialsAuthenticationHandler" p:httpClient-ref="httpClient" />
                 <bean class="org.jasig.cas.adaptors.ldap.BindLdapAuthenticationHandler" >
+					<!-- <property name="passwordEncoder">
+						<bean class="org.jasig.cas.authentication.handler.DefaultPasswordEncoder">
+							<constructor-arg value="MD5" />
+						</bean>
+					</property> -->
                     <property name="contextSource" ref="contextSource" />
-                    <property name="searchContextSource" ref="contextSource" />
+                    <property name="searchContextSource" ref="pooledContextSource" />
                     <property name="filter" value="(|(mail=%u)(cn=%u))" />
                     <property name="searchBase" value="${ldap.users.search.dn}" />
                     <property name="ignorePartialResultException" value="yes" />
                 </bean>
+                <bean class="com.ammob.passport.authentication.handler.CustomAuthenticationHandler" />
             </list>
         </property>
+		<property name="authenticationMetaDataPopulators">
+			<list>
+				<bean class="org.jasig.cas.authentication.SamlAuthenticationMetaDataPopulator" />
+			    <bean class="org.jasig.cas.authentication.principal.RememberMeAuthenticationMetaDataPopulator" />
+			</list>
+		</property>
     </bean>
+
+	<bean id="authenticationUserDetailsService" class="org.springframework.security.cas.userdetails.GrantedAuthorityFromAssertionAttributesUserDetailsService">
+		<constructor-arg>
+			<array>
+				<value>role</value>
+			</array>
+		</constructor-arg>
+	</bean>
 
     <bean id="serviceRegistryDao" class="org.jasig.cas.services.InMemoryServiceRegistryDaoImpl">
         <property name="registeredServices">
             <list>
-                <bean class="org.jasig.cas.services.RegisteredServiceImpl">
-                    <property name="id" value="0" />
-                    <property name="name" value="HTTP" />
-                    <property name="description" value="Allows HTTP Urls" />
-                    <property name="serviceId" value="http://**" />
-                    <property name="evaluationOrder" value="10000001" />
-                </bean>
+                    <bean class="org.jasig.cas.services.RegexRegisteredService">
+                        <property name="id" value="0" />
+                        <property name="name" value="HTTP and IMAP" />
+                        <property name="description" value="Allows HTTP(S) and IMAP(S) protocols" />
+                        <property name="serviceId" value="^(https?|imaps?)://.*" />
+                        <property name="evaluationOrder" value="10000001" />
+                    </bean>
             </list>
         </property>
     </bean>

@@ -85,7 +85,7 @@ public class UserFormControllerTest extends BaseControllerTestCase {
     public void testEditProfile() throws Exception {
         log.debug("testing edit profile...");
         request = newGet("/userform.html");
-        request.setRemoteUser("user");
+        request.setRemoteUser("mupengUser");
 
         user = c.showForm(request, new MockHttpServletResponse());
         assertEquals("Tomcat User", user.getFullName());
@@ -100,6 +100,8 @@ public class UserFormControllerTest extends BaseControllerTestCase {
         user.setConfirmPassword(user.getPassword());
         user.setLastName("Updated Last Name");
 
+        request.setRemoteUser(user.getUsername());
+        
         BindingResult errors = new DataBinder(user).getBindingResult();
         c.onSubmit(user, errors, request, new MockHttpServletResponse());
 
@@ -112,12 +114,11 @@ public class UserFormControllerTest extends BaseControllerTestCase {
         request = newPost("/userform.html");
         user = new User();
         user.setFirstName("Jack");
-        request.setRemoteUser("user");
+        request.setRemoteUser("mupeng");
 
         BindingResult errors = new DataBinder(user).getBindingResult();
         c.onSubmit(user, errors, request, new MockHttpServletResponse());
-        
-        assertTrue(errors.getAllErrors().size() == 10);
+        assertTrue(errors.getAllErrors().size() == 4);
     }
 
     @Test

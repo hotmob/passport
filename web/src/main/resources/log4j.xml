@@ -68,11 +68,11 @@
         <level value="WARN"/>
     </logger>
    
-    <logger name="com.ammob.passport">
-        <level value="DEBUG"/>
+    <logger name="org.springframework.orm">
+        <level value="INFO"/>
     </logger>
-
-    <logger name="com.ammob.passport.tool">
+    
+    <logger name="com.ammob.passport">
         <level value="INFO"/>
     </logger>
 

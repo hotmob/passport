@@ -14,6 +14,9 @@
     <import resource="classpath:applicationContext-resources.xml" />
  	<import resource="classpath:applicationContext-resources-cas.xml" />
  	<import resource="classpath:applicationContext-security.xml" />
+    <import resource="classpath:applicationContext-controllers.xml" />
+ 
+    <import resource="cxf-servlet.xml" />
  
     <!-- Configures Spring Social -->
     <bean class="com.ammob.passport.webapp.config.SocialConfig" />

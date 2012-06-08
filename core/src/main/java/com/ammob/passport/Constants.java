@@ -91,4 +91,14 @@ public final class Constants {
      * The name of the remote or local statics resources uri setting.
      */
     public static final String SECURITY_SUPERVISION_CODE = "9y5HQ0zqsONrBpSv5HwfTcASYjqVPyQ4O3RMN7xQcg";
+    
+    /**
+     * The string of the remote user avata statics resources uri prefix setting.
+     */
+    public static final String USER_DEFAULT_AVATA_URL_PREFIX = "http://avata.766.com/";
+    
+    /**
+     * The string of the remote user avata statics resources uri suffix setting.
+     */
+    public static final String USER_DEFAULT_AVATA_URL_SUFFIX = "/b_avatar.jpg";
 }

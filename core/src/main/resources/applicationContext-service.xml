@@ -12,7 +12,6 @@
     <!-- =================================================================== -->
     <!-- Passport: Manager & Service                                         -->
     <!-- =================================================================== -->
-    
     <bean id="ldapUserDetailsManager" class="org.springframework.security.ldap.userdetails.LdapUserDetailsManager">
         <constructor-arg ref="contextSource" />
         <property name="groupSearchBase" value="${ldap.groups.search.dn}" />
@@ -22,6 +21,20 @@
         		<constructor-arg index="1" value="cn" />
         	</bean>
         </property>
+        <property name="userDetailsMapper">
+            <bean class="com.ammob.passport.mapper.PersonMapper" />
+        </property>
+    </bean>
+    
+    <bean id="ldapUserDetailsService" class="org.springframework.security.ldap.userdetails.LdapUserDetailsService">
+	    <constructor-arg ref="ldapUserSearch" />
+	    <constructor-arg ref="ldapAuthoritiesPopulator" />
+    </bean>
+    
+    <bean id="ldapUserSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
+	    <constructor-arg value="${ldap.users.search.dn}" />
+	    <constructor-arg value="(|(mail={0})(cn={0}))" />
+	    <constructor-arg ref="contextSource" />
     </bean>
     
     <bean id="ldapAuthoritiesPopulator" class="org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator">
@@ -29,8 +42,66 @@
         <constructor-arg value="${ldap.groups.search.dn}" />
         <property name="groupRoleAttribute" value="cn" />
         <property name="groupSearchFilter" value="(uniqueMember={0})" />
+        <property name="defaultRole" value="ROLE_USER" />
     </bean>
     
+    <bean id="odmManager" class="org.springframework.ldap.odm.core.impl.OdmManagerImplFactoryBean">
+        <property name="converterManager" ref="converterManager" />
+        <property name="contextSource" ref="contextSource" />
+        <property name="managedClasses">
+            <set>
+                <value>com.ammob.passport.model.User</value>
+            </set>
+        </property>
+    </bean>
+    
+    <bean id="fromStringConverter" class="org.springframework.ldap.odm.typeconversion.impl.converters.FromStringConverter" />
+    <bean id="toStringConverter" class="org.springframework.ldap.odm.typeconversion.impl.converters.ToStringConverter" />
+
+    <bean id="converterManager" class="org.springframework.ldap.odm.typeconversion.impl.ConverterManagerFactoryBean">
+        <property name="converterConfig">
+            <set>
+                <bean class="org.springframework.ldap.odm.typeconversion.impl.ConverterManagerFactoryBean$ConverterConfig">
+                    <property name="fromClasses">
+                         <set> 
+                             <value>java.lang.String</value>
+                         </set>
+                     </property>
+                     <property name="toClasses">
+                         <set>
+                             <value>java.lang.Byte</value>
+                             <value>java.lang.Short</value>
+                             <value>java.lang.Integer</value>
+                             <value>java.lang.Long</value>
+                             <value>java.lang.Float</value>
+                             <value>java.lang.Double</value>
+                             <value>java.lang.Boolean</value>
+                         </set>
+                    </property>
+                    <property name="converter" ref="fromStringConverter" />
+                </bean>
+                <bean class="org.springframework.ldap.odm.typeconversion.impl.ConverterManagerFactoryBean$ConverterConfig">
+                    <property name="fromClasses">
+                        <set>
+                             <value>java.lang.Byte</value>
+                             <value>java.lang.Short</value>
+                             <value>java.lang.Integer</value>
+                             <value>java.lang.Long</value>
+                             <value>java.lang.Float</value>
+                             <value>java.lang.Double</value>
+                             <value>java.lang.Boolean</value>
+                         </set> 
+                     </property>
+                     <property name="toClasses">
+                         <set> 
+                             <value>java.lang.String</value>
+                         </set>
+                    </property>
+                    <property name="converter" ref="toStringConverter" />
+                </bean>
+            </set>
+        </property>
+    </bean>
     <!-- =================================================================== -->
     <!-- AOP: Configuration and Aspects                                      -->
     <!-- =================================================================== -->
@@ -112,5 +183,11 @@
     <!-- Security class from Spring Security - used to configure Password    -->
     <!-- Encryption in UserManagerImpl. Can override in security.xml.        -->
     <!-- =================================================================== -->
-    <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"/>
+    <!-- <bean id="textEncryptor" class="org.springframework.security.crypto.encrypt.Encryptors" factory-method="noOpText" /> -->
+    <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder">
+        <property name="encodeHashAsBase64" value="true"/>
+    </bean>
+    <bean id="passwordComparisonAuthenticator" class="org.springframework.security.ldap.authentication.PasswordComparisonAuthenticator">
+        <constructor-arg ref="contextSource" />
+    </bean>
 </beans>

@@ -4,7 +4,7 @@
 	<head>
 		<%@ include file="/WEB-INF/view/jsp/common/meta.jsp" %>
 		<title><decorator:title/> | <fmt:message key="webapp.name"/></title>
-		<link rel="stylesheet" type="text/css" media="all" href="<c:url value='${appConfig["resourcesUri"]}statics/styles/${appConfig["csstheme"]}/theme.css?1'/>"/>
+		<link rel="stylesheet" type="text/css" media="all" href="<c:url value='${appConfig["resourcesUri"]}statics/styles/${appConfig["csstheme"]}/theme.css'/>"/>
 		<link rel="stylesheet" type="text/css" media="all" href="<c:url value='${appConfig["resourcesUri"]}statics/styles/lib/bootstrap.css'/>" />
 		<link rel="stylesheet" type="text/css" media="all" href="<c:url value='${appConfig["resourcesUri"]}statics/styles/lib/bootstrap-responsive.css'/>" />
 		<decorator:head/>

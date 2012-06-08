@@ -167,10 +167,10 @@
     </listener>
     <listener>
         <listener-class>com.ammob.passport.webapp.listener.UserCounterListener</listener-class>
-    </listener><!-- 
+    </listener>
     <listener>
         <listener-class>com.ammob.passport.webapp.jsp.EscapeXmlELResolverListener</listener-class>
-    </listener> -->
+    </listener>
     <listener>
         <listener-class>net.sf.navigator.menu.MenuContextListener</listener-class>
     </listener>

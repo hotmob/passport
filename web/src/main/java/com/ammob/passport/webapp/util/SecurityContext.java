@@ -15,6 +15,14 @@
  */
 package com.ammob.passport.webapp.util;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.jasig.cas.CentralAuthenticationService;
+import org.jasig.cas.authentication.principal.Credentials;
+import org.jasig.cas.ticket.TicketCreationException;
+import org.springframework.web.util.CookieGenerator;
+
+import com.ammob.passport.authentication.principal.InternalRememberMeUsernamePasswordCredentials;
 import com.ammob.passport.model.User;
 
 /**
@@ -44,5 +52,40 @@ public final class SecurityContext {
 	public static void remove() {
 		currentUser.remove();
 	}
-
+	
+    /** 
+     * Invoke generate validate Tickets and add the TGT to cookie. 
+     * @param loginName     the user login name. 
+     * @param loginPassword the user login password. 
+     * @param response      the HttpServletResponse object. 
+     * @param internal
+     * @param rememberMe      rememberMe. 
+     */  
+	public static void addCasSignin(CentralAuthenticationService centralAuthenticationService, CookieGenerator ticketGrantingTicketCookieGenerator, 
+    		String loginName, String loginPassword, boolean internal,  boolean rememberMe, HttpServletResponse response) 
+    				throws TicketCreationException {
+			InternalRememberMeUsernamePasswordCredentials credentials = new InternalRememberMeUsernamePasswordCredentials();
+            credentials.setUsername(loginName);
+            credentials.setPassword(loginPassword);
+            credentials.setInternal(internal);
+            credentials.setRememberMe(rememberMe);
+            addCasSignin(centralAuthenticationService, ticketGrantingTicketCookieGenerator, credentials, response);
+    }
+	
+    /** 
+     * Invoke generate validate Tickets and add the TGT to cookie. 
+     * @param loginName     the user login name. 
+     * @param loginPassword the user login password. 
+     * @param response      the HttpServletResponse object. 
+     */  
+	public static void addCasSignin(CentralAuthenticationService centralAuthenticationService, CookieGenerator ticketGrantingTicketCookieGenerator, 
+			Credentials credentials, HttpServletResponse response) 
+    				throws TicketCreationException {
+        try {
+            String ticketGrantingTicket = centralAuthenticationService.createTicketGrantingTicket(credentials);
+            ticketGrantingTicketCookieGenerator.addCookie(response, ticketGrantingTicket);
+        } catch (Exception e) {
+        	throw new TicketCreationException();
+        }
+    }
 }

@@ -46,11 +46,11 @@ public class RestLogginClient {
 //		final String service = "http://passport.test.766.com/services/";
 //		final String validateServer = "http://passport.test.766.com/serviceValidate";
 		
-		final String server = "http://passport.test.766.com/v1/tickets/";
+		final String server = "http://passport.766.com/v1/tickets/";
 		final String username = "hotmob";
 		final String password = "123456";
-		final String service = "http://passport.test.766.com/services/";
-		final String validateServer = "http://passport.test.766.com/serviceValidate";
+		final String service = "http://passport.766.com/services/";
+		final String validateServer = "http://passport.766.com/serviceValidate";
 		
 //		final String server = "http://dev.local.ammob.com:9080/v1/tickets/";
 //		final String username = "hotmob";

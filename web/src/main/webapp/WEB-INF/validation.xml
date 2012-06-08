@@ -7,7 +7,7 @@
     <global>
         <constant>
             <constant-name>phone</constant-name>
-            <constant-value>^\(?(\d{3})\)?[-| ]?(\d{3})[-| ]?(\d{4})$</constant-value>
+            <constant-value>(^\(?(\d{3})\)?[-| ]?(\d{3})[-| ]?(\d{4})$|(\d{11})|^((\d{7,8})|(\d{4}|\d{3})-(\d{7,8})|(\d{4}|\d{3})-(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1})|(\d{7,8})-(\d{4}|\d{3}|\d{2}|\d{1}))$)</constant-value>
         </constant>
         <constant>
             <constant-name>zip</constant-name>
@@ -61,7 +61,7 @@
                 </var>      
                 <var>
                     <var-name>maxlength</var-name>
-                    <var-value>16</var-value>
+                    <var-value>30</var-value>
                 </var>
                 <var>
                     <var-name>mask</var-name>
@@ -109,7 +109,7 @@
                 </var>      
                 <var>
                     <var-name>maxlength</var-name>
-                    <var-value>16</var-value>
+                    <var-value>30</var-value>
                 </var>
                 <var>
                     <var-name>mask</var-name>
@@ -167,11 +167,11 @@
 				</var>		
 				<var>
 					<var-name>maxlength</var-name>
-					<var-value>16</var-value>
+					<var-value>30</var-value>
 				</var>
 		        <var>
 					<var-name>mask</var-name>
-					<var-value>^[a-zA-Z0-9]*$</var-value>
+					<var-value>^[\x21-\x7e]*$</var-value>
 				</var>
             </field>
             <field property="confirmPassword" depends="required,twofields">

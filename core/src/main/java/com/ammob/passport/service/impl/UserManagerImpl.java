@@ -1,74 +1,66 @@
 package com.ammob.passport.service.impl;
 
+import com.ammob.passport.Constants;
 import com.ammob.passport.dao.UserDao;
+import com.ammob.passport.model.Role;
 import com.ammob.passport.model.User;
 import com.ammob.passport.service.UserManager;
 import com.ammob.passport.service.UserService;
+import com.ammob.passport.enumerate.AttributeEnum;
 import com.ammob.passport.enumerate.StateEnum;
 import com.ammob.passport.exception.UserExistsException;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.jasig.services.persondir.IPersonAttributes;
+import org.jasig.services.persondir.support.MultivaluedPersonAttributeUtils;
+import org.jasig.services.persondir.support.NamedPersonImpl;
 import org.jasig.services.persondir.support.ldap.LdapPersonAttributeDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.ldap.core.DistinguishedName;
+import org.springframework.ldap.odm.core.OdmManager;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.jws.WebService;
+import javax.naming.directory.SearchControls;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.jasig.services.persondir.IPersonAttributeDao;
-import org.jasig.services.persondir.IPersonAttributes;
-
 /**
  * Implementation of UserManager interface.
  * 
- * @author Mob
+ * @author <a href="mailto:hotmob@gmail.com">Mob</a>
  *
  */
-@SuppressWarnings("restriction")
 @Service("userManager")
 @WebService(serviceName = "UserService", endpointInterface = "com.ammob.passport.service.UserService")
-public class UserManagerImpl extends GenericManagerImpl<User, Long> implements UserManager, UserService, IPersonAttributeDao, AuthenticationUserDetailsService<Authentication> {
-	
-    private PasswordEncoder passwordEncoder;
+public class UserManagerImpl extends GenericManagerImpl<User, Long> implements UserManager, UserService {
+	private PasswordEncoder passwordEncoder;
     private UserDao userDao;
-    private UserDao ldapUserDao;
-    private IPersonAttributeDao personAttributeRepository;
-    
+	
 	@Autowired
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
+	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
+	}
 
     @Autowired
-    @Qualifier("userDao")
     public void setUserDao(UserDao userDao) {
         this.dao = userDao;
         this.userDao = userDao;
     }
-
-    @Autowired
-    @Qualifier("ldapUserDao")
-    public void setMemberDao(UserDao userDao) {
-        this.ldapUserDao = userDao;
-    }
-    
-    @Autowired
-	public void setPersonAttributeRepository(LdapPersonAttributeDao personAttributeRepository) {
-		this.personAttributeRepository = personAttributeRepository;
-	}
-
 	/**
      * {@inheritDoc}
      */
@@ -83,63 +75,15 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
         return userDao.getAllDistinct();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public User saveMember(User user) throws UserExistsException {
-        if (user.getVersion() == null) { // if new user, lowercase userId
-            user.setUsername(user.getUsername().toLowerCase());
-        }
-        boolean passwordChanged = false; // Get and prepare password management-related artifacts
-        if (passwordEncoder != null) {   // Check whether we have to encrypt (or re-encrypt) the password
-            if (user.getVersion() == null) { // New user, always encrypt
-            	log.info("Creat new user !");
-                passwordChanged = true;
-                Map<String, Object> queryParams = new HashMap<String, Object>();
-                queryParams.put("cn", user.getUsername());
-                queryParams.put("mail", user.getEmail());
-                List<User> queryResult = ldapUserDao.findByNamedQuery("queryUsernameOrEmail", queryParams);
-                if(queryResult != null && !queryResult.isEmpty()) {
-                	log.info("Creat new user is fail, user exists ! : exists num" + queryResult.size());
-                	Set<StateEnum> types = new HashSet<StateEnum>();
-                	for(User resultUser : queryResult) {
-                		if(resultUser.getUsername().equals(user.getUsername()))
-                			types.add(StateEnum.USERNAME_EXISTENCE);
-                		if(resultUser.getEmail().equals(user.getEmail()))
-                			types.add(StateEnum.EMAIL_EXISTENCE);
-                	}
-                	throw new UserExistsException("User'" + user.getUsername() + " Or " + user.getEmail() + "' already exists! ", types);
-                }
-            } else {// Existing user, check password in DB
-                String currentPassword = ldapUserDao.getUserPassword(user.getUsername());
-                if (currentPassword == null) {
-                    passwordChanged = true;
-                } else {
-                    if (!currentPassword.equals(user.getPassword())) {
-                        passwordChanged = true;
-                    }
-                }
-            }
-            // If password was changed (or new user), encrypt it
-            if (passwordChanged) {
-                user.setPassword(passwordEncoder.encodePassword(user.getPassword(), null));
-            }
-        } else {
-            log.warn("PasswordEncoder not set, skipping password encryption...");
-        }
-        return ldapUserDao.saveUser(user);
-    }
+
     
     /**
      * {@inheritDoc}
      */
     public User saveUser(User user) throws UserExistsException {
-
-        if (user.getVersion() == null) {
-            // if new user, lowercase userId
+        if (user.getVersion() == null) { // if new user, lowercase userId
             user.setUsername(user.getUsername().toLowerCase());
         }
-
         // Get and prepare password management-related artifacts
         boolean passwordChanged = false;
         if (passwordEncoder != null) {
@@ -165,7 +109,6 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
         } else {
             log.warn("PasswordEncoder not set, skipping password encryption...");
         }
-
         try {
             return userDao.saveUser(user);
         } catch (DataIntegrityViolationException e) {
@@ -186,33 +129,8 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
         log.debug("removing user: " + userId);
         userDao.remove(new Long(userId));
     }
-    
-    /**
-     * {@inheritDoc}
-     *
-     * @param identifying the login name or login email of the human
-     * @return User the populated user object
-     * @throws UsernameNotFoundException thrown when user not found
-     * @throws UserExistsException 
-     */
-    public User getMemberByUsernameOrEmail(String identifying) throws UsernameNotFoundException {
-        Map<String, Object> queryParams = new HashMap<String, Object>();
-        queryParams.put("cn", identifying);
-        queryParams.put("mail", identifying);
-		try {
-			List<User> queryResult = ldapUserDao.findByNamedQuery("queryUsernameOrEmail", queryParams);
-	        if(queryResult == null || queryResult.isEmpty()) {
-	        	throw new UsernameNotFoundException("User Identifying : '" + identifying + "' is not found...");
-	        } else if(queryResult.size() > 1) {
-	        	log.error("User Identifying : '" + identifying + "' size is : " + queryResult.size());
-	        }
-		    return  (User) ldapUserDao.loadUserByUsername(queryResult.get(0).getUsername());
-		} catch (Exception e) {
-			throw new UsernameNotFoundException("User Identifying : '" + identifying + "' Is Not Found, ");
-		}
-    }
-    
-    /**
+	
+	/**
      * {@inheritDoc}
      *
      * @param username the login name of the human
@@ -227,92 +145,122 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
      * {@inheritDoc}
      */
     public List<User> search(String searchTerm) {
-        return super.search(searchTerm, User.class);
+    	List<User> results = super.search(searchTerm, User.class);
+        if (!StringUtils.hasText(searchTerm)) {
+            // Find people with a surname of Harvey
+        	SearchControls DEFAULT_SEARCH_CONTROLS = new SearchControls(SearchControls.ONELEVEL_SCOPE, 1, 50000, null, true, false);
+            List<User> searchResults = new ArrayList<User>();
+			try {
+				searchResults.addAll(odmManager.search(User.class, new DistinguishedName("ou=users"), "cn=hotmob", DEFAULT_SEARCH_CONTROLS));
+			} catch (Exception e) {}
+            for (User person : searchResults) {
+            	results.add(person);
+            }
+        }
+    	return results;
     }
-
-	/* (non-Javadoc)
-	 * @see org.springframework.security.core.userdetails.AuthenticationUserDetailsService#loadUserDetails(org.springframework.security.core.Authentication)
-	 */
-	public UserDetails loadUserDetails(Authentication authentication)
-			throws UsernameNotFoundException {
-		try {
-			personAttributeRepository.getPerson(authentication.getName());
-//			personAttributeRepository.
-			log.info(authentication.getName() + " is login !!!!");
-			UserDetails userDetails = ldapUserDao.loadUserByUsername(authentication.getName());
-			return userDetails;
-		} catch (Exception e) {
-			throw new UsernameNotFoundException(
-					"find user:[" + authentication.getName() + "] is error! message:" + e.getMessage());
+    
+    /**
+     * {@inheritDoc}
+     *
+     * @param identifying the login name or login email of the human
+     * @return User the populated user object
+     * @throws UsernameNotFoundException thrown when user not found
+     * @throws UserExistsException 
+     */
+    public UserDetails loadUserDetails(String username) throws UsernameNotFoundException {
+    	UserDetails user = ldapUserDetailsManager.loadUserByUsername(username);
+    	if(user == null)
+    		throw new UsernameNotFoundException("User : '" + username + "' Is Not Found, ");
+    	return user;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public User getPerson(String identifying) {
+    	Map<String, Object> ldapUser = new HashMap<String, Object>();
+    	ldapUser = personAttributeRepository.getUserAttributes(generateQuerySeed(identifying, identifying));
+		if(ldapUser != null) {
+	    	try {
+	    		User user = new User(ldapUser.get(AttributeEnum.USER_USERNAME.getValue()).toString());
+	    		UserDetails userDetails = loadUserDetails(user.getUsername());
+	    		BeanUtils.populate(user, ldapUser);
+				BeanUtils.copyProperties(user, userDetails);
+				for(GrantedAuthority authoritie : userDetails.getAuthorities())
+					user.addRole(new Role(authoritie.getAuthority()));
+				if(!user.getRoles().contains(new Role(Constants.USER_ROLE)))
+					user.addRole(new Role(Constants.USER_ROLE)); // add default role
+				user.setVersion(1);
+				return user;
+			} catch (UsernameNotFoundException e) {
+				log.warn(e.getMessage());
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
 		}
+    	return null;
+    }
+    
+    /**
+     * generate ldap query map seed.
+     * @param username
+     * @param email
+     * @return
+     */
+    protected Map<String, Object> generateQuerySeed(String username, String email) {
+    	Map<String, Object> seed = new HashMap<String, Object>();
+		seed.put("username", username);
+		seed.put("mail", email);
+		return seed;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.jasig.services.persondir.IPersonAttributeDao#getAvailableQueryAttributes()
-	 */
-	public Set<String> getAvailableQueryAttributes() {
-		return personAttributeRepository.getAvailableQueryAttributes();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.jasig.services.persondir.IPersonAttributeDao#getMultivaluedUserAttributes(java.util.Map)
-	 */
-	@SuppressWarnings("deprecation")
-	public Map<String, List<Object>> getMultivaluedUserAttributes(
-			Map<String, List<Object>> arg0) {
-		return personAttributeRepository.getMultivaluedUserAttributes(arg0);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.jasig.services.persondir.IPersonAttributeDao#getMultivaluedUserAttributes(java.lang.String)
-	 */
-	@SuppressWarnings("deprecation")
-	public Map<String, List<Object>> getMultivaluedUserAttributes(String arg0) {
-		return personAttributeRepository.getMultivaluedUserAttributes(arg0);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.jasig.services.persondir.IPersonAttributeDao#getPeople(java.util.Map)
-	 */
-	public Set<IPersonAttributes> getPeople(Map<String, Object> arg0) {
-		return personAttributeRepository.getPeople(arg0);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.jasig.services.persondir.IPersonAttributeDao#getPeopleWithMultivaluedAttributes(java.util.Map)
-	 */
-	public Set<IPersonAttributes> getPeopleWithMultivaluedAttributes(
-			Map<String, List<Object>> arg0) {
-		return personAttributeRepository.getPeopleWithMultivaluedAttributes(arg0);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.jasig.services.persondir.IPersonAttributeDao#getPerson(java.lang.String)
-	 */
-	public IPersonAttributes getPerson(String arg0) {
-		return personAttributeRepository.getPerson(arg0);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.jasig.services.persondir.IPersonAttributeDao#getPossibleUserAttributeNames()
-	 */
-	public Set<String> getPossibleUserAttributeNames() {
-		return personAttributeRepository.getPossibleUserAttributeNames();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.jasig.services.persondir.IPersonAttributeDao#getUserAttributes(java.util.Map)
-	 */
-	@SuppressWarnings("deprecation")
-	public Map<String, Object> getUserAttributes(Map<String, Object> arg0) {
-		return personAttributeRepository.getUserAttributes(arg0);
-	}
-
-	/* (non-Javadoc)
-	 * @see org.jasig.services.persondir.IPersonAttributeDao#getUserAttributes(java.lang.String)
-	 */
-	@SuppressWarnings("deprecation")
-	public Map<String, Object> getUserAttributes(String arg0) {
-		return personAttributeRepository.getUserAttributes(arg0);
-	}
+    
+    /**
+     * {@inheritDoc}
+     */
+	public IPersonAttributes getPersonAttributes(String identifying) {
+		final Set<IPersonAttributes> people = personAttributeRepository.getPeopleWithMultivaluedAttributes(
+				MultivaluedPersonAttributeUtils.toMultivaluedMap(generateQuerySeed(identifying, identifying)));
+        IPersonAttributes person = (IPersonAttributes)DataAccessUtils.singleResult(people);
+        if (person == null) {
+            return null;
+        }
+        //Force set the name of the returned IPersonAttributes if it isn't provided in the return object
+        if (person.getName() == null) {
+            person = new NamedPersonImpl(identifying, person.getAttributes());
+        }
+		return person;
+    }
+	
+    /**
+     * {@inheritDoc}
+     */
+    public User savePerson(User user) throws UserExistsException {
+        if (user.getVersion() == null) { // New user, always encrypt
+        	log.info("Creat new user ! [ " + user.getUsername());
+            if (passwordEncoder != null) 
+                user.setPassword("{MD5}" + passwordEncoder.encodePassword(user.getPassword(), null));
+            user.setUsername(user.getUsername().toLowerCase());// new user, lowercase userId
+            if(this.getPersonAttributes(user.getUsername()) != null)
+            	throw new UserExistsException(user.getUsername() + " is exists ! ", StateEnum.USERNAME_EXISTENCE);
+            if(this.getPersonAttributes(user.getEmail()) != null)
+            	throw new UserExistsException(user.getEmail() + " is exists ! ", StateEnum.EMAIL_EXISTENCE);
+            ldapUserDetailsManager.createUser(user);
+        } else {// Existing user, check password in DB
+        	String currentPassword = new String((byte[]) this.getPersonAttributes(user.getUsername()).getAttributeValue(AttributeEnum.USER_PASSWORD.getValue()));
+            if (!currentPassword.equals(user.getPassword()) && passwordEncoder != null) {
+            	user.setPassword("{MD5}" + passwordEncoder.encodePassword(user.getPassword(), null));
+            }
+            ldapUserDetailsManager.updateUser(user);
+        }
+        return user;
+    }
+	@Autowired
+	private LdapPersonAttributeDao personAttributeRepository;
+	@Autowired
+    private LdapUserDetailsManager ldapUserDetailsManager;
+	@Autowired
+	private OdmManager odmManager;
 }

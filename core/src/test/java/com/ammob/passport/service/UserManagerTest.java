@@ -1,16 +1,15 @@
 package com.ammob.passport.service;
 
-import java.util.Collection;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import com.ammob.passport.Constants;
+import com.ammob.passport.enumerate.AttributeEnum;
 import com.ammob.passport.model.User;
+
+import org.jasig.services.persondir.IPersonAttributes;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
 
 import static org.junit.Assert.*;
 
@@ -20,14 +19,12 @@ public class UserManagerTest extends BaseManagerTestCase {
     private UserManager mgr;
     @Autowired
     private RoleManager roleManager;
-    @Autowired
-    private LdapUserDetailsManager ldapUserDetailsManager;
     
     private User user;
 
     @Test
     public void testGetUser() throws Exception {
-        user = mgr.getUserByUsername("user");
+        user = mgr.getUserByUsername("mupeng");
         assertNotNull(user);
         
         log.debug(user);
@@ -36,7 +33,7 @@ public class UserManagerTest extends BaseManagerTestCase {
 
     @Test
     public void testSaveUser() throws Exception {
-        user = mgr.getUserByUsername("user");
+        user = mgr.getUserByUsername("mupeng");
         user.setPhoneNumber("303-555-1212");
 
         log.debug("saving user with updated phone number: " + user);
@@ -74,13 +71,40 @@ public class UserManagerTest extends BaseManagerTestCase {
     }
     
     @Test
-    public void testLoadUserByUsername() {
-    	UserDetails user = ldapUserDetailsManager.loadUserByUsername("hotmob");
-    	Collection<? extends GrantedAuthority> authorities= user.getAuthorities();
-    	System.out.println(user.getUsername());
-    	for(GrantedAuthority authoritie : authorities) {
-    		System.out.println(authoritie.getAuthority());
-    	}
+    public void testGetMemberByUsername() {
+    	UserDetails user = mgr.loadUserDetails("hotmob");
 		assertNotNull(user);
 	}
+    
+    @Test
+    public void testGetMemberFromRepository() {
+    	IPersonAttributes attributes = mgr.getPersonAttributes("hotmob");
+		log.debug(attributes.getAttributeValues(AttributeEnum.USER_AUTHORITIES.getValue()));
+		assertNotNull(attributes);
+	}
+    
+    @Test
+    public void testGetPerson() {
+    	User user = mgr.getPerson("hotmob");
+    	System.out.println(user);
+		assertNotNull(user);
+	}
+    
+    @Test
+    public void testSavePerson() throws Exception {
+        user = new User();
+        user = (User) populate(user);
+        user.addRole(roleManager.getRole(Constants.USER_ROLE));
+        user.setUsername("hotmob" + System.currentTimeMillis());
+        user.setEmail(user.getUsername() + "@ammob.com");
+    	user = mgr.savePerson(user);
+    	user = mgr.getPerson(user.getUsername());
+    	System.out.println(user);
+		assertNotNull(user);
+	}
+    
+    @Test
+    public void testSearchPerson() throws Exception {
+    	mgr.search(null);
+    }
 }

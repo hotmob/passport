@@ -3,10 +3,6 @@ package com.ammob.passport.dao;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
@@ -18,18 +14,14 @@ import java.util.ResourceBundle;
 
 /**
  * Base class for running DAO tests.
- *
- * @author <a href="mailto:matt@raibledesigns.com">Matt Raible</a>
+ * @author mraible
  */
 @ContextConfiguration(
-        locations = {"classpath:/applicationContext-resources.xml",
-                "classpath:/applicationContext-dao.xml",
-                "classpath*:/applicationContext.xml",
-                "classpath:**/applicationContext*.xml"})
+    locations={"classpath:/applicationContext-resources.xml",
+               "classpath:/applicationContext-dao.xml",
+               "classpath*:/applicationContext.xml",
+               "classpath:**/applicationContext*.xml"})
 public abstract class BaseDaoTestCase extends AbstractTransactionalJUnit4SpringContextTests {
-    @Autowired
-    private SessionFactory sessionFactory;
-
     /**
      * Log variable for all child classes. Uses LogFactory.getLog(getClass()) from Commons Logging
      */
@@ -51,19 +43,18 @@ public abstract class BaseDaoTestCase extends AbstractTransactionalJUnit4SpringC
         try {
             rb = ResourceBundle.getBundle(className);
         } catch (MissingResourceException mre) {
-            log.trace("No resource bundle found for: " + className);
+            //log.warn("No resource bundle found for: " + className);
         }
     }
 
     /**
      * Utility method to populate a javabean-style object with values
      * from a Properties file
-     *
      * @param obj the model object to populate
      * @return Object populated object
      * @throws Exception if BeanUtils fails to copy properly
      */
-    protected Object populate(final Object obj) throws Exception {
+    protected Object populate(Object obj) throws Exception {
         // loop through all the beans methods and set its properties from its .properties file
         Map<String, String> map = new HashMap<String, String>();
 
@@ -75,18 +66,5 @@ public abstract class BaseDaoTestCase extends AbstractTransactionalJUnit4SpringC
         BeanUtils.copyProperties(obj, map);
 
         return obj;
-    }
-
-    /**
-     * Create a HibernateTemplate from the SessionFactory and call flush() and clear() on it.
-     * Designed to be used after "save" methods in tests: http://issues.appfuse.org/browse/APF-178.
-     *
-     * @throws org.springframework.beans.BeansException
-     *          when can't find 'sessionFactory' bean
-     */
-    protected void flush() throws BeansException {
-        HibernateTemplate hibernateTemplate = new HibernateTemplate(sessionFactory);
-        hibernateTemplate.flush();
-        hibernateTemplate.clear();
     }
 }

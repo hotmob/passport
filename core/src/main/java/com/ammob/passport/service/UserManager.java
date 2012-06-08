@@ -4,6 +4,8 @@ import com.ammob.passport.dao.UserDao;
 import com.ammob.passport.model.User;
 import com.ammob.passport.exception.UserExistsException;
 
+import org.jasig.services.persondir.IPersonAttributes;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
@@ -25,12 +27,6 @@ public interface UserManager extends GenericManager<User, Long> {
     void setUserDao(UserDao userDao);
     
     /**
-     * Convenience method for testing - allows you to mock the DAO and set it on an interface.
-     * @param userDao the UserDao implementation to use
-     */
-    void setMemberDao(UserDao userDao);
-
-    /**
      * Retrieves a user by userId.  An exception is thrown if user not found
      *
      * @param userId the identifier for the user
@@ -38,6 +34,20 @@ public interface UserManager extends GenericManager<User, Long> {
      */
     User getUser(String userId);
 
+    /**
+     * From ldap repository to finds a user by their identifying.
+     * @param identifying username or mail
+     * @return
+     */
+    User getPerson(String identifying);
+    
+    /**
+     * From ldap repository to finds a user by their identifying.
+     * @param identifying username or mail
+     * @return
+     */
+    IPersonAttributes getPersonAttributes(String identifying);
+    
     /**
      * Finds a user by their username.
      * @param username the user's username used to login
@@ -49,13 +59,13 @@ public interface UserManager extends GenericManager<User, Long> {
     
     /**
      * From ldap to finds a user by their identifying.
-     * @param identifying the user's identifying used to login
+     * @param username the user's username used to login
      * @return User a populated user object
      * @throws org.springframework.security.core.userdetails.UsernameNotFoundException
      *         exception thrown when user not found
      */
-    User getMemberByUsernameOrEmail(String identifying) throws UsernameNotFoundException;
-
+    UserDetails loadUserDetails(String username) throws UsernameNotFoundException;
+    
     /**
      * Retrieves a list of all users.
      * @return List
@@ -78,7 +88,7 @@ public interface UserManager extends GenericManager<User, Long> {
      * @throws UserExistsException thrown when user already exists
      * @return user the updated user object
      */
-    User saveMember(User user) throws UserExistsException;
+    User savePerson(User user) throws UserExistsException;
     
     /**
      * Removes a user from the database by their userId

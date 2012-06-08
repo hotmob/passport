@@ -9,6 +9,7 @@ import org.compass.core.support.search.CompassSearchCommand;
 import org.compass.core.support.search.CompassSearchHelper;
 import org.compass.core.support.search.CompassSearchResults;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -109,22 +110,18 @@ public class GenericManagerImpl<T, PK extends Serializable> implements GenericMa
      * <p/>
      * Search implementation using Compass.
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<T> search(String q, Class clazz) {
-        if (q == null || "".equals(q.trim())) {
+    @SuppressWarnings("unchecked")
+	public List<T> search(String q, Class<?> clazz) {
+        if (!StringUtils.hasText(q)) {
             return getAll();
         }
-
         List<T> results = new ArrayList<T>();
-
         CompassSearchCommand command = new CompassSearchCommand(q);
         CompassSearchResults compassResults = compass.search(command);
         CompassHit[] hits = compassResults.getHits();
-
         if (log.isDebugEnabled() && clazz != null) {
             log.debug("Filtering by type: " + clazz.getName());
         }
-
         for (CompassHit hit : hits) {
             if (clazz != null) {
                 if (hit.data().getClass().equals(clazz)) {
@@ -134,11 +131,9 @@ public class GenericManagerImpl<T, PK extends Serializable> implements GenericMa
                 results.add((T) hit.data());
             }
         }
-
         if (log.isDebugEnabled()) {
             log.debug("Number of results for '" + q + "': " + results.size());
         }
-
         return results;
     }
 }

@@ -8,8 +8,10 @@
 
 <p>
     <fmt:message key="404.message">
-        <fmt:param><c:url value="/home"/></fmt:param>
+        <fmt:param><c:url value="/"/></fmt:param>
     </fmt:message>
 </p>
-
+<p style="text-align: center; margin-top: 20px">
+    <img src="<c:url value='${appConfig["resourcesUri"]}statics/images/404.jpg'/>" alt="<fmt:message key="404.title"/>" />
+</p>
 </page:applyDecorator>

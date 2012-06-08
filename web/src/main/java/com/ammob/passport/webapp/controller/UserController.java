@@ -1,6 +1,9 @@
 package com.ammob.passport.webapp.controller;
 
+import java.util.List;
+
 import com.ammob.passport.Constants;
+import com.ammob.passport.model.User;
 import com.ammob.passport.service.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,6 +34,13 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView handleRequest(@RequestParam(required = false, value = "q") String query) throws Exception {
-        return new ModelAndView("admin/userList", Constants.USER_LIST, mgr.search(query));
+    	System.out.println("query : " + query);
+    	List<User> users = null;
+		try {
+			users = mgr.search(query);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+        return new ModelAndView("admin/userList", Constants.USER_LIST, users);
     }
 }

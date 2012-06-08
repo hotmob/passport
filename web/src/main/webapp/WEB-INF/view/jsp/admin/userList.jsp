@@ -20,7 +20,7 @@
            onclick="location.href='<c:url value="/userform?method=Add&from=list"/>'"
            value="<fmt:message key="button.add"/>"/>
 
-    <input type="button" onclick="location.href='<c:url value="/mainMenu"/>'" class="btn"
+    <input type="button" onclick="location.href='<c:url value="/home"/>'" class="btn"
            value="<fmt:message key="button.done"/>"/>
 
     <display:table name="userList" cellspacing="0" cellpadding="0" requestURI=""

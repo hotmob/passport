@@ -2,24 +2,25 @@ package com.ammob.passport.dao;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import com.ammob.passport.dao.hibernate.GenericDaoHibernate;
+import com.ammob.passport.dao.jpa.GenericDaoJpa;
 import com.ammob.passport.model.User;
-import org.hibernate.SessionFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import static org.junit.Assert.*;
 
 public class GenericDaoTest extends BaseDaoTestCase {
     Log log = LogFactory.getLog(GenericDaoTest.class);
     GenericDao<User, Long> genericDao;
-    @Autowired
-    SessionFactory sessionFactory;
+    @PersistenceContext(unitName=GenericDaoJpa.PERSISTENCE_UNIT_NAME)
+    private EntityManager entityManager;
 
     @Before
     public void setUp() {
-        genericDao = new GenericDaoHibernate<User, Long>(User.class, sessionFactory);
+        genericDao = new GenericDaoJpa<User, Long>(User.class, entityManager);
     }
 
     @Test

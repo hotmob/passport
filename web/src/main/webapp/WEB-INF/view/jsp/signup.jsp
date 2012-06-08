@@ -6,16 +6,6 @@
 </head>
 <body id="signup" />
 <div class="main wrapper">
-    <spring:bind path="signupForm.*">
-        <c:if test="${not empty status.errorMessages}">
-            <div class="alert alert-error fade in">
-                <a href="#" data-dismiss="alert" class="close">&times;</a>
-                <c:forEach var="error" items="${status.errorMessages}">
-                    <c:out value="${error}" escapeXml="false"/><br/>
-                </c:forEach>
-            </div>
-        </c:if>
-    </spring:bind>
 	<div class="separator"></div>
 	<div class="reg_con">
 		<form:form  id="signupForm" commandName="signupForm" method="post" onsubmit="return validateSignupForm(this)">

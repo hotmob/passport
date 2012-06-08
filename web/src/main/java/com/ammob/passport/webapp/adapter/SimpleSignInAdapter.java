@@ -24,8 +24,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jasig.cas.CentralAuthenticationService;
 import org.jasig.cas.authentication.principal.UsernamePasswordCredentials;
+import org.jasig.cas.ticket.TicketCreationException;
 import org.jasig.cas.ticket.TicketException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.WebAttributes;
@@ -35,6 +35,8 @@ import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.web.SignInAdapter;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.util.CookieGenerator;
+
+import com.ammob.passport.webapp.util.SecurityContext;
 
 /**
  * Signs the user in by setting the currentUser property on the {@link SecurityContext}.
@@ -48,33 +50,27 @@ public class SimpleSignInAdapter implements SignInAdapter {
 	protected final transient Log log = LogFactory.getLog(getClass());
 	
 	private final RequestCache requestCache;
-
 	private CentralAuthenticationService centralAuthenticationService;
-	
 	private CookieGenerator ticketGrantingTicketCookieGenerator;
-	
-	@Autowired
-	public void setCentralAuthenticationService(CentralAuthenticationService centralAuthenticationService) {
+
+	@Inject
+	public SimpleSignInAdapter(RequestCache requestCache, CentralAuthenticationService centralAuthenticationService, CookieGenerator ticketGrantingTicketCookieGenerator) {
+		this.requestCache = requestCache;
 		this.centralAuthenticationService = centralAuthenticationService;
-	}
-	
-	@Autowired
-	public void setTicketGrantingTicketCookieGenerator(CookieGenerator ticketGrantingTicketCookieGenerator) {
 		this.ticketGrantingTicketCookieGenerator = ticketGrantingTicketCookieGenerator;
 	}
 	
-	@Inject
-	public SimpleSignInAdapter(RequestCache requestCache) {
-		this.requestCache = requestCache;
-	}
-	
 	public String signIn(String localUserId, Connection<?> connection, NativeWebRequest request) {
-		//SignInUtil.signin(localUserId);
-		log.info("+++++++++++++++++++++++++++++++++0 : " + localUserId);
-		SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(localUserId, null, null));	
-		String dd = extractOriginalUrl(request);
-		log.info("+++++++++++++++++++++++++++++++++ : " + dd);
-		return dd;
+		try {
+			SecurityContext.addCasSignin(centralAuthenticationService, ticketGrantingTicketCookieGenerator, localUserId, "", true, false, (HttpServletResponse) request.getNativeResponse());
+			SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(localUserId, null, null));	
+			return extractOriginalUrl(request);
+		} catch (TicketCreationException e) {
+			log.warn(localUserId + "'s bind signIn fail ! e : " + e );
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	private String extractOriginalUrl(NativeWebRequest request) {

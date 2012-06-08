@@ -19,16 +19,16 @@ import java.io.Serializable;
 @Searchable(root = false)
 public class Address extends BaseObject implements Serializable {
     private static final long serialVersionUID = 3617859655330969141L;
-    private String address;
+    private String postalAddress;
     private String city;
     private String province;
     private String country;
     private String postalCode;
 
-    @Column(length = 150)
+    @Column(name = "postal_address", length = 150)
     @SearchableProperty
-    public String getAddress() {
-        return address;
+    public String getPostalAddress() {
+        return postalAddress;
     }
 
     @Column(length = 50)
@@ -55,8 +55,8 @@ public class Address extends BaseObject implements Serializable {
         return postalCode;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setPostalAddress(String postalAddress) {
+        this.postalAddress = postalAddress;
     }
 
     public void setCity(String city) {
@@ -101,7 +101,7 @@ public class Address extends BaseObject implements Serializable {
      */
     public int hashCode() {
         int result;
-        result = (address != null ? address.hashCode() : 0);
+        result = (postalAddress != null ? postalAddress.hashCode() : 0);
         result = 29 * result + (city != null ? city.hashCode() : 0);
         result = 29 * result + (province != null ? province.hashCode() : 0);
         result = 29 * result + (country != null ? country.hashCode() : 0);
@@ -117,7 +117,7 @@ public class Address extends BaseObject implements Serializable {
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
                 .append("country", this.country)
-                .append("address", this.address)
+                .append("postalAddress", this.postalAddress)
                 .append("province", this.province)
                 .append("postalCode", this.postalCode)
                 .append("city", this.city).toString();

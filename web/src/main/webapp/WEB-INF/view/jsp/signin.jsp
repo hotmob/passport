@@ -3,7 +3,6 @@
 <title><fmt:message key="login.title" /></title>
 <meta name="heading" content="<fmt:message key='login.heading'/>" />
 <meta name="menu" content="Login" />
-<script type="text/javascript"  src="http://qzonestyle.gtimg.cn/qzone/openapi/qc.js#appId=100253900" charset="UTF-8"></script>
 </head>
 <body id="login">
     <div class="main wrapper">
@@ -57,26 +56,30 @@
             <div class="login_cooperate">
                 <h4><fmt:message key="login.other" /></h4>
                 <ul>
-                    <li title='<fmt:message key="login.other.sina"/>'>
-                        <button type="submit"><img src="<c:url value='${appConfig["resourcesUri"]}statics/images/oauth/weibo.png'/>" /></button>
+                    <li title='<fmt:message key="login.other.sina"/>' class="oauth_weibo">
+                        <form action="<c:url value="/signin/weibo" />" method="POST">
+                            <button type="submit" ></button>
+                        </form>
                     </li>
-                    <li title="<fmt:message key="login.other.tencent"/>" >
-                       <button type="submit"><img src="<c:url value='${appConfig["resourcesUri"]}statics/images/oauth/tencent.png'/>" /></button>
+                    <li title="<fmt:message key="login.other.tencent"/>"  class="oauth_txwb">
+                        <form action="<c:url value="/signin/txwb" />" method="POST">
+                            <button type="submit" ></button>
+                        </form>
                     </li>
-                    <li title="Facebook">
+                    <li title="Facebook" class="oauth_facebook">
                         <form action="<c:url value="/signin/facebook" />" method="POST">
-                            <button type="submit"><img src="<c:url value='${appConfig["resourcesUri"]}statics/images/oauth/facebook.png'/>" /></button>
-                            <input type="hidden" name="scope" value="email,publish_stream,offline_access" />            
+                            <input type="hidden" name="scope" value="email,publish_stream,offline_access" />
+                            <button type="submit" ></button>       
                         </form>
                     </li>
-                    <li title="Twitter">
+                    <li title="Twitter" class="oauth_twitter">
                         <form id="tw_signin" action="<c:url value="/signin/twitter"/>" method="POST">
-                            <button type="submit"><img src="<c:url value='${appConfig["resourcesUri"]}statics/images/oauth/twitter.png'/>" /></button>
+                            <button type="submit" ></button>
                         </form>
                     </li>
-                    <li title="Linkedin">
+                    <li title="Linkedin" class="oauth_linkedin">
                         <form id="li_signin" action="<c:url value="/signin/linkedin"/>" method="POST">
-                            <button type="submit"><img src="<c:url value='${appConfig["resourcesUri"]}statics/images/oauth/linkedin.png'/>" /></button>
+                            <button type="submit" ></button>
                         </form>
                     </li>
                 </ul>

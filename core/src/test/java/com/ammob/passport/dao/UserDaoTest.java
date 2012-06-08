@@ -12,17 +12,19 @@ import org.compass.core.CompassTemplate;
 import org.compass.gps.CompassGps;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.test.annotation.ExpectedException;
-import org.springframework.test.annotation.NotTransactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import static org.junit.Assert.*;
 
 public class UserDaoTest extends BaseDaoTestCase {
+    @PersistenceContext
+    private EntityManager entityManager;
+    
     @Autowired
-    @Qualifier("userDao")
     private UserDao dao;
     @Autowired
     private RoleDao rdao;
@@ -32,9 +34,8 @@ public class UserDaoTest extends BaseDaoTestCase {
     private CompassGps compassGps;
 
     @Test
-    @ExpectedException(DataAccessException.class)
+    @ExpectedException(ObjectRetrievalFailureException.class)
     public void testGetUserInvalid() throws Exception {
-        // should throw DataAccessException
         dao.get(1000L);
     }
 
@@ -56,26 +57,24 @@ public class UserDaoTest extends BaseDaoTestCase {
     }
 
     @Test
-    @NotTransactional
-    @ExpectedException(DataIntegrityViolationException.class)
+    //@ExpectedException(DataIntegrityViolationException.class)
     public void testUpdateUser() throws Exception {
         User user = dao.get(-1L);
 
         Address address = user.getAddress();
-        address.setAddress("new address");
+        address.setPostalAddress("new address");
 
-        dao.saveUser(user);
-        flush();
+        dao.save(user);
 
         user = dao.get(-1L);
-        assertEquals(address, user.getAddress());
-        assertEquals("new address", user.getAddress().getAddress());
-
-        // verify that violation occurs when adding new user with same username
+        assertEquals(user.getAddress(), address);
+        assertEquals("new address", user.getAddress().getPostalAddress());
+        
+        //verify that violation occurs when adding new user with same username
         user.setId(null);
 
         // should throw DataIntegrityViolationException
-        dao.saveUser(user);
+        dao.save(user);
     }
 
     @Test
@@ -85,30 +84,24 @@ public class UserDaoTest extends BaseDaoTestCase {
 
         Role role = rdao.getRoleByName(Constants.ADMIN_ROLE);
         user.addRole(role);
-        dao.saveUser(user);
-        flush();
+        dao.save(user);
 
-        user = dao.get(-1L);
         assertEquals(2, user.getRoles().size());
 
         //add the same role twice - should result in no additional role
         user.addRole(role);
-        dao.saveUser(user);
-        flush();
+        dao.save(user);
 
-        user = dao.get(-1L);
         assertEquals("more than 2 roles", 2, user.getRoles().size());
 
         user.getRoles().remove(role);
-        dao.saveUser(user);
-        flush();
+        dao.save(user);
 
-        user = dao.get(-1L);
         assertEquals(1, user.getRoles().size());
     }
 
     @Test
-    @ExpectedException(DataAccessException.class)
+    @ExpectedException(ObjectRetrievalFailureException.class)
     public void testAddAndRemoveUser() throws Exception {
         User user = new User("testuser");
         user.setPassword("testpass");
@@ -122,32 +115,27 @@ public class UserDaoTest extends BaseDaoTestCase {
         user.setAddress(address);
         user.setEmail("testuser@appfuse.org");
         user.setWebsite("http://raibledesigns.com");
-
+        
         Role role = rdao.getRoleByName(Constants.USER_ROLE);
         assertNotNull(role.getId());
         user.addRole(role);
 
-        user = dao.saveUser(user);
-        flush();
+        user = dao.save(user);
 
         assertNotNull(user.getId());
-        user = dao.get(user.getId());
         assertEquals("testpass", user.getPassword());
 
         dao.remove(user.getId());
-        flush();
 
-        // should throw DataAccessException
+        // should throw EntityNotFoundException
         dao.get(user.getId());
     }
-
-    @Test
+    
     public void testUserExists() throws Exception {
         boolean b = dao.exists(-1L);
         assertTrue(b);
     }
-
-    @Test
+    
     public void testUserNotExists() throws Exception {
         boolean b = dao.exists(111L);
         assertFalse(b);
@@ -176,7 +164,8 @@ public class UserDaoTest extends BaseDaoTestCase {
         user = dao.get(-2L);
         user.setFirstName("MattX");
         dao.saveUser(user);
-        flush();
+        entityManager.flush();
+        entityManager.clear();
 
         // now verify it is reflected in the index
         user = compassTemplate.get(User.class, -2);

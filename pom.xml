@@ -68,7 +68,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>2.4</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -120,12 +120,6 @@
 
 	<!-- Dependencies calculated by AppFuse when running full-source plugin -->
 	<dependencies>
-		<!-- CGLIB, only required and used for @Configuration usage -->
-		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib-nodep</artifactId>
-			<version>${cglib.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>${jdbc.groupId}</groupId>
 			<artifactId>${jdbc.artifactId}</artifactId>
@@ -209,16 +203,29 @@
 			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${spring.version}</version>
+            <optional>true</optional>
+        </dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<version>${spring.version}</version>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
@@ -245,21 +252,72 @@
                 </exclusion>
             </exclusions>
         </dependency>
-	    <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-ldap</artifactId>
-            <version>${spring.security.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.social</groupId>
-            <artifactId>spring-social-core</artifactId>
-            <version>${spring.social.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.subethamail</groupId>
             <artifactId>subethasmtp-wiser</artifactId>
             <version>${wiser.version}</version>
             <scope>test</scope>
+        </dependency>
+        <!-- Spring Project -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-ldap</artifactId>
+            <version>${spring.security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-cas</artifactId>
+            <version>${spring.security.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ldap</groupId>
+            <artifactId>spring-ldap-core</artifactId>
+            <version>${spring.ldap.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ldap</groupId>
+            <artifactId>spring-ldap-odm</artifactId>
+            <version>${spring.ldap.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ldap</groupId>
+            <artifactId>spring-ldap-test</artifactId>
+            <version>${spring.ldap.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.social</groupId>
+            <artifactId>spring-social-core</artifactId>
+            <version>${spring.social.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-web</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- CAS Project -->
+        <dependency>
+            <groupId>org.jasig.cas</groupId>
+            <artifactId>cas-server-core</artifactId>
+            <version>${cas.server.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-webmvc</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jasig.cas</groupId>
+            <artifactId>cas-server-support-ldap</artifactId>
+            <version>${cas.server.version}</version>
+        </dependency>
+        <!-- CGLIB, only required and used for @Configuration usage -->
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib-nodep</artifactId>
+            <version>${cglib.version}</version>
         </dependency>
     </dependencies>
 
@@ -289,7 +347,7 @@
 						</excludes>
 					</instrumentation>
 				</configuration>
-				<version>2.4</version>
+				<version>2.5.1</version>
 			</plugin>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -415,8 +473,8 @@
 	<properties>
 		<!-- Application settings -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<copyright.year>2011</copyright.year>
-		<dao.framework>hibernate</dao.framework>
+		<copyright.year>2012</copyright.year>
+		<dao.framework>jpa</dao.framework>
 		<web.framework>spring</web.framework>
 		<amp.genericCore>true</amp.genericCore>
 		<amp.fullSource>true</amp.fullSource>
@@ -425,7 +483,7 @@
 		<!-- Framework dependency versions -->
 		<appfuse.version>2.1.1-SNAPSHOT</appfuse.version>
 		<commons.fileupload.version>1.2.1</commons.fileupload.version>
-		<commons.io.version>1.3.2</commons.io.version>
+		<commons.io.version>2.0.1</commons.io.version>
 		<displaytag.version>1.2</displaytag.version>
 		<spring.version>3.1.1.RELEASE</spring.version>
         <spring.security.version>3.1.0.RELEASE</spring.security.version>
@@ -437,23 +495,23 @@
         <springmodules.validation.version>0.8</springmodules.validation.version>
         
 		<!-- Testing dependency versions -->
-		<cargo.version>1.0.6</cargo.version>
+		<cargo.version>1.2.1</cargo.version>
 		<jmock.version>2.5.1</jmock.version>
 		<jsp.version>2.1</jsp.version>
 		<junit.version>4.8.2</junit.version>
 		<servlet.version>2.5</servlet.version>
 		<wiser.version>1.2</wiser.version>
-		<jetty.version>8.0.4.v20111024</jetty.version>
+		<jetty.version>8.1.3.v20120416</jetty.version>
 
 		<!-- WebTest dependency versions -->
 		<webtest.version>3.0</webtest.version>
 
-		<cargo.container>tomcat6x</cargo.container>
-		<cargo.container.home>${env.CATALINA_HOME}</cargo.container.home>
-		<cargo.container.url>http://archive.apache.org/dist/tomcat/tomcat-6/v6.0.29/bin/apache-tomcat-6.0.29.zip</cargo.container.url>
-		<cargo.host>localhost</cargo.host>
-		<cargo.port>8081</cargo.port>
-		<cargo.wait>false</cargo.wait>
+        <cargo.container>tomcat7x</cargo.container>
+        <cargo.container.home>${env.CATALINA_HOME}</cargo.container.home>
+        <cargo.container.url>http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.27/bin/apache-tomcat-7.0.27.zip</cargo.container.url>
+        <cargo.host>localhost</cargo.host>
+        <cargo.port>8081</cargo.port>
+        <cargo.wait>false</cargo.wait>
 
 		<!-- Jetty Cargo settings: <cargo.container>jetty6x</cargo.container> <cargo.container.url>http://dist.codehaus.org/jetty/jetty-6.1.21/jetty-6.1.21.zip</cargo.container.url> -->
 
@@ -463,10 +521,10 @@
 		<hibernate.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</hibernate.dialect>
 		<jdbc.groupId>mysql</jdbc.groupId>
 		<jdbc.artifactId>mysql-connector-java</jdbc.artifactId>
-		<jdbc.version>5.1.14</jdbc.version>
+		<jdbc.version>5.1.19</jdbc.version>
 		<jdbc.driverClassName>com.mysql.jdbc.Driver</jdbc.driverClassName>
 		<jdbc.url>jdbc:mysql://mysql.766app.com/${db.name}?createDatabaseIfNotExist=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=utf-8&amp;amp;autoReconnect=true</jdbc.url>
-		<jdbc.username>root</jdbc.username>
+		<jdbc.username>hotmob</jdbc.username>
 		<jdbc.password>123456</jdbc.password>
 		<!-- <ldap.url>ldap://120.33.33.198:389/</ldap.url>
 		<ldap.password>uDAapwhm04ih</ldap.password> -->
@@ -483,12 +541,15 @@
 		<commons.collections.version>3.2.1</commons.collections.version>
 		<commons.dbcp.version>1.3</commons.dbcp.version>
 		<commons.lang.version>2.6</commons.lang.version>
+		<commons.pool.version>1.6</commons.pool.version>
 		<compass.version>2.2.0</compass.version>
-		<cxf.version>2.3.3</cxf.version>
+		<cxf.version>2.6.0</cxf.version>
 		<dwr.version>2.0.3</dwr.version>
 		<ehcache.version>2.3.1</ehcache.version>
 		<ehcache.web.version>2.0.3</ehcache.web.version>
 		<hibernate.version>3.6.1.Final</hibernate.version>
+		<hibernate.entitymanager.version>3.6.1.Final</hibernate.entitymanager.version>
+		<hibernate.validator.version>4.0.2.GA</hibernate.validator.version>
 		<javamail.version>1.4.1</javamail.version>
 		<jpa.version>2.0-cr-1</jpa.version>
 		<jstl.version>1.1.2</jstl.version>
@@ -498,9 +559,10 @@
 		<struts.menu.version>2.4.3</struts.menu.version>
 		<urlrewrite.version>3.1.0</urlrewrite.version>
 		<velocity.version>1.4</velocity.version>
-		<cas.server.version>3.4.11</cas.server.version>
-		<person.directory.version>1.5.0-RC6</person.directory.version>
+		<cas.server.version>3.4.12</cas.server.version>
+		<quartz.version>1.6.1</quartz.version>
 		<jcaptcha.version>1.0</jcaptcha.version>
 		<cglib.version>2.2</cglib.version>
+		<ognl.version>2.7.3</ognl.version>
 	</properties>
 </project>

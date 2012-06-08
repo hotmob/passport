@@ -4,12 +4,11 @@ import com.ammob.passport.Constants;
 import com.ammob.passport.service.RoleManager;
 import com.ammob.passport.webapp.form.SignupForm;
 import com.ammob.passport.webapp.util.RequestUtil;
+import com.ammob.passport.webapp.util.SecurityContext;
 import com.ammob.passport.enumerate.StateEnum;
 import com.ammob.passport.exception.UserExistsException;
 
 import org.jasig.cas.CentralAuthenticationService;
-import org.jasig.cas.authentication.principal.UsernamePasswordCredentials;
-import org.jasig.cas.ticket.TicketException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -67,36 +66,37 @@ public class SignupController extends BaseFormController {
 	}
 
 	@ModelAttribute
-	@RequestMapping(method = RequestMethod.GET, params =  {"bind","type!=766"})
+	@RequestMapping(method = RequestMethod.GET, params =  {"bind"})
 	public ModelAndView showBindForm(HttpServletRequest request, WebRequest webRequest) {
-		Locale locale = request.getLocale();
-		SignupForm signupForm = null;
 		Connection<?> connection = ProviderSignInUtils.getConnection(webRequest);
 		if (connection != null) {
-			signupForm = SignupForm.fromProviderUser(connection.fetchUserProfile());
+			SignupForm signupForm = SignupForm.fromProviderUser(connection.fetchUserProfile());
 			signupForm.setAvataUrl(connection.getImageUrl());
 			signupForm.setProviderId(StringUtils.capitalize(connection.getKey().getProviderId()));
-			saveMessage(request, getText("user.bound", signupForm.getUsername(), locale));
-			saveMessage(request, getText("user.bound.tip", signupForm.getProviderId(), locale));
-		} else {
-			signupForm = new SignupForm(true);
+			saveMessage(request, getText("user.bound", signupForm.getUsername(),  request.getLocale()));
+			saveMessage(request, getText("user.bound.tip", signupForm.getProviderId(),  request.getLocale()));
+			return new ModelAndView("bind", "signupForm",  signupForm);
 		}
-		ModelAndView mav = new ModelAndView("bind", "signupForm",  signupForm);
-		return mav;
+		saveError(request, getText("bind.error", "",  request.getLocale()));
+		return new ModelAndView("redirect:/");
 	}
 	
-	@RequestMapping(method = RequestMethod.POST, params =  {"bind"})
+	@RequestMapping(method = RequestMethod.POST, params =  {"bind", "step!=1"})
 	public String onBindSubmit(SignupForm signupForm, BindingResult errors,
-			WebRequest request, HttpServletResponse response)
+			WebRequest webRequest, HttpServletRequest request, HttpServletResponse response)
 					throws Exception {
-		if(bindTicketGrantingTicket(signupForm.getUsername(), signupForm.getPassword(), response)) {
-			ProviderSignInUtils.handlePostSignUp(signupForm.getUsername(), request);
-			System.out.println("绑定成功++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+		try {
+			if(StringUtils.hasText(signupForm.getConfirmPassword())) { // New User, Signup !
+				onSubmit(signupForm, errors, request, response);
+			} else {
+				SecurityContext.addCasSignin(centralAuthenticationService, ticketGrantingTicketCookieGenerator, signupForm.getUsername(), signupForm.getPassword(), false, false, response);
+			}
+			ProviderSignInUtils.handlePostSignUp(signupForm.getUsername(), webRequest);
 			return "redirect:/";
+		} catch (Exception e) {
+			saveError(request, getText("bind.error.signup", new Object[] {},  request.getLocale()));
+			return "signup";
 		}
-		System.out.println("绑定失败-------------------------------------------------------------------------------------------");
-		// TODO 开始注册步骤
-		return "signup";
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
@@ -114,14 +114,11 @@ public class SignupController extends BaseFormController {
 				}
 			}
 		}
-		if (log.isDebugEnabled()) {
-			log.debug("entering 'onSubmit' method...");
-		}
 		Locale locale = request.getLocale();
 		// Set the default user role on this new user
 		signupForm.addRole(roleManager.getRole(Constants.USER_ROLE));
 		try {
-			this.getUserManager().saveMember(signupForm);
+			this.getUserManager().savePerson(signupForm);
 		} catch (UserExistsException e) {
 			if(e.isContainsType(StateEnum.USERNAME_EXISTENCE)) 
 				errors.rejectValue("username", "errors.existing.user", new Object[] { signupForm.getUsername()}, "duplicate user");
@@ -142,7 +139,7 @@ public class SignupController extends BaseFormController {
 		auth.setDetails(signupForm);
 		SecurityContextHolder.getContext().setAuthentication(auth);
 		// cas
-		bindTicketGrantingTicket(signupForm.getUsername(), signupForm.getPassword(), response);
+		SecurityContext.addCasSignin(centralAuthenticationService, ticketGrantingTicketCookieGenerator, signupForm.getUsername(), signupForm.getConfirmPassword(), true, false, response);
 		   
 		// Send user an e-mail
 		if (log.isDebugEnabled()) {
@@ -157,26 +154,4 @@ public class SignupController extends BaseFormController {
 		}
 	   return getRedirectView("/login", signupForm.getService());
 	}
-
-    /** 
-     * Invoke generate validate Tickets and add the TGT to cookie. 
-     * @param loginName     the user login name. 
-     * @param loginPassword the user login password. 
-     * @param response      the HttpServletResponse object. 
-     */  
-    protected boolean bindTicketGrantingTicket(String loginName, String loginPassword, HttpServletResponse response) {
-        try {
-            UsernamePasswordCredentials credentials = new UsernamePasswordCredentials();
-            credentials.setUsername(loginName);
-            credentials.setPassword(loginPassword);
-            String ticketGrantingTicket = centralAuthenticationService.createTicketGrantingTicket(credentials);
-            ticketGrantingTicketCookieGenerator.addCookie(response, ticketGrantingTicket);
-            return true;
-        } catch (TicketException te) {
-        	log.error("Validate the loginname " + loginName + " and loginPassword " + loginPassword + " failure, can't bind the TGT!", te);
-        } catch (Exception e){
-        	log.error("bindTicketGrantingTicket has exception.", e);
-        }
-        return false;
-    }
 }

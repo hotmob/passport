@@ -9,14 +9,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 
 @ContextConfiguration(
-        locations = {"classpath:/applicationContext-resources.xml",
-        			 "classpath:/applicationContext-resources-cas.xml",
-                	 "classpath:/applicationContext-dao.xml",
-                	 "classpath:/applicationContext-captcha.xml",
-                	 "classpath:/applicationContext-service.xml",
-                	 "classpath:/applicationContext.xml", // for modular archetypes
-                	 "classpath:/applicationContext-validation.xml",
-                	 "/WEB-INF/dispatcher-servlet.xml"})
+        locations = {	"classpath:/applicationContext.xml", // for modular archetypes
+                	 		"/WEB-INF/applicationContext.xml",
+                	 		"/WEB-INF/dispatcher-servlet.xml"})
 
 public abstract class BaseControllerTestCase extends AbstractTransactionalJUnit4SpringContextTests {
     protected transient final Log log = LogFactory.getLog(getClass());

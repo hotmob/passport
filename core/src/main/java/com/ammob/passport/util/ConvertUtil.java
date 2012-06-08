@@ -3,8 +3,8 @@ package com.ammob.passport.util;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import com.ammob.passport.model.LabelValue;
 
+import com.ammob.passport.model.LabelValue;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;

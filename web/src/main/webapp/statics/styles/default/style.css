@@ -51,8 +51,6 @@ a:hover{ color:#ff6600; text-decoration:underline;}
 .login_cooperate h4{ font-weight:100; padding:0 0 10px;}
 .login_cooperate ul li{ width:32px; height:32px; float:left; margin:0 10px 0 0; display:inline;background-repeat:no-repeat;}	
 .login_cooperate ul li a{ width:32px; height:32px; display:block;}
-.login_cooperate ul li a img{display:none;}
-.login_cooperate ul li button{background: #FFFFFF;border-width:0px;background-repeat:no-repeat;border-style:none;}
 
 /* ===reg=== */
 .reg_con{border:1px solid #e4e4e4; width:900px; min-height:490px; padding-bottom:20px; background:url(../../images/reg_bg.gif) no-repeat right bottom; margin:0 auto; position:relative;}
@@ -123,10 +121,19 @@ a:hover{ color:#ff6600; text-decoration:underline;}
 .login_con a{ color:#54759e;}
 .logined{ padding:15px 20px 0; height:60px;}
 .logined img{ border:1px solid #cecece;}
-.logined dt{ padding:0 0 8px}
+.logined dt{ padding:0 0 8px;line-height:24px;}
 .logined dt span{ color:#9b9b9b;}
 .logined .pic{ float:left; padding-right:12px;}
 .login_manage{ padding:24px 8px; border-bottom:1px solid #e8e8e8; margin:0 12px;}
-.login_manage h4{ font-weight:100; margin-bottom:5px;}
-.login_record{ padding:7px 20px 0; line-height:18px;}
+.login_manage h4{ padding:30px 8px; font-weight:100; margin-bottom:-40px;}
+.login_record{ padding:15px 28px 0; line-height:18px;}
 .login_record h4{ font-weight:100; margin-bottom:5px;}
+
+.oauth_txwb button { background:url(../../images/oauth/tencent.png) no-repeat; cursor:pointer; width: 32px; height: 32px; border: none;}
+.oauth_weibo button { background:url(../../images/oauth/weibo.png) no-repeat; cursor:pointer; width: 32px; height: 32px; border: none;}
+.oauth_twitter button { background:url(../../images/oauth/twitter.png) no-repeat; cursor:pointer; width: 32px; height: 32px; border: none;}
+.oauth_linkedin button { background:url(../../images/oauth/linkedin.png) no-repeat; cursor:pointer; width: 32px; height: 32px; border: none;}
+.oauth_facebook button { background:url(../../images/oauth/facebook.png) no-repeat; cursor:pointer; width: 32px; height: 32px; border: none;}
+
+.avatar {background: url(../../images/userface.gif) no-repeat; border: 1px solid #D3D3D3; display: block; margin-right: 10px; padding: 2px;float: left;overflow: hidden;}
+.avatar img { display: block; height: 72px; width: 72px; }

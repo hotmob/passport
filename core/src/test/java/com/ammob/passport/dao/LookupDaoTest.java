@@ -13,11 +13,11 @@ import static org.junit.Assert.assertTrue;
  */
 public class LookupDaoTest extends BaseDaoTestCase {
     @Autowired
-    LookupDao lookupDao;
+    private LookupDao dao;
 
     @Test
     public void testGetRoles() {
-        List roles = lookupDao.getRoles();
+        List roles = dao.getRoles();
         log.debug(roles);
         assertTrue(roles.size() > 0);
     }

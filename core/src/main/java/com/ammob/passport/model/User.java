@@ -6,10 +6,17 @@ import org.compass.annotations.Searchable;
 import org.compass.annotations.SearchableComponent;
 import org.compass.annotations.SearchableId;
 import org.compass.annotations.SearchableProperty;
+import org.springframework.ldap.core.DistinguishedName;
+import org.springframework.ldap.odm.annotations.Attribute;
+import org.springframework.ldap.odm.annotations.Entry;
+import org.springframework.ldap.odm.annotations.Attribute.Type;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 
+import com.ammob.passport.Constants;
+
+import javax.naming.Name;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -27,7 +34,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,42 +54,65 @@ import java.util.Set;
 @Table(name = "app_user")
 @Searchable
 @XmlRootElement
+@Entry(objectClasses={"userDetails", "inetOrgPerson", "top"})
 public class User extends BaseObject implements Serializable, UserDetails {
+	
     private static final long serialVersionUID = 3832626162173359411L;
-
+    @org.springframework.ldap.odm.annotations.Transient
     private Long id;
+    
+    @Attribute(name="cn", syntax="1.3.6.1.4.1.1466.115.121.1.15")
     private String username;                    	// required
-    private String password;                    	// required
-    private String confirmPassword;
-    private String passwordHint;
+    @Attribute(name="userPassword", syntax="1.3.6.1.4.1.1466.115.121.1.40", type=Type.BINARY)
+    private byte[] password;                  		// required
+    @Attribute(name="sn", syntax="1.3.6.1.4.1.1466.115.121.1.15")
     private String firstName;                   		// required
+    @Attribute(name="givenName", syntax="1.3.6.1.4.1.1466.115.121.1.15")
     private String lastName;                    		// required
+    @Attribute(name="mail", syntax="1.3.6.1.4.1.1466.115.121.1.26")
     private String email;                       	    // required; unique
+    @Attribute(name="telephoneNumber", syntax="1.3.6.1.4.1.1466.115.121.1.50")
     private String phoneNumber;
+    @org.springframework.ldap.odm.annotations.Transient
     private String website;
+    @org.springframework.ldap.odm.annotations.Transient
     private Address address = new Address();
+    @org.springframework.ldap.odm.annotations.Transient
     private Integer version;
+    @org.springframework.ldap.odm.annotations.Transient
     private Set<Role> roles = new HashSet<Role>();
+    @org.springframework.ldap.odm.annotations.Transient
     private boolean enabled;
+    @org.springframework.ldap.odm.annotations.Transient
     private boolean accountExpired;
+    @org.springframework.ldap.odm.annotations.Transient
     private boolean accountLocked;
+    @org.springframework.ldap.odm.annotations.Transient
     private boolean credentialsExpired;
+    @org.springframework.ldap.odm.annotations.Transient
+    private String confirmPassword;
+    @org.springframework.ldap.odm.annotations.Transient
+    private String passwordHint;
     
-	private String nickname;                    	// 昵称, 显示名
-	private String sex;                             	// 性别
-	private String description;                 	// 用户描述
-	private String regTime;                      // 注册时间
-	private String uuid;                           	// UUID
-	private String birthTime;                   	// 出生日期
-	private String userId;                        	// 用户身份证号码
-	private String bloodType;                 	// 用户血型
-	private String ethnicity;                    	// 用户种族
+    @org.springframework.ldap.odm.annotations.Id
+	private Name dn;                  					// DN
+    @org.springframework.ldap.odm.annotations.Transient
+	private String displayName;                   // 昵称, 显示名
+	@Attribute(name="description", syntax="1.3.6.1.4.1.1466.115.121.1.15")
+	private String description;                 		// 用户描述
+	@org.springframework.ldap.odm.annotations.Transient
+	private String regTime;                      	// 注册时间
+	@org.springframework.ldap.odm.annotations.Transient
+	private String uuid;                           		// UUID
+	@org.springframework.ldap.odm.annotations.Transient
 	private String avataUrl;
+	@org.springframework.ldap.odm.annotations.Transient
 	private Set<String> state = new HashSet<String>(); // 状态, 1: 邮箱已验证
-    
-    
-    
-    
+	@Attribute(name="objectClass", syntax="1.3.6.1.4.1.1466.115.121.1.38")
+	private List<String> objectClass=new ArrayList<String>();
+	@Attribute(name="seeAlso", syntax="1.3.6.1.4.1.1466.115.121.1.12")
+	private List<String> seeAlso=new ArrayList<String>();
+	
     /**
      * Default constructor - creates a new instance with no values set.
      */
@@ -112,7 +144,9 @@ public class User extends BaseObject implements Serializable, UserDetails {
     @Column(nullable = false)
     @XmlTransient
     public String getPassword() {
-        return password;
+    	if(password == null)
+    		return "";
+		return new String(password);
     }
 
     @Transient @XmlTransient
@@ -275,13 +309,13 @@ public class User extends BaseObject implements Serializable, UserDetails {
     public void setId(Long id) {
         this.id = id;
     }
-
+	
     public void setUsername(String username) {
         this.username = username;
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = password.getBytes();
     }
 
     public void setConfirmPassword(String confirmPassword) {
@@ -319,7 +353,7 @@ public class User extends BaseObject implements Serializable, UserDetails {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
-
+    
     public void setVersion(Integer version) {
         this.version = version;
     }
@@ -393,15 +427,6 @@ public class User extends BaseObject implements Serializable, UserDetails {
     }
 	
 	@Transient
-	public String getSex() {
-		return sex;
-	}
-	
-	public void setSex(String sex) {
-		this.sex = sex;
-	}
-	
-	@Transient
 	public String getDescription() {
 		return description;
 	}
@@ -411,12 +436,12 @@ public class User extends BaseObject implements Serializable, UserDetails {
 	}
 	
 	@Transient
-	public String getNickname() {
-		return nickname;
+	public String getDisplayName() {
+		return displayName;
 	}
 	
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 	
 	@Transient
@@ -458,46 +483,10 @@ public class User extends BaseObject implements Serializable, UserDetails {
 	}
 	
 	@Transient
-	public String getBirthTime() {
-		return birthTime;
-	}
-	
-	public void setBirthTime(String birthTime) {
-		this.birthTime = birthTime;
-	}
-	
-	@Transient
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-	
-	@Transient
-	public String getBloodType() {
-		return bloodType;
-	}
-	
-	public void setBloodType(String bloodType) {
-		this.bloodType = bloodType;
-	}
-	
-	@Transient
-	public String getEthnicity() {
-		return ethnicity;
-	}
-
-	public void setEthnicity(String ethnicity) {
-		this.ethnicity = ethnicity;
-	}
-	
-	@Transient
 	public String getAvataUrl() {
 		if(!StringUtils.hasText(this.avataUrl)) {
 			if(StringUtils.hasText(this.uuid)){
-				this.avataUrl =  this.uuid.replaceAll("-", "/");
+				this.avataUrl =  Constants.USER_DEFAULT_AVATA_URL_PREFIX + this.uuid.replaceAll("-", "/") + Constants.USER_DEFAULT_AVATA_URL_SUFFIX;
 			}
 		}
 		return this.avataUrl;
@@ -505,5 +494,32 @@ public class User extends BaseObject implements Serializable, UserDetails {
 
 	public void setAvataUrl(String avataUrl) {
 		this.avataUrl = avataUrl;
+	}
+
+	@Transient
+	public Name getDn() {
+		return dn;
+	}
+
+	public void setDn(String dn) {
+		this.dn=new DistinguishedName(dn);
+	}
+	
+	@Transient
+	public Iterator<String> getObjectClassIterator() {
+		return Collections.unmodifiableList(objectClass).iterator();
+	}
+	
+	public void addSeeAlso(String seeAlso) {
+		this.seeAlso.add(seeAlso);
+	}
+
+	public void removeSeeAlso(String seeAlso) {
+		this.seeAlso.remove(seeAlso);
+	}
+
+	@Transient
+	public Iterator<String> getSeeAlsoIterator() {
+		return seeAlso.iterator();
 	}
 }

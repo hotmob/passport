@@ -12,7 +12,10 @@
         <from>^/services//(.*)$</from>
         <to type="forward">/services/$1</to>
     </rule>
-
+    <rule match-type="regex">
+        <from>^/v1//(.*)$</from>
+        <to type="forward">/v1/$1</to>
+    </rule>
     <!-- Add rules here for anything that shouldn't be served up by Spring MVC. -->
     <rule>
         <from>/</from>
@@ -37,6 +40,10 @@
     <rule>
         <from>/services/**</from>
         <to>/services/$1</to>
+    </rule>
+    <rule>
+        <from>/v1/**</from>
+        <to>/v1/$1</to>
     </rule>
     <rule>
         <from>/statics/**</from>

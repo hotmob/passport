@@ -82,25 +82,9 @@
 				<artifactId>jetty-maven-plugin</artifactId>
 				<version>${jetty.version}</version>
 				<configuration>
-					<webAppConfig>
-						<contextPath>/</contextPath>
-						<tempDirectory>${project.build.directory}/work</tempDirectory>
-						<!-- <defaultsDescriptor>src/test/resources/webdefault.xml</defaultsDescriptor> -->
-						<!-- <overrideDescriptor>src/main/resources/override-web.xml</overrideDescriptor> -->
-					</webAppConfig>
-					<scanTargetPatterns>
-						<scanTargetPattern>
-							<directory>src/main/webapp/WEB-INF</directory>
-							<excludes>
-								<exclude>**/*.jsp</exclude>
-							</excludes>
-							<includes>
-								<include>**/*.properties</include>
-								<include>**/*.xml</include>
-							</includes>
-						</scanTargetPattern>
-					</scanTargetPatterns>
-					<scanIntervalSeconds>0</scanIntervalSeconds>
+                    <webApp>
+                        <contextPath>/</contextPath>
+                    </webApp>
 					<connectors>
 					    <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector"> 
 							<port>80</port>
@@ -140,13 +124,19 @@
 						<configuration>
 							<encoding>UTF8</encoding>
 							<includes>ApplicationResources*.properties,
+							     displaytag*.properties,
 							     *.vm</includes>
 							<excludes>
 								ApplicationResources_de*.properties,
 								ApplicationResources_fr*.properties,
 								ApplicationResources_nl*.properties,
 								ApplicationResources_pt*.properties,
-								ApplicationResources_es*.properties</excludes>
+								ApplicationResources_es*.properties,
+								displaytag_de*.properties,
+								displaytag_fr*.properties,
+								displaytag_nl*.properties,
+								displaytag_pt*.properties,
+								displaytag_es*.properties</excludes>
 						</configuration>
 					</execution>
 					<execution>
@@ -366,6 +356,11 @@
 			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-taglibs</artifactId>
 			<version>${spring.security.version}</version>
@@ -384,11 +379,6 @@
                 </exclusion>
             </exclusions>
 		</dependency>
-		<dependency>
-		    <groupId>org.springframework.social</groupId>
-		    <artifactId>spring-social-core</artifactId>
-	        <version>${spring.social.version}</version>
-	    </dependency>
 		<dependency>
 		    <groupId>org.springframework.social</groupId>
 		    <artifactId>spring-social-web</artifactId>
@@ -455,6 +445,13 @@
 			<artifactId>standard</artifactId>
 			<version>${jstl.version}</version>
 		</dependency>
+		<!-- Hibernate Validator -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <scope>runtime</scope>
+            <version>${hibernate.validator.version}</version>
+        </dependency>
         <!-- Mock Test -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -462,86 +459,78 @@
             <version>4.1.1</version>
             <scope>compile</scope>
         </dependency>
-		<!-- CAS Project -->
-        <dependency>
-            <groupId>org.jasig.cas</groupId>
-            <artifactId>cas-server-webapp</artifactId>
-            <version>${cas.server.version}</version>
-            <type>pom</type>
-            <exclusions>
-                <exclusion>
-                    <artifactId>org.springframework</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.jasig.cas</groupId>
-            <artifactId>cas-server-support-ldap</artifactId>
-            <version>${cas.server.version}</version>
-        </dependency>
-        <dependency>
-		    <groupId>org.jasig.cas</groupId>
-		    <artifactId>cas-server-support-openid</artifactId>
-		    <version>${cas.server.version}</version>
-		</dependency>
         <!-- Captcha -->
 		<dependency>
 			<groupId>com.octo.captcha</groupId>
 			<artifactId>jcaptcha</artifactId>
 			<version>${jcaptcha.version}</version>
 		</dependency>
+		<!-- Quartz -->
+		<dependency>
+            <groupId>org.opensymphony.quartz</groupId>
+            <artifactId>quartz</artifactId>
+            <version>${quartz.version}</version>
+            <type>jar</type>
+        </dependency>
+        <!-- Ognl -->
+        <dependency>
+            <groupId>ognl</groupId>
+            <artifactId>ognl</artifactId>
+            <version>${ognl.version}</version>
+            <scope>runtime</scope>
+        </dependency>
 	</dependencies>
 
-	<profiles>
-		<profile>
-			<id>integration-test</id>
-			<activation>
-				<property>
-					<name>!skipTests</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.cargo</groupId>
-						<artifactId>cargo-maven2-plugin</artifactId>
-						<version>${cargo.version}</version>
-						<configuration>
-							<wait>${cargo.wait}</wait>
-							<container>
-								<containerId>${cargo.container}</containerId>
-								<home>${cargo.container.home}</home>
-								<zipUrlInstaller>
-									<url>${cargo.container.url}</url>
-									<installDir>${installDir}</installDir>
-								</zipUrlInstaller>
-							</container>
-							<configuration>
-								<home>${project.build.directory}/${cargo.container}/container</home>
-								<properties>
-									<cargo.hostname>${cargo.host}</cargo.hostname>
-									<cargo.servlet.port>${cargo.port}</cargo.servlet.port>
-								</properties>
-							</configuration>
-						</configuration>
-						<executions>
-							<execution>
-								<id>start-container</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>start</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>stop-container</id>
-								<phase>post-integration-test</phase>
-								<goals>
-									<goal>stop</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
+    <profiles>
+        <profile>
+            <id>integration-test</id>
+            <activation>
+                <property>
+                    <name>!skipTests</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.cargo</groupId>
+                        <artifactId>cargo-maven2-plugin</artifactId>
+                        <version>${cargo.version}</version>
+                        <configuration>
+                            <wait>${cargo.wait}</wait>
+                            <container>
+                                <containerId>${cargo.container}</containerId>
+                                <home>${cargo.container.home}</home>
+                                <zipUrlInstaller>
+                                    <url>${cargo.container.url}</url>
+                                    <extractDir>${installDir}</extractDir>
+                                </zipUrlInstaller>
+                            </container>
+                            <configuration>
+                                <home>${project.build.directory}/${cargo.container}/container</home>
+                                <properties>
+                                    <cargo.hostname>${cargo.host}</cargo.hostname>
+                                    <cargo.servlet.port>${cargo.port}</cargo.servlet.port>
+                                </properties>
+                            </configuration>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>start-container</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>start</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>stop-container</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>webtest-maven-plugin</artifactId>
                         <version>1.0.0</version>
@@ -592,26 +581,11 @@
                             <src>src/main/resources/default-data.xml</src>
                         </configuration>
                     </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-war-plugin</artifactId>
-                        <configuration>
-                            <webResources>
-                            	<resource>
-                            		<directory>src/main/webapp</directory>
-                            		<excludes>
-										<exclude>**/*Test.java</exclude>
-                            		</excludes>
-                            	</resource>
-                            </webResources>
-                        </configuration>
-                    </plugin>
                 </plugins>
             </build>
         </profile>
     </profiles>
-
-    <reporting>
+     <reporting>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

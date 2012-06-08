@@ -18,7 +18,12 @@
         classes that are mapped as persistent entities.  Do whatever blows your 
         skirt up.
         -->
-        
+        <class>org.jasig.cas.services.AbstractRegisteredService</class>
+        <class>org.jasig.cas.services.RegexRegisteredService</class>
+        <class>org.jasig.cas.services.RegisteredServiceImpl</class>
+        <class>org.jasig.cas.ticket.TicketGrantingTicketImpl</class>
+        <class>org.jasig.cas.ticket.ServiceTicketImpl</class>
+        <class>org.jasig.cas.ticket.registry.support.JpaLockingStrategy$Lock</class>
+        <!-- <exclude-unlisted-classes/> -->
     </persistence-unit>
-    
 </persistence>

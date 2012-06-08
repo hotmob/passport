@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
@@ -32,13 +34,26 @@
         <property name="pooled" value="false" />
         <property name="baseEnvironmentProperties">
             <map>
-                <entry>
-                    <key>
-                        <value>java.naming.security.authentication</value>
-                    </key>
-                    <value>simple</value>
-                </entry>
+                <entry key="com.sun.jndi.ldap.connect.timeout" value="8000" />
+                <entry key="com.sun.jndi.ldap.read.timeout" value="5000" />
+                <entry key="java.naming.security.authentication" value="simple" />
             </map>
+        </property>
+    </bean>
+    
+    <bean id="pooledContextSource" class="org.springframework.ldap.pool.factory.PoolingContextSource"
+        p:minIdle="${ldap.pool.minIdle}" p:maxIdle="${ldap.pool.maxIdle}"
+        p:maxActive="${ldap.pool.maxSize}" p:maxWait="${ldap.pool.maxWait}"
+        p:timeBetweenEvictionRunsMillis="${ldap.pool.evictionPeriod}"
+        p:minEvictableIdleTimeMillis="${ldap.pool.idleTime}" p:testOnBorrow="${ldap.pool.testOnBorrow}"
+        p:testWhileIdle="${ldap.pool.testWhileIdle}"
+        p:dirContextValidator-ref="dirContextValidator" p:contextSource-ref="contextSource" />
+
+    <bean id="dirContextValidator" class="org.springframework.ldap.pool.validation.DefaultDirContextValidator"
+        p:base="" p:filter="objectclass=*">
+        <property name="searchControls">
+            <bean class="javax.naming.directory.SearchControls" p:timeLimit="3000"
+                p:countLimit="100" p:searchScope="0" p:returningAttributes="" />
         </property>
     </bean>
 </beans>
