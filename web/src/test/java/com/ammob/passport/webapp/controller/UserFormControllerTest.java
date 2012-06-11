@@ -64,7 +64,7 @@ public class UserFormControllerTest extends BaseControllerTestCase {
         request.addUserRole(Constants.ADMIN_ROLE);
 
         User user = c.showForm(request, new MockHttpServletResponse());
-        assertEquals("Tomcat User", user.getFullName());
+        assertEquals("Tomcat User", user.getDisplayName());
     }
 
     @Test
@@ -88,7 +88,7 @@ public class UserFormControllerTest extends BaseControllerTestCase {
         request.setRemoteUser("mupengUser");
 
         user = c.showForm(request, new MockHttpServletResponse());
-        assertEquals("Tomcat User", user.getFullName());
+        assertEquals("Tomcat User", user.getDisplayName());
     }
 
     @Test

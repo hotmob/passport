@@ -58,66 +58,105 @@ import java.util.Set;
 public class User extends BaseObject implements Serializable, UserDetails {
 	
     private static final long serialVersionUID = 3832626162173359411L;
+ 
+    @Id
+    @SearchableId
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @org.springframework.ldap.odm.annotations.Transient
     private Long id;
-    
+    @SearchableProperty
+    @Column(nullable = false, length = 50, unique = true)
     @Attribute(name="cn", syntax="1.3.6.1.4.1.1466.115.121.1.15")
     private String username;                    	// required
+    @Column(nullable = false)
+    @XmlTransient
     @Attribute(name="userPassword", syntax="1.3.6.1.4.1.1466.115.121.1.40", type=Type.BINARY)
     private byte[] password;                  		// required
+    @SearchableProperty
+    @Column(name = "first_name", nullable = false, length = 50)
     @Attribute(name="sn", syntax="1.3.6.1.4.1.1466.115.121.1.15")
     private String firstName;                   		// required
+    @SearchableProperty
+    @Column(name = "last_name", nullable = false, length = 50)
     @Attribute(name="givenName", syntax="1.3.6.1.4.1.1466.115.121.1.15")
     private String lastName;                    		// required
+    @SearchableProperty
+    @Column(nullable = false, unique = true)
     @Attribute(name="mail", syntax="1.3.6.1.4.1.1466.115.121.1.26")
     private String email;                       	    // required; unique
+    @SearchableProperty
+    @Column(name = "phone_number")
     @Attribute(name="telephoneNumber", syntax="1.3.6.1.4.1.1466.115.121.1.50")
     private String phoneNumber;
+    @SearchableProperty
     @org.springframework.ldap.odm.annotations.Transient
     private String website;
+    @Embedded
+    @SearchableComponent
     @org.springframework.ldap.odm.annotations.Transient
     private Address address = new Address();
+    @Version
     @org.springframework.ldap.odm.annotations.Transient
     private Integer version;
+    @JoinTable(
+            name = "user_role",
+            joinColumns = { @JoinColumn(name = "user_id") },
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @ManyToMany(fetch = FetchType.EAGER)
     @org.springframework.ldap.odm.annotations.Transient
     private Set<Role> roles = new HashSet<Role>();
+    @Column(name = "account_enabled")
     @org.springframework.ldap.odm.annotations.Transient
     private boolean enabled;
+    @Column(name = "account_expired", nullable = false)
     @org.springframework.ldap.odm.annotations.Transient
     private boolean accountExpired;
+    @Column(name = "account_locked", nullable = false)
     @org.springframework.ldap.odm.annotations.Transient
     private boolean accountLocked;
+    @Column(name = "credentials_expired", nullable = false)
     @org.springframework.ldap.odm.annotations.Transient
     private boolean credentialsExpired;
+    @Transient 
+    @XmlTransient
     @org.springframework.ldap.odm.annotations.Transient
     private String confirmPassword;
+    @Column(name = "password_hint")
+    @XmlTransient
     @org.springframework.ldap.odm.annotations.Transient
     private String passwordHint;
     
     @org.springframework.ldap.odm.annotations.Id
 	private Name dn;                  					// DN
+	@Transient
     @org.springframework.ldap.odm.annotations.Transient
 	private String displayName;                   // 昵称, 显示名
+	@Transient
 	@Attribute(name="description", syntax="1.3.6.1.4.1.1466.115.121.1.15")
 	private String description;                 		// 用户描述
+	@Transient
 	@org.springframework.ldap.odm.annotations.Transient
 	private String regTime;                      	// 注册时间
+	@Transient
 	@org.springframework.ldap.odm.annotations.Transient
 	private String uuid;                           		// UUID
+	@Transient
 	@org.springframework.ldap.odm.annotations.Transient
 	private String avataUrl;
+	@Transient
 	@org.springframework.ldap.odm.annotations.Transient
 	private Set<String> state = new HashSet<String>(); // 状态, 1: 邮箱已验证
+	@Transient
 	@Attribute(name="objectClass", syntax="1.3.6.1.4.1.1466.115.121.1.38")
 	private List<String> objectClass=new ArrayList<String>();
+	@Transient
 	@Attribute(name="seeAlso", syntax="1.3.6.1.4.1.1466.115.121.1.12")
 	private List<String> seeAlso=new ArrayList<String>();
 	
     /**
      * Default constructor - creates a new instance with no values set.
      */
-    public User() {
-    }
+    public User() {}
 
     /**
      * Create a new instance and set the username.
@@ -128,110 +167,54 @@ public class User extends BaseObject implements Serializable, UserDetails {
         this.username = username;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @SearchableId
     public Long getId() {
         return id;
     }
 
-    @Column(nullable = false, length = 50, unique = true)
-    @SearchableProperty
     public String getUsername() {
         return username;
     }
 
-    @Column(nullable = false)
-    @XmlTransient
     public String getPassword() {
     	if(password == null)
     		return "";
 		return new String(password);
     }
 
-    @Transient @XmlTransient
     public String getConfirmPassword() {
         return confirmPassword;
     }
 
-    @Column(name = "password_hint")
-    @XmlTransient
     public String getPasswordHint() {
         return passwordHint;
     }
 
-    @Column(name = "first_name", nullable = false, length = 50)
-    @SearchableProperty
     public String getFirstName() {
         return firstName;
     }
 
-    @Column(name = "last_name", nullable = false, length = 50)
-    @SearchableProperty
     public String getLastName() {
         return lastName;
     }
 
-    @Column(nullable = false, unique = true)
-    @SearchableProperty
     public String getEmail() {
         return email;
     }
-
-    @Column(name = "phone_number")
-    @SearchableProperty
+    
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    @SearchableProperty
     public String getWebsite() {
         return website;
     }
 
-    /**
-     * Returns the full name.
-     *
-     * @return firstName + ' ' + lastName
-     */
-    @Transient
-    public String getFullName() {
-        return firstName + ' ' + lastName;
-    }
-
-    @Embedded
-    @SearchableComponent
     public Address getAddress() {
         return address;
     }
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_role",
-            joinColumns = { @JoinColumn(name = "user_id") },
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
     public Set<Role> getRoles() {
         return roles;
-    }
-
-    /**
-     * Convert user roles to LabelValue objects for convenience.
-     *
-     * @return a list of LabelValue objects with role information
-     */
-    @Transient
-    public List<LabelValue> getRoleList() {
-        List<LabelValue> userRoles = new ArrayList<LabelValue>();
-
-        if (this.roles != null) {
-            for (Role role : roles) {
-                // convert the user's roles to LabelValue Objects
-                userRoles.add(new LabelValue(role.getName(), role.getName()));
-            }
-        }
-
-        return userRoles;
     }
 
     /**
@@ -247,24 +230,20 @@ public class User extends BaseObject implements Serializable, UserDetails {
      * @return GrantedAuthority[] an array of roles.
      * @see org.springframework.security.core.userdetails.UserDetails#getAuthorities()
      */
-    @Transient
     public Set<GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new LinkedHashSet<GrantedAuthority>();
         authorities.addAll(roles);
         return authorities;
     }
 
-    @Version
     public Integer getVersion() {
         return version;
     }
 
-    @Column(name = "account_enabled")
     public boolean isEnabled() {
         return enabled;
     }
 
-    @Column(name = "account_expired", nullable = false)
     public boolean isAccountExpired() {
         return accountExpired;
     }
@@ -273,12 +252,10 @@ public class User extends BaseObject implements Serializable, UserDetails {
      * @see org.springframework.security.core.userdetails.UserDetails#isAccountNonExpired()
      * @return true if account is still active
      */
-    @Transient
     public boolean isAccountNonExpired() {
         return !isAccountExpired();
     }
 
-    @Column(name = "account_locked", nullable = false)
     public boolean isAccountLocked() {
         return accountLocked;
     }
@@ -287,12 +264,10 @@ public class User extends BaseObject implements Serializable, UserDetails {
      * @see org.springframework.security.core.userdetails.UserDetails#isAccountNonLocked()
      * @return false if account is locked
      */
-    @Transient
     public boolean isAccountNonLocked() {
         return !isAccountLocked();
     }
 
-    @Column(name = "credentials_expired", nullable = false)
     public boolean isCredentialsExpired() {
         return credentialsExpired;
     }
@@ -301,7 +276,6 @@ public class User extends BaseObject implements Serializable, UserDetails {
      * @see org.springframework.security.core.userdetails.UserDetails#isCredentialsNonExpired()
      * @return true if credentials haven't expired
      */
-    @Transient
     public boolean isCredentialsNonExpired() {
         return !credentialsExpired;
     }
@@ -426,7 +400,6 @@ public class User extends BaseObject implements Serializable, UserDetails {
         return sb.toString();
     }
 	
-	@Transient
 	public String getDescription() {
 		return description;
 	}
@@ -435,8 +408,9 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		this.description = description;
 	}
 	
-	@Transient
 	public String getDisplayName() {
+		if(!StringUtils.hasText(displayName))
+			return firstName + ' ' + lastName;
 		return displayName;
 	}
 	
@@ -444,7 +418,6 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		this.displayName = displayName;
 	}
 	
-	@Transient
 	public String getState() {
 		return state.toString().substring(1, state.toString().length() - 1);
 	}
@@ -464,7 +437,6 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		}
 	}
 	
-	@Transient
 	public String getRegTime() {
 		return regTime;
 	}
@@ -473,7 +445,6 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		this.regTime = regTime;
 	}
 	
-	@Transient
 	public String getUuid() {
 		return uuid;
 	}
@@ -482,7 +453,6 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		this.uuid = uuid;
 	}
 	
-	@Transient
 	public String getAvataUrl() {
 		if(!StringUtils.hasText(this.avataUrl)) {
 			if(StringUtils.hasText(this.uuid)){
@@ -496,7 +466,6 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		this.avataUrl = avataUrl;
 	}
 
-	@Transient
 	public Name getDn() {
 		return dn;
 	}
@@ -505,7 +474,6 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		this.dn=new DistinguishedName(dn);
 	}
 	
-	@Transient
 	public Iterator<String> getObjectClassIterator() {
 		return Collections.unmodifiableList(objectClass).iterator();
 	}
@@ -518,7 +486,6 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		this.seeAlso.remove(seeAlso);
 	}
 
-	@Transient
 	public Iterator<String> getSeeAlsoIterator() {
 		return seeAlso.iterator();
 	}

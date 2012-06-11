@@ -19,38 +19,38 @@ import java.io.Serializable;
 @Searchable(root = false)
 public class Address extends BaseObject implements Serializable {
     private static final long serialVersionUID = 3617859655330969141L;
+    @SearchableProperty
+    @Column(name = "postal_address", length = 150)
     private String postalAddress;
+    @SearchableProperty
+    @Column(length = 50)
     private String city;
+    @SearchableProperty
+    @Column(length = 100)
     private String province;
+    @SearchableProperty
+    @Column(length = 100)
     private String country;
+    @SearchableProperty
+    @Column(name = "postal_code", length = 15)
     private String postalCode;
 
-    @Column(name = "postal_address", length = 150)
-    @SearchableProperty
     public String getPostalAddress() {
         return postalAddress;
     }
 
-    @Column(length = 50)
-    @SearchableProperty
     public String getCity() {
         return city;
     }
 
-    @Column(length = 100)
-    @SearchableProperty
     public String getProvince() {
         return province;
     }
 
-    @Column(length = 100)
-    @SearchableProperty
     public String getCountry() {
         return country;
     }
 
-    @Column(name = "postal_code", length = 15)
-    @SearchableProperty
     public String getPostalCode() {
         return postalCode;
     }

@@ -27,6 +27,6 @@ public class GenericDaoTest extends BaseDaoTestCase {
     public void getUser() {
         User user = genericDao.get(-1L);
         assertNotNull(user);
-        assertEquals("user", user.getUsername());
+        assertEquals("mupeng", user.getUsername());
     }
 }

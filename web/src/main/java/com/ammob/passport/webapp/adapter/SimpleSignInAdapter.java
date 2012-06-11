@@ -64,11 +64,12 @@ public class SimpleSignInAdapter implements SignInAdapter {
 		try {
 			SecurityContext.addCasSignin(centralAuthenticationService, ticketGrantingTicketCookieGenerator, localUserId, "", true, false, (HttpServletResponse) request.getNativeResponse());
 			SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(localUserId, null, null));	
+			log.info(localUserId + "'s bind signIn success ! " );
 			return extractOriginalUrl(request);
 		} catch (TicketCreationException e) {
 			log.warn(localUserId + "'s bind signIn fail ! e : " + e );
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warn(localUserId + "'s bind signIn fail ! e : " + e );
 		}
 		return null;
 	}

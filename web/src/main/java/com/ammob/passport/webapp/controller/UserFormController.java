@@ -70,7 +70,7 @@ public class UserFormController extends BaseFormController {
         Locale locale = request.getLocale();
         if (request.getParameter(Constants.SECURITY_SUPERVISION_CODE) != null) {
             getUserManager().removeUser(user.getId().toString());
-            saveMessage(request, getText("user.deleted", user.getFullName(), locale));
+            saveMessage(request, getText("user.deleted", user.getDisplayName(), locale));
             return getSuccessView();
         } else {
             if (request.isUserInRole(Constants.ADMIN_ROLE)) {// only attempt to change roles if user is admin for other users, showForm() method will handle populating
@@ -104,23 +104,23 @@ public class UserFormController extends BaseFormController {
                 return "userform";
             }
             if (!StringUtils.equals(request.getParameter("from"), "list")) {
-                saveMessage(request, getText("user.saved", user.getFullName(), locale));
+                saveMessage(request, getText("user.saved", user.getDisplayName(), locale));
                 // return to main Menu
                 return getCancelView();
             } else {
                 if (StringUtils.isBlank(request.getParameter("version"))) {
-                    saveMessage(request, getText("user.added", user.getFullName(), locale));
+                    saveMessage(request, getText("user.added", user.getDisplayName(), locale));
                     // Send an account information e-mail
                     message.setSubject(getText("signup.email.subject", locale));
                     try {
-                        sendUserMessage(user, getText("newuser.email.message", user.getFullName(), locale),
+                        sendUserMessage(user, getText("newuser.email.message", user.getDisplayName(), locale),
                                 RequestUtil.getAppURL(request));
                     } catch (MailException me) {
                         saveError(request, me.getCause().getLocalizedMessage());
                     }
                     return getSuccessView();
                 } else {
-                    saveMessage(request, getText("user.updated.byAdmin", user.getFullName(), locale));
+                    saveMessage(request, getText("user.updated.byAdmin", user.getDisplayName(), locale));
                 }
             }
         }

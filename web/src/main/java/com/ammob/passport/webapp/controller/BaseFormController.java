@@ -76,6 +76,9 @@ public class BaseFormController implements ServletContextAware {
         this.userManager = userManager;
     }
 
+    public UserManager getUserManager() {
+        return this.userManager;
+	}
     @SuppressWarnings("unchecked")
     public void saveError(HttpServletRequest request, String error) {
         List<String> errors = (List<String>) request.getSession().getAttribute(MESSAGES_ERROR_KEY);
@@ -95,14 +98,6 @@ public class BaseFormController implements ServletContextAware {
         messages.add(msg);
         request.getSession().setAttribute(MESSAGES_SUCESS_KEY, messages);
     }
-
-    /**
-     * 
-     * @return
-     */
-    public UserManager getUserManager() {
-		return userManager;
-	}
 
     /**
      * Convenience method for getting a i18n key's value.  Calling
@@ -148,7 +143,6 @@ public class BaseFormController implements ServletContextAware {
      *
      * @return the user's populated form from the session
      */
-    @SuppressWarnings("rawtypes")
 	public Map<?, ?> getConfiguration() {
         Map<?, ?> config = (HashMap<?, ?>) servletContext.getAttribute(Constants.CONFIG);
         // so unit tests don't puke when nothing's been set
@@ -189,7 +183,7 @@ public class BaseFormController implements ServletContextAware {
         if (log.isDebugEnabled()) {
             log.debug("sending e-mail to user [" + user.getEmail() + "]...");
         }
-        String identifying = StringUtils.hasText(user.getFullName()) ? user.getFullName() : user.getUsername();
+        String identifying = StringUtils.hasText(user.getDisplayName()) ? user.getDisplayName() : user.getUsername();
         message.setTo( identifying + "<" + user.getEmail() + ">");
 
         Map<String, Serializable> model = new HashMap<String, Serializable>();

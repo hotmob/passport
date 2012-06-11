@@ -18,9 +18,7 @@ import java.util.ResourceBundle;
  */
 @ContextConfiguration(
     locations={"classpath:/applicationContext-resources.xml",
-               "classpath:/applicationContext-dao.xml",
-               "classpath*:/applicationContext.xml",
-               "classpath:**/applicationContext*.xml"})
+               		"classpath:/applicationContext-dao.xml"})
 public abstract class BaseDaoTestCase extends AbstractTransactionalJUnit4SpringContextTests {
     /**
      * Log variable for all child classes. Uses LogFactory.getLog(getClass()) from Commons Logging

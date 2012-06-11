@@ -96,46 +96,4 @@
             </list>
         </property>
     </bean>
-    <!--
-	    | Whereas CredentialsToPrincipalResolvers identify who it is some Credentials might authenticate, 
-	    | AuthenticationHandlers actually authenticate credentials.  Here we declare the AuthenticationHandlers that
-	    | authenticate the Principals that the CredentialsToPrincipalResolvers identified.  CAS will try these handlers in turn
-	    | until it finds one that both supports the Credentials presented and succeeds in authenticating.
-	    +-->
-    <bean id="personAttributeRepository" class="org.jasig.services.persondir.support.ldap.LdapPersonAttributeAndRoleDao">
-        <property name="ldapAuthoritiesPopulator" ref="ldapAuthoritiesPopulator" />
-        <property name="baseDN" value="${ldap.users.search.dn}" />
-        <property name="queryType" value="OR" />
-        <property name="queryAttributeMapping">
-            <map>
-                <entry key="username" value="cn" />
-                <entry key="mail" value="mail" />
-            </map>
-        </property>
-        <property name="contextSource" ref="contextSource" />
-        <property name="resultAttributeMapping">
-            <map>
-                <!-- Mapping beetween LDAP entry's attributes (key) and Principal"s (value) -->
-                <entry key="cn" value="username" />
-                <entry key="userPassword" value="password" />
-                <entry key="sn" value="firstName" />
-                <entry key="givenName" value="lastName" />
-                <entry key="displayName" value="displayName" />
-                <entry key="description" value="description" />
-                <entry key="photo" value="avataUrl" />
-                <entry key="mail" value="email" />
-                <entry key="st" value="state" />
-                <entry key="telephoneNumber"  value="phoneNumber" />
-                <entry key="entryUUID" value="uuid" />
-                <entry key="authorities" value="authorities" />
-                <entry key="modifyTimestamp" value="version" />
-                <entry key="createTimestamp" value="regTime" />
-                <entry key="country" value="address.country" />
-                <entry key="province" value="address.province" />
-                <entry key="city" value="address.city" />
-                <entry key="postalAddress" value="address.postalAddress" />
-                <entry key="postalCode" value="address.postalCode" />
-            </map>
-        </property>
-    </bean>
 </beans>
