@@ -55,7 +55,7 @@ public class MailEngine {
     public void sendMessage(SimpleMailMessage msg, String templateName, Map<String, Serializable> model) {
         String result = null;
         try {
-            result = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, templateName, model);
+            result = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, templateName, "UTF-8", model);
         } catch (VelocityException e) {
             e.printStackTrace();
             log.error(e.getMessage());

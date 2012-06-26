@@ -84,9 +84,9 @@ public class UserFormController extends BaseFormController {
             } else {// if user is not an admin then load roles from the database (or any other user properties that should not be editable by users without admin role) 
                 User cleanUser = null;;
                 try {
-                	cleanUser = getUserManager().getPerson(request.getRemoteUser());
+                	cleanUser = getUserManager().getUserByUsername(request.getRemoteUser());
     			} catch (UsernameNotFoundException e) {
-    				cleanUser = getUserManager().getUserByUsername(request.getRemoteUser());
+    				log.warn("Error : User is not found ! [ " + request.getRemoteUser() + " ]");
     			}
                 user.setRoles(cleanUser.getRoles());
             }
@@ -162,17 +162,16 @@ public class UserFormController extends BaseFormController {
                 }
             }
 
-            User user;
+            User user = new User();
             if (userId == null && !isAdd(request)) {
                 try {
-					user = getUserManager().getPerson(request.getRemoteUser());
-				} catch (UsernameNotFoundException e) {
 					user = getUserManager().getUserByUsername(request.getRemoteUser());
+				} catch (UsernameNotFoundException e) {
+					log.warn("Error : User is not found ! [ " + request.getRemoteUser() + " ]");
 				}
             } else if (!StringUtils.isBlank(userId) && !"".equals(request.getParameter("version"))) {
                 user = getUserManager().getUser(userId);
             } else {
-                user = new User();
                 user.addRole(new Role(Constants.USER_ROLE));
             }
             user.setConfirmPassword(user.getPassword());

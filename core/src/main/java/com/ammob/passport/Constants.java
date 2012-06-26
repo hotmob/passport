@@ -95,10 +95,15 @@ public final class Constants {
     /**
      * The string of the remote user avata statics resources uri prefix setting.
      */
-    public static final String USER_DEFAULT_AVATA_URL_PREFIX = "http://avata.766.com/";
+    public static final String USER_DEFAULT_AVATA_URL_PREFIX = "http://avatar.766.com/";
     
     /**
      * The string of the remote user avata statics resources uri suffix setting.
      */
     public static final String USER_DEFAULT_AVATA_URL_SUFFIX = "/b_avatar.jpg";
+    
+	/** 
+	 * The email verified tag
+	 **/
+	public static final String STATES_EMAIL_VERIFIED = "Verified_Email";
 }

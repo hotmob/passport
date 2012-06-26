@@ -21,7 +21,25 @@
 						<dt>
                             <strong><%=request.getUserPrincipal().getName()%></strong> <span><fmt:message key="mainMenu.heading" /></span>
                         </dt>
-                        <dt><c:out value="${user.email}" escapeXml="false"/></dt>
+                        <dt>
+                            <c:out value="${user.email}" escapeXml="false"/>
+                            <c:out value="${user.state}" escapeXml="false"/>
+                            <c:out value="${STATES_EMAIL_VERIFIED}" escapeXml="false"/>
+                           <%--  <c:forEach var="item" items="${Users.section}">
+							  ${item.dd}
+							</c:forEach> --%>
+                            <appfuse:constants scope="request"/>
+							<c:choose>
+								<c:when test="${fn:contains(user.state, STATES_EMAIL_VERIFIED)}">
+                                    <span><fmt:message key="user.activation" /></span>
+								</c:when>
+								<c:otherwise>
+	                                <form id="activation" action="<c:url value="/hint?username=${user.username}&activation"/>" method="POST">
+	                                    <button type="submit"><span><fmt:message key="user.activated" /></span></button>
+	                                </form>
+								</c:otherwise>
+							</c:choose>
+						</dt>
                     </dl>
                 </div>
                 <div class="login_manage">

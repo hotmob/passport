@@ -17,8 +17,10 @@
         </c:if>
     </spring:bind>
     <div class="hint_con">
-        <h3 class="get_password_tit"></h3>
         <c:choose>
+            <c:when test="${hintForm.getStep() eq 0}">
+                <%@ include file="default/ui/hint/passwordA.jsp"%>
+            </c:when>
             <c:when test="${hintForm.getStep() eq 1}">
                 <%@ include file="default/ui/hint/passwordB.jsp"%>
             </c:when>
@@ -29,7 +31,7 @@
                 <%@ include file="default/ui/hint/passwordD.jsp"%>
             </c:when>
             <c:otherwise>
-                <%@ include file="default/ui/hint/passwordA.jsp"%>
+                <%@ include file="default/ui/hint/activation.jsp"%>
             </c:otherwise>      
         </c:choose>
     </div>

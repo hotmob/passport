@@ -1,4 +1,5 @@
 <%@ include file="/WEB-INF/view/jsp/common/taglibs.jsp" %>
+<h3 class="get_password_tit"></h3>
 <div class="flowsteps">
     <ol class="num4">
         <li class="current">

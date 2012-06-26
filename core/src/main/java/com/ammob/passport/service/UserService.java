@@ -1,7 +1,7 @@
 package com.ammob.passport.service;
 
-import com.ammob.passport.model.User;
 import com.ammob.passport.exception.UserExistsException;
+import com.ammob.passport.model.User;
 
 import javax.jws.WebService;
 import javax.ws.rs.DELETE;
@@ -16,9 +16,10 @@ import java.util.List;
  * Web Service interface so hierarchy of Generic Manager isn't carried through.
  */
 @WebService
-@Path("/")
+@Path("/users")
 @Produces({"application/json", "application/xml"})
 public interface UserService {
+	
     /**
      * Retrieves a user by userId.  An exception is thrown if user not found
      *
@@ -26,7 +27,7 @@ public interface UserService {
      * @return User
      */
     @GET
-    @Path("/user/{id}")
+    @Path("/{id}")
     User getUser(@PathParam("id") String userId);
 
     /**
@@ -43,7 +44,7 @@ public interface UserService {
      * @return List
      */
     @GET
-    @Path("/users")
+    @Path("/")
     List<User> getUsers();
 
     /**
@@ -54,7 +55,7 @@ public interface UserService {
      * @throws UserExistsException thrown when user already exists
      */
     @POST
-    @Path("/user")
+    @Path("/")
     User saveUser(User user) throws UserExistsException;
 
     /**
@@ -63,6 +64,6 @@ public interface UserService {
      * @param userId the user's id
      */
     @DELETE
-    @Path("/user")
+    @Path("/")
     void removeUser(String userId);
 }

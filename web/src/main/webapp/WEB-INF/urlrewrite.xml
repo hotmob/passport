@@ -7,14 +7,23 @@
         <from>^/admin/user/(.*)\$</from>
         <to type="forward">/app/admin/userform?id=$1&amp;from=list</to>
     </rule>
+    <!-- old passport rest service rule . -->
+    <rule>
+        <from>/v1/users/**</from>
+        <to type="forward">/services/api/users/$1?_type=json</to>
+    </rule>
+    <rule>
+        <from>/v1/tickets</from>
+        <to type="forward">/services/api/tickets</to>
+    </rule>
+    <rule>
+        <from>/v1/tickets/**</from>
+        <to type="forward">/services/api/tickets/$1</to>
+    </rule>
     <!-- The following fixes a CSS bug in CXF. -->
     <rule match-type="regex">
         <from>^/services//(.*)$</from>
         <to type="forward">/services/$1</to>
-    </rule>
-    <rule match-type="regex">
-        <from>^/v1//(.*)$</from>
-        <to type="forward">/v1/$1</to>
     </rule>
     <!-- Add rules here for anything that shouldn't be served up by Spring MVC. -->
     <rule>
@@ -40,10 +49,6 @@
     <rule>
         <from>/services/**</from>
         <to>/services/$1</to>
-    </rule>
-    <rule>
-        <from>/v1/**</from>
-        <to>/v1/$1</to>
     </rule>
     <rule>
         <from>/statics/**</from>

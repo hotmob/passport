@@ -22,11 +22,13 @@
         </jaxrs:features>
         <jaxrs:serviceBeans>
             <ref bean="userManager"/>
+            <ref bean="grantManager"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <ref bean="jsonProvider"/>
         </jaxrs:providers>
         <jaxrs:extensionMappings>
+            <entry key="html" value="text/html"/>
             <entry key="json" value="application/json"/>
             <entry key="xml" value="application/xml"/>
             <entry key="feed" value="application/atom+xml"/>

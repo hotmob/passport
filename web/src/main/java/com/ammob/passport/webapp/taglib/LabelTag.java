@@ -85,7 +85,7 @@ public class LabelTag extends TagSupport {
         }
 
         Errors errors = requestContext.getErrors(formName, false);
-        List fes = null;
+        List<?> fes = null;
         if (errors != null) {
             fes = errors.getFieldErrors(fieldName);
             //String errorMsg = getErrorMessages(fes);

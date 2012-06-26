@@ -17,7 +17,7 @@
                    defaultsort="1" class="table table-condensed" pagesize="50" requestURI="">
         <display:column property="username" escapeXml="true" style="width: 30%" titleKey="user.username"
                         sortable="true"/>
-        <display:column titleKey="activeUsers.fullName" sortable="true">
+        <display:column titleKey="activeUsers.displayName" sortable="true">
             <c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
             <c:if test="${not empty user.email}">
                 <a href="mailto:<c:out value="${user.email}"/>">

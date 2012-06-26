@@ -147,7 +147,7 @@ public class BaseFormController implements ServletContextAware {
         Map<?, ?> config = (HashMap<?, ?>) servletContext.getAttribute(Constants.CONFIG);
         // so unit tests don't puke when nothing's been set
         if (config == null) {
-            return new HashMap();
+            return new HashMap<Object,Object>();
         }
         return config;
     }
@@ -183,15 +183,10 @@ public class BaseFormController implements ServletContextAware {
         if (log.isDebugEnabled()) {
             log.debug("sending e-mail to user [" + user.getEmail() + "]...");
         }
-        String identifying = StringUtils.hasText(user.getDisplayName()) ? user.getDisplayName() : user.getUsername();
-        message.setTo( identifying + "<" + user.getEmail() + ">");
-
+        //message.setTo( user.getUsername() + "<" + user.getEmail() + ">");
+        message.setTo(user.getEmail());
         Map<String, Serializable> model = new HashMap<String, Serializable>();
         model.put("user", user);
-
-        // TODO: once you figure out how to get the global resource bundle in
-        // WebWork, then figure it out here too.  In the meantime, the Username
-        // and Password labels are hard-coded into the template. 
         // model.put("bundle", getTexts());
         model.put("message", msg);
         model.put("applicationURL", url);

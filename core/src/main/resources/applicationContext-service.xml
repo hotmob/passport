@@ -13,6 +13,15 @@
     <!-- =================================================================== -->
     <!-- Passport: Manager & Service                                         -->
     <!-- =================================================================== -->
+    <bean id="httpClient" class="org.jasig.cas.util.HttpClient">
+	    <property name="readTimeout" value="5000" />
+	    <property name="connectionTimeout" value="5000" />
+    </bean>
+    
+    <bean id="ldapTemplate" class="org.springframework.ldap.core.LdapTemplate">
+        <property name="contextSource" ref="contextSource"/>
+    </bean>
+    
     <bean id="ldapUserDetailsManager" class="org.springframework.security.ldap.userdetails.LdapUserDetailsManager">
         <constructor-arg ref="contextSource" />
         <property name="groupSearchBase" value="${ldap.groups.search.dn}" />
@@ -24,6 +33,28 @@
         </property>
         <property name="userDetailsMapper">
             <bean class="com.ammob.passport.mapper.PersonMapper" />
+        </property>
+        <property name="attributesToRetrieve">
+			<list>
+				<value>cn</value>
+				<value>userPassword</value>
+				<value>sn</value>
+				<value>givenName</value>
+				<value>displayName</value>
+				<value>description</value>
+				<value>labeledURI</value>
+				<value>mail</value>
+				<value>st</value>
+				<value>telephoneNumber</value>
+				<value>entryUUID</value>
+				<value>modifyTimestamp</value>
+				<value>createTimestamp</value>
+				<value>country</value>
+				<value>province</value>
+				<value>city</value>
+				<value>postalAddress</value>
+				<value>postalCode</value>
+			</list>
         </property>
     </bean>
     
@@ -130,7 +161,7 @@
                 <entry key="givenName" value="lastName" />
                 <entry key="displayName" value="displayName" />
                 <entry key="description" value="description" />
-                <entry key="photo" value="avataUrl" />
+                <entry key="labeledURI" value="avataUrl" />
                 <entry key="mail" value="email" />
                 <entry key="st" value="state" />
                 <entry key="telephoneNumber"  value="phoneNumber" />
@@ -210,10 +241,10 @@
     <bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
         <property name="velocityProperties">
             <props>
+	            <prop key="input.encoding">UTF-8</prop>
+	            <prop key="output.encoding">UTF-8</prop>
                 <prop key="resource.loader">class</prop>
-                <prop key="class.resource.loader.class">
-                    org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
-                </prop>
+                <prop key="class.resource.loader.class">org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader</prop>
                 <prop key="velocimacro.library"></prop>
             </props>
         </property>

@@ -1,16 +1,15 @@
 package com.ammob.passport.service.impl;
 
-import com.ammob.passport.Constants;
 import com.ammob.passport.dao.UserDao;
-import com.ammob.passport.model.Role;
+import com.ammob.passport.mapper.PersonMapper;
 import com.ammob.passport.model.User;
 import com.ammob.passport.service.UserManager;
 import com.ammob.passport.service.UserService;
+import com.ammob.passport.util.StringUtil;
 import com.ammob.passport.enumerate.AttributeEnum;
 import com.ammob.passport.enumerate.StateEnum;
 import com.ammob.passport.exception.UserExistsException;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.jasig.services.persondir.IPersonAttributes;
 import org.jasig.services.persondir.support.MultivaluedPersonAttributeUtils;
 import org.jasig.services.persondir.support.NamedPersonImpl;
@@ -18,12 +17,18 @@ import org.jasig.services.persondir.support.ldap.LdapPersonAttributeDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.ldap.control.PagedResult;
+import org.springframework.ldap.control.PagedResultsCookie;
+import org.springframework.ldap.control.PagedResultsDirContextProcessor;
+import org.springframework.ldap.core.CollectingNameClassPairCallbackHandler;
+import org.springframework.ldap.core.ContextMapperCallbackHandler;
 import org.springframework.ldap.core.DistinguishedName;
-import org.springframework.ldap.odm.core.OdmManager;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
 import org.springframework.stereotype.Service;
@@ -32,8 +37,6 @@ import org.springframework.util.StringUtils;
 import javax.jws.WebService;
 import javax.naming.directory.SearchControls;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,11 +64,16 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
         this.dao = userDao;
         this.userDao = userDao;
     }
+    
 	/**
      * {@inheritDoc}
      */
     public User getUser(String userId) {
-        return userDao.get(new Long(userId));
+    	if(StringUtil.isNumeric(userId)) {
+    		return userDao.get(new Long(userId));
+    	} else {
+    		return getUserByUsername(userId);
+    	}
     }
 
     /**
@@ -75,8 +83,6 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
         return userDao.getAllDistinct();
     }
 
-
-    
     /**
      * {@inheritDoc}
      */
@@ -126,8 +132,12 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
      * {@inheritDoc}
      */
     public void removeUser(String userId) {
-        log.debug("removing user: " + userId);
-        userDao.remove(new Long(userId));
+    	 log.debug("removing user: " + userId);
+    	if(StringUtil.isNumeric(userId)) {
+    		userDao.remove(new Long(userId));
+    	} else {
+    		ldapUserDetailsManager.deleteUser(userId);
+    	}
     }
 	
 	/**
@@ -138,72 +148,44 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
      * @throws UsernameNotFoundException thrown when username not found
      */
     public User getUserByUsername(String username) throws UsernameNotFoundException {
-        return (User) userDao.loadUserByUsername(username);
+    	User user = null;
+		try {
+			user = (User) ldapUserDetailsManager.loadUserByUsername(username);
+		} catch (Exception e) {
+			log.warn("LDAP not found username : " + username);
+		}
+    	if(user == null)
+    		user = (User) userDao.loadUserByUsername(username);
+    	return user;
     }
 
     /**
      * {@inheritDoc}
      */
-    public List<User> search(String searchTerm) {
+    @SuppressWarnings("unchecked")
+	public List<User> search(String searchTerm) {
     	List<User> results = super.search(searchTerm, User.class);
         if (!StringUtils.hasText(searchTerm)) {
-            // Find people with a surname of Harvey
-        	SearchControls DEFAULT_SEARCH_CONTROLS = new SearchControls(SearchControls.ONELEVEL_SCOPE, 1, 50000, null, true, false);
-            List<User> searchResults = new ArrayList<User>();
 			try {
-				searchResults.addAll(odmManager.search(User.class, new DistinguishedName("ou=users"), "cn=hotmob", DEFAULT_SEARCH_CONTROLS));
-			} catch (Exception e) {}
-            for (User person : searchResults) {
-            	results.add(person);
-            }
+				PagedResultsCookie cookie = new PagedResultsCookie(null);
+				results.addAll(getPagePersons(20, cookie).getResultList());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
         }
     	return results;
     }
     
-    /**
-     * {@inheritDoc}
-     *
-     * @param identifying the login name or login email of the human
-     * @return User the populated user object
-     * @throws UsernameNotFoundException thrown when user not found
-     * @throws UserExistsException 
-     */
-    public UserDetails loadUserDetails(String username) throws UsernameNotFoundException {
-    	UserDetails user = ldapUserDetailsManager.loadUserByUsername(username);
-    	if(user == null)
-    		throw new UsernameNotFoundException("User : '" + username + "' Is Not Found, ");
-    	return user;
+    private PagedResult getPagePersons(int pageSize, PagedResultsCookie cookie) {
+    	SearchControls searchControls = new SearchControls();
+    	EqualsFilter filter = new EqualsFilter("objectclass", "inetOrgPerson");
+    	searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+    	PagedResultsDirContextProcessor requestControl = new PagedResultsDirContextProcessor(pageSize,cookie);
+    	CollectingNameClassPairCallbackHandler handler = new ContextMapperCallbackHandler(new PersonMapper()); 
+    	ldapTemplate.search(DistinguishedName.EMPTY_PATH, filter.encode(), searchControls, handler, requestControl);
+    	return new PagedResult(handler.getList(),requestControl.getCookie());
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public User getPerson(String identifying) {
-    	Map<String, Object> ldapUser = new HashMap<String, Object>();
-    	ldapUser = personAttributeRepository.getUserAttributes(generateQuerySeed(identifying, identifying));
-		if(ldapUser != null) {
-	    	try {
-	    		User user = new User(ldapUser.get(AttributeEnum.USER_USERNAME.getValue()).toString());
-	    		UserDetails userDetails = loadUserDetails(user.getUsername());
-	    		BeanUtils.populate(user, ldapUser);
-				BeanUtils.copyProperties(user, userDetails);
-				for(GrantedAuthority authoritie : userDetails.getAuthorities())
-					user.addRole(new Role(authoritie.getAuthority()));
-				if(!user.getRoles().contains(new Role(Constants.USER_ROLE)))
-					user.addRole(new Role(Constants.USER_ROLE)); // add default role
-				user.setVersion(1);
-				return user;
-			} catch (UsernameNotFoundException e) {
-				log.warn(e.getMessage());
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				e.printStackTrace();
-			}
-		}
-    	return null;
-    }
-    
+
     /**
      * generate ldap query map seed.
      * @param username
@@ -223,7 +205,7 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
 	public IPersonAttributes getPersonAttributes(String identifying) {
 		final Set<IPersonAttributes> people = personAttributeRepository.getPeopleWithMultivaluedAttributes(
 				MultivaluedPersonAttributeUtils.toMultivaluedMap(generateQuerySeed(identifying, identifying)));
-        IPersonAttributes person = (IPersonAttributes)DataAccessUtils.singleResult(people);
+        IPersonAttributes person = DataAccessUtils.singleResult(people);
         if (person == null) {
             return null;
         }
@@ -257,10 +239,25 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
         }
         return user;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void changePassword(final String oldPassword, final String newPassword) {
+    	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    	String currentPassword = new String((byte[]) this.getPersonAttributes(authentication.getName()).getAttributeValue(AttributeEnum.USER_PASSWORD.getValue()));
+    	if (currentPassword.equals(oldPassword)) {
+    		ldapUserDetailsManager.changePassword(null, "{MD5}" + passwordEncoder.encodePassword(newPassword, null));
+    	} else {
+	    	log.warn(currentPassword + " : " + oldPassword);
+	    	ldapUserDetailsManager.changePassword(oldPassword, "{MD5}" + passwordEncoder.encodePassword(newPassword, null));
+    	}
+    }
+    
 	@Autowired
 	private LdapPersonAttributeDao personAttributeRepository;
 	@Autowired
     private LdapUserDetailsManager ldapUserDetailsManager;
 	@Autowired
-	private OdmManager odmManager;
+	private LdapTemplate ldapTemplate;
 }

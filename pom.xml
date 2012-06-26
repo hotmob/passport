@@ -133,8 +133,9 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit-dep</artifactId>
-			<version>4.5</version>
-			<scope>test</scope>
+			<version>${junit.version}</version>
+			<!-- <scope>test</scope> -->
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -525,7 +526,7 @@
 		<commons.lang.version>2.6</commons.lang.version>
 		<commons.pool.version>1.6</commons.pool.version>
 		<compass.version>2.2.0</compass.version>
-		<cxf.version>2.6.0</cxf.version>
+		<cxf.version>2.6.1</cxf.version>
 		<dwr.version>2.0.3</dwr.version>
 		<ehcache.version>2.3.1</ehcache.version>
 		<ehcache.web.version>2.0.3</ehcache.web.version>

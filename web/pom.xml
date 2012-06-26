@@ -18,25 +18,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.zeroturnaround</groupId>
-				<artifactId>jrebel-maven-plugin</artifactId>
-				<version>1.1.1</version>
-				<executions>
-					<execution>
-						<id>generate-rebel-xml</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<!-- <rebelXmlDirectory>${basedir}/src/main/webapp/WEB-INF/classes</rebelXmlDirectory> -->
-					<relativePath>../../</relativePath>
-					<rootPath>$${project.path.root}</rootPath>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>dbunit-maven-plugin</artifactId>
 				<version>1.0-beta-3</version>
@@ -124,8 +105,7 @@
 						<configuration>
 							<encoding>UTF8</encoding>
 							<includes>ApplicationResources*.properties,
-							     displaytag*.properties,
-							     *.vm</includes>
+							     displaytag*.properties</includes>
 							<excludes>
 								ApplicationResources_de*.properties,
 								ApplicationResources_fr*.properties,
@@ -383,16 +363,34 @@
 		    <groupId>org.springframework.social</groupId>
 		    <artifactId>spring-social-facebook</artifactId>
 		    <version>${spring.social.facebook.version}</version>
+		    <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
+                    <artifactId>jackson-mapper-asl</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
 		<dependency>
             <groupId>org.springframework.social</groupId>
             <artifactId>spring-social-twitter</artifactId>
             <version>${spring.social.twitter.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
+                    <artifactId>jackson-mapper-asl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.social</groupId>
             <artifactId>spring-social-linkedin</artifactId>
             <version>${spring.social.linkedin.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
+                    <artifactId>jackson-mapper-asl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 		<dependency>
 			<groupId>org.springmodules</groupId>
@@ -446,13 +444,6 @@
             <artifactId>hibernate-validator</artifactId>
             <scope>runtime</scope>
             <version>${hibernate.validator.version}</version>
-        </dependency>
-        <!-- Mock Test -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.1.1</version>
-            <scope>compile</scope>
         </dependency>
         <!-- Captcha -->
 		<dependency>

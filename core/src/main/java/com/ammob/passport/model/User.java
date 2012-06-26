@@ -2,6 +2,7 @@ package com.ammob.passport.model;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.compass.annotations.Searchable;
 import org.compass.annotations.SearchableComponent;
 import org.compass.annotations.SearchableId;
@@ -11,7 +12,7 @@ import org.springframework.ldap.odm.annotations.Attribute;
 import org.springframework.ldap.odm.annotations.Entry;
 import org.springframework.ldap.odm.annotations.Attribute.Type;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.ldap.userdetails.LdapUserDetails;
 import org.springframework.util.StringUtils;
 
 import com.ammob.passport.Constants;
@@ -55,7 +56,8 @@ import java.util.Set;
 @Searchable
 @XmlRootElement
 @Entry(objectClasses={"userDetails", "inetOrgPerson", "top"})
-public class User extends BaseObject implements Serializable, UserDetails {
+@JsonIgnoreProperties(value={ "password" }) 
+public class User extends BaseObject implements Serializable, LdapUserDetails {
 	
     private static final long serialVersionUID = 3832626162173359411L;
  
@@ -126,6 +128,7 @@ public class User extends BaseObject implements Serializable, UserDetails {
     @org.springframework.ldap.odm.annotations.Transient
     private String passwordHint;
     
+    @Transient
     @org.springframework.ldap.odm.annotations.Id
 	private Name dn;                  					// DN
 	@Transient
@@ -152,8 +155,16 @@ public class User extends BaseObject implements Serializable, UserDetails {
 	@Transient
 	@Attribute(name="seeAlso", syntax="1.3.6.1.4.1.1466.115.121.1.12")
 	private List<String> seeAlso=new ArrayList<String>();
-	
-    /**
+    // PPolicy data
+	@Transient
+	@org.springframework.ldap.odm.annotations.Transient
+    private int timeBeforeExpiration = Integer.MAX_VALUE;
+
+	@Transient
+	@org.springframework.ldap.odm.annotations.Transient
+    private int graceLoginsRemaining = Integer.MAX_VALUE;
+
+	/**
      * Default constructor - creates a new instance with no values set.
      */
     public User() {}
@@ -410,7 +421,7 @@ public class User extends BaseObject implements Serializable, UserDetails {
 	
 	public String getDisplayName() {
 		if(!StringUtils.hasText(displayName))
-			return firstName + ' ' + lastName;
+			return firstName + " " + lastName;
 		return displayName;
 	}
 	
@@ -466,8 +477,10 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		this.avataUrl = avataUrl;
 	}
 
-	public Name getDn() {
-		return dn;
+	public String getDn() {
+		if(dn == null)
+			return null;
+		return dn.toString();
 	}
 
 	public void setDn(String dn) {
@@ -488,5 +501,21 @@ public class User extends BaseObject implements Serializable, UserDetails {
 
 	public Iterator<String> getSeeAlsoIterator() {
 		return seeAlso.iterator();
+	}
+
+	public void setTimeBeforeExpiration(int timeBeforeExpiration) {
+		this.timeBeforeExpiration = timeBeforeExpiration;
+	}
+	
+	public int getTimeBeforeExpiration() {
+		return timeBeforeExpiration;
+	}
+
+	public void setGraceLoginsRemaining(int graceLoginsRemaining) {
+		this.graceLoginsRemaining = graceLoginsRemaining;
+	}
+	
+    public int getGraceLoginsRemaining() {
+		return graceLoginsRemaining;
 	}
 }

@@ -174,12 +174,11 @@
 					</div>
 				</fieldset>
 				<fieldset class="control-group">
-					<label for="userRoles" class="control-label"><fmt:message
-							key="userProfile.assignRoles" /></label>
+					<label for="userRoles" class="control-label"><fmt:message key="userProfile.assignRoles" /></label>
 					<div class="controls">
 						<select id="userRoles" name="userRoles" multiple="true">
 							<c:forEach items="${availableRoles}" var="role">
-								<option value="${role.value}" ${fn:contains(user.roles, role.label) ? 'selected' : ''}>${role.label}</option>
+								<option value="${role.value}"  <c:if test="${fn:contains(user.roles, role.label)}"><c:out value="selected"/></c:if>>${role.label}</option>
 							</c:forEach>
 						</select>
 					</div>
@@ -189,10 +188,10 @@
 				<fieldset class="control-group">
 					<label class="control-label"><fmt:message key="user.roles" />:</label>
 					<div class="controls readonly">
-						<c:forEach var="role" items="${user.roleList}" varStatus="status">
-							<c:out value="${role.label}" />
+						<c:forEach var="role" items="${user.roles}" varStatus="status">
+							<c:out value="${role.name}" />
 							<c:if test="${!status.last}">,</c:if>
-							<input type="hidden" name="userRoles" value="<c:out value="${role.label}"/>" />
+							<input type="hidden" name="userRoles" value="<c:out value="${role.name}"/>" />
 						</c:forEach>
 					</div>
 					<form:hidden path="enabled" />

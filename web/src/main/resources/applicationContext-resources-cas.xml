@@ -23,7 +23,6 @@
         p:targetObject-ref="servicesManager" p:targetMethod="reload" />
     <bean id="periodicServiceRegistryReloaderTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean"
         p:jobDetail-ref="serviceRegistryReloaderJobDetail" p:startDelay="120000" p:repeatInterval="120000" />
-    <bean id="httpClient" class="org.jasig.cas.util.HttpClient" p:readTimeout="5000" p:connectionTimeout="5000" />
     <bean id="persistentIdGenerator" class="org.jasig.cas.authentication.principal.ShibbolethCompatiblePersistentIdGenerator" p:salt="casrocks" />
     <!-- CentralAuthenticationService -->
     <bean id="centralAuthenticationService" class="org.jasig.cas.CentralAuthenticationServiceImpl"
@@ -70,7 +69,7 @@
 </bean>
 
     <!-- ********************************************** ticketGrantingTicketCookieGenerator.xml ********************************************** -->
-    <bean id="ticketGrantingTicketCookieGenerator" class="org.jasig.cas.web.support.CookieRetrievingCookieGenerator"
+    <bean id="ticketGrantingTicketCookieGenerator" class="org.jasig.cas.web.support.CookieRetrievingCookieGenerator" p:cookieDomain="${cas.cookise.domainname}"
         p:cookieSecure="false" p:cookieMaxAge="-1" p:cookieName="AuthTGC" p:cookiePath="/" />
 
     <!-- ********************************************** ticketRegistry.xml ********************************************** -->

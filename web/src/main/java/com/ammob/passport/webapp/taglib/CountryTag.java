@@ -88,7 +88,7 @@ public class CountryTag extends TagSupport {
         }
 
         Locale userLocale = pageContext.getRequest().getLocale();
-        List countries = this.buildCountryList(userLocale);
+        List<?> countries = this.buildCountryList(userLocale);
 
         if (scope != null) {
             if (scope.equals("page")) {
@@ -111,7 +111,7 @@ public class CountryTag extends TagSupport {
                 sb.append(eval.evalString("prompt", prompt) + "</option>\n");
             }
 
-            for (Iterator i = countries.iterator(); i.hasNext();) {
+            for (Iterator<?> i = countries.iterator(); i.hasNext();) {
                 LabelValue country = (LabelValue) i.next();
                 sb.append("    <option value=\"" + country.getValue() + "\"");
 
@@ -152,7 +152,8 @@ public class CountryTag extends TagSupport {
      *
      * @return List of LabelValues for all available countries.
      */
-    protected List buildCountryList(Locale locale) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	protected List<?> buildCountryList(Locale locale) {
         final String EMPTY = "";
         final Locale[] available = Locale.getAvailableLocales();
 
@@ -180,7 +181,8 @@ public class CountryTag extends TagSupport {
      * Class to compare LabelValues using their labels with
      * locale-sensitive behaviour.
      */
-    public class LabelValueComparator implements Comparator {
+    @SuppressWarnings("rawtypes")
+	public class LabelValueComparator implements Comparator {
         private Comparator c;
 
         /**
@@ -200,7 +202,8 @@ public class CountryTag extends TagSupport {
          *
          * @return The value returned by comparing the localized labels.
          */
-        public final int compare(Object o1, Object o2) {
+        @SuppressWarnings("unchecked")
+		public final int compare(Object o1, Object o2) {
             LabelValue lhs = (LabelValue) o1;
             LabelValue rhs = (LabelValue) o2;
 

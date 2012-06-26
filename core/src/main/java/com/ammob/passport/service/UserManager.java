@@ -5,7 +5,6 @@ import com.ammob.passport.model.User;
 import com.ammob.passport.exception.UserExistsException;
 
 import org.jasig.services.persondir.IPersonAttributes;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
@@ -33,13 +32,6 @@ public interface UserManager extends GenericManager<User, Long> {
      * @return User
      */
     User getUser(String userId);
-
-    /**
-     * From ldap repository to finds a user by their identifying.
-     * @param identifying username or mail
-     * @return
-     */
-    User getPerson(String identifying);
     
     /**
      * From ldap repository to finds a user by their identifying.
@@ -56,15 +48,6 @@ public interface UserManager extends GenericManager<User, Long> {
      *         exception thrown when user not found
      */
     User getUserByUsername(String username) throws UsernameNotFoundException;
-    
-    /**
-     * From ldap to finds a user by their identifying.
-     * @param username the user's username used to login
-     * @return User a populated user object
-     * @throws org.springframework.security.core.userdetails.UsernameNotFoundException
-     *         exception thrown when user not found
-     */
-    UserDetails loadUserDetails(String username) throws UsernameNotFoundException;
     
     /**
      * Retrieves a list of all users.
@@ -103,4 +86,17 @@ public interface UserManager extends GenericManager<User, Long> {
      * @return a list of matches, or all if no searchTerm.
      */
     List<User> search(String searchTerm);
+    
+    /**
+     * Changes the password for the current user. The username is obtained from the security context.
+     * <p>
+     * If the old password is supplied, the update will be made by rebinding as the user, thus modifying the password
+     * using the user's permissions. If <code>oldPassword</code> is null, the update will be attempted using a
+     * standard read/write context supplied by the context source.
+     * </p>
+     *
+     * @param oldPassword the old password
+     * @param newPassword the new value of the password.
+     */
+    void changePassword(final String oldPassword, final String newPassword);
 }

@@ -3,6 +3,7 @@ package com.ammob.passport.webapp.controller;
 import com.ammob.passport.Constants;
 import com.ammob.passport.service.RoleManager;
 import com.ammob.passport.webapp.form.SignupForm;
+import com.ammob.passport.webapp.util.AuthCodeUtil;
 import com.ammob.passport.webapp.util.RequestUtil;
 import com.ammob.passport.webapp.util.SecurityContext;
 import com.ammob.passport.enumerate.StateEnum;
@@ -148,7 +149,7 @@ public class SignupController extends BaseFormController {
 		// Send an account information e-mail
 		message.setSubject(getText("signup.email.subject", locale));
 		try {
-			sendUserMessage(signupForm, getText("signup.email.message", locale), RequestUtil.getAppURL(request));
+			sendUserMessage(signupForm, getText("signup.email.message", locale), RequestUtil.getAppURL(request) + "/hint?" + AuthCodeUtil.wrap(signupForm.getUsername()) + "&activation");
 		} catch (MailException me) {
 			saveError(request, me.getMostSpecificCause().getMessage());
 		}

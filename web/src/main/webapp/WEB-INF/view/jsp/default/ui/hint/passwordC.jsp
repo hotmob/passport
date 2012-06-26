@@ -1,5 +1,6 @@
 <%@ include file="/WEB-INF/view/jsp/common/taglibs.jsp" %>
 <%@ page import="java.util.List" %>
+<h3 class="get_password_tit"></h3>
 <div class="flowsteps">
     <ol class="num4">
         <li class="done">
@@ -57,6 +58,8 @@
                 </li>
                 <li class="btn_con">
                     <form:hidden path="step"/>
+                    <form:hidden path="version" />
+                    <form:hidden path="oldPassword" />
                     <input type="submit" class="btn btn-success" name="save" value="<fmt:message key="label.flows.step.next" />" tabindex="4" />
                 </li>
              </c:if>
