@@ -3,7 +3,7 @@ package com.ammob.passport.webapp.controller;
 import com.ammob.passport.Constants;
 import com.ammob.passport.enumerate.AttributeEnum;
 import com.ammob.passport.model.User;
-import com.ammob.passport.webapp.form.HintForm;
+import com.ammob.passport.webapp.form.UserForm;
 import com.ammob.passport.webapp.util.AuthCodeUtil;
 import com.ammob.passport.webapp.util.RequestUtil;
 
@@ -33,30 +33,30 @@ public class HintController extends BaseFormController {
 	
 	@ModelAttribute
 	@RequestMapping(method = RequestMethod.GET)
-	public HintForm showForm(){
-		return new HintForm();
+	public UserForm showForm(){
+		return new UserForm();
 	}
 	
 	@ModelAttribute
 	@RequestMapping(method = RequestMethod.GET, params =  {"username", "authcode", "timestamp", "activation"})
-	public HintForm showForm(@RequestParam(value="username", required=true) String username, 
+	public UserForm showForm(@RequestParam(value="username", required=true) String username, 
 			 								 @RequestParam(value="authcode", required=true) String authcode, 
 			 								 @RequestParam(value="timestamp", required=true) Long timestamp, HttpServletRequest request) throws Exception {
 		if((username.concat(timestamp.toString())).equals(AuthCodeUtil.authcodeDecode(authcode))) {
 			User user = this.getUserManager().getUserByUsername(username);
 			user.setState(Constants.STATES_EMAIL_VERIFIED);
 			this.getUserManager().savePerson(user);
-			return new HintForm(username, 100);
+			return new UserForm(username, 100);
 		} else {
 			saveError(request, this.getText("errors.token", new Object[] {}, request.getLocale()));
 			log.warn("user name, pw and auth : " + username + " : " + timestamp + " : " + authcode + " : " + AuthCodeUtil.authcodeDecode(authcode));
 		}
-		return new HintForm(username, 100);
+		return new UserForm(username, 100);
 	}
 	
 	@ModelAttribute
 	@RequestMapping(method = RequestMethod.GET, params =  {"username", "authcode", "timestamp", "password"})
-	public HintForm showForm(@RequestParam(value="username", required=true) String username, 
+	public UserForm showForm(@RequestParam(value="username", required=true) String username, 
 											 @RequestParam(value="authcode", required=true) String authcode, 
 											 @RequestParam(value="timestamp", required=true) Long timestamp, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -64,7 +64,8 @@ public class HintController extends BaseFormController {
 			Long mistiming = AuthCodeUtil.getUnixTimestamp() - timestamp;
 			log.info("Long mistiming value : " + mistiming);
 			if(mistiming < 3600) {
-				return new HintForm(username, new String((byte[]) this.getUserManager().getPersonAttributes(username).getAttributeValue(AttributeEnum.USER_PASSWORD.getValue())), 2);
+				IPersonAttributes attributes = this.getUserManager().getPersonAttributes(username);
+				return new UserForm(username, new String((byte[]) attributes.getAttributeValue(AttributeEnum.USER_PASSWORD.getValue())), attributes.getAttributeValue(AttributeEnum.USER_EMAIL.getValue()).toString(), 2);
 			} else {
 				saveError(request, this.getText("errors.exceed.time", new Object[] {"URL"}, request.getLocale()));
 			}
@@ -72,13 +73,13 @@ public class HintController extends BaseFormController {
 			saveError(request, this.getText("errors.token", new Object[] {}, request.getLocale()));
 			log.warn("user name, pw and auth : " + username + " : " + timestamp + " : " + authcode + " : " + AuthCodeUtil.authcodeDecode(authcode));
 		}
-		return new HintForm(username, 2);
+		return new UserForm(username, 2);
 	}
 	
     @RequestMapping(method = RequestMethod.POST)
-    public String onSubmit(HintForm hintForm, BindingResult errors, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public String onSubmit(UserForm userForm, BindingResult errors, HttpServletRequest request, HttpServletResponse response) throws Exception {
     	if (validator != null) { // validator is null during testing
-			validator.validate(hintForm, errors);
+			validator.validate(userForm, errors);
 			if(request.getParameter(Constants.SECURITY_SUPERVISION_CODE) == null) {// don't validate when supervision
 				if(!validateCaptcha(request)) {
 					errors.rejectValue("captcha", "errors.captcha", new Object[] {}, "captcha error");
@@ -91,17 +92,17 @@ public class HintController extends BaseFormController {
 		if (log.isDebugEnabled()) {
 			log.debug("Processing Password Hint...");
 		}
-		switch(hintForm.getStep()) {
+		switch(userForm.getStep()) {
 		case 0:
 			try {
-				hintForm.setStep(1);
-				IPersonAttributes user = this.getUserManager().getPersonAttributes(hintForm.getUsername());
-				hintForm.setEmail(user.getAttributeValue(AttributeEnum.USER_EMAIL.getValue()).toString());
+				userForm.setStep(1);
+				IPersonAttributes user = this.getUserManager().getPersonAttributes(userForm.getUsername());
+				userForm.setEmail(user.getAttributeValue(AttributeEnum.USER_EMAIL.getValue()).toString());
 		        message.setSubject(getText("hint.email.subject", request.getLocale()));
-				String url = RequestUtil.getAppURL(request) + "/hint?" + AuthCodeUtil.wrap(hintForm.getUsername()) + "&password";
-				sendUserMessage(hintForm, getText("hint.heading", request.getLocale()), url);
+				String url = RequestUtil.getAppURL(request) + "/hint?" + AuthCodeUtil.wrap(userForm.getUsername()) + "&password";
+				sendUserMessage(userForm, getText("hint.heading", request.getLocale()), url);
 			} catch (UsernameNotFoundException e) {
-				errors.rejectValue("username", "hint.error", new Object[] {hintForm.getUsername()}, "errors user identifying");
+				errors.rejectValue("username", "hint.error", new Object[] {userForm.getUsername()}, "errors user identifying");
 			} catch (MailException me) {
 				saveError(request, me.getMostSpecificCause().getMessage());
 			} catch (Exception e) {
@@ -112,9 +113,9 @@ public class HintController extends BaseFormController {
 			break;
 		case 2:
 			try {
-				hintForm.setStep(3);
-				SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(hintForm.getUsername(), null, null));
-				this.getUserManager().changePassword(hintForm.getOldPassword(), hintForm.getPassword());
+				userForm.setStep(3);
+				SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userForm.getUsername(), null, null));
+				this.getUserManager().changePassword(userForm.getOldPassword(), userForm.getPassword());
 				SecurityContextHolder.getContext().setAuthentication(null);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -135,6 +136,7 @@ public class HintController extends BaseFormController {
 			User user = this.getUserManager().getUserByUsername(username);
 			if(!user.getState().contains(Constants.STATES_EMAIL_VERIFIED))
 				sendUserMessage(user, getText("signup.email.message", request.getLocale()), RequestUtil.getAppURL(request) + "/hint?" + AuthCodeUtil.wrap(username) + "&activation");
+			RequestUtil.setCookie(response, Constants.STATES_EMAIL_VERIFIED, Long.toString(System.currentTimeMillis()), "/");
 		} catch (MailException me) {
 			saveError(request, me.getMostSpecificCause().getMessage());
 		}

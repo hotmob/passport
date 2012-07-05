@@ -16,26 +16,21 @@
                 <div class="logined">
                     <dl>
 						<dd class="avatar">
-								<img src="${user.avataUrl}">
+								<img src="${userForm.avataUrl}">
 						</dd>
 						<dt>
                             <strong><%=request.getUserPrincipal().getName()%></strong> <span><fmt:message key="mainMenu.heading" /></span>
                         </dt>
                         <dt>
-                            <c:out value="${user.email}" escapeXml="false"/>
-                            <c:out value="${user.state}" escapeXml="false"/>
-                            <c:out value="${STATES_EMAIL_VERIFIED}" escapeXml="false"/>
-                           <%--  <c:forEach var="item" items="${Users.section}">
-							  ${item.dd}
-							</c:forEach> --%>
-                            <appfuse:constants scope="request"/>
+                            <c:out value="${userForm.email}" escapeXml="false"/>
+                            <appfuse:constants />
 							<c:choose>
-								<c:when test="${fn:contains(user.state, STATES_EMAIL_VERIFIED)}">
+								<c:when test="${fn:contains(userForm.state, STATES_EMAIL_VERIFIED)}">
                                     <span><fmt:message key="user.activation" /></span>
 								</c:when>
 								<c:otherwise>
-	                                <form id="activation" action="<c:url value="/hint?username=${user.username}&activation"/>" method="POST">
-	                                    <button type="submit"><span><fmt:message key="user.activated" /></span></button>
+	                                <form id="activation" action="<c:url value="/hint?username=${userForm.username}&activation"/>" method="POST">
+	                                    <c:if test="${userForm.send == false}"><button type="submit"><span><fmt:message key="user.activated" /></span></button></c:if>
 	                                </form>
 								</c:otherwise>
 							</c:choose>

@@ -11,7 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.DataBinder;
 import org.subethamail.wiser.Wiser;
 
-import com.ammob.passport.webapp.form.HintForm;
+import com.ammob.passport.webapp.form.UserForm;
 
 import static org.junit.Assert.*;
 
@@ -34,7 +34,7 @@ public class HintControllerTest extends BaseControllerTestCase {
         wiser.setPort(getSmtpPort());
         wiser.start();
         
-        HintForm user = new HintForm(0);
+        UserForm user = new UserForm(0);
         String time = String.valueOf(System.currentTimeMillis());
         user.setUsername("self".concat(time));
         user.setEmail(time.concat("self-registered@raibledesigns.com"));

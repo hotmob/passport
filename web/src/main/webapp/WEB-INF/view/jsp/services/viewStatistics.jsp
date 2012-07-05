@@ -1,4 +1,4 @@
-<%@include file="includes/top.jsp"%>
+<%@ include file="/WEB-INF/view/jsp/common/taglibs.jsp"%>
 <h2>Runtime Statistics</h2>
 <table width="800">
     <thead>
@@ -77,5 +77,3 @@
 <img src="${appender.chartGenerator.chartUrl}" alt="${appender.name}" />
 
 </c:forEach>
-
-<%@include file="includes/bottom.jsp" %>

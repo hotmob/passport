@@ -5,8 +5,10 @@ import com.ammob.passport.model.User;
 
 import javax.jws.WebService;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -57,7 +59,16 @@ public interface UserService {
     @POST
     @Path("/")
     User saveUser(User user) throws UserExistsException;
-
+    
+    /**
+     * add a user from the database by their userId
+     *
+     * @param userId the user's id
+     */
+    @PUT
+    @Path("/")
+    User creatUser(@FormParam("username") String username, @FormParam("password") String password, @FormParam("email") String email) throws UserExistsException;
+    
     /**
      * Removes a user from the database by their userId
      *

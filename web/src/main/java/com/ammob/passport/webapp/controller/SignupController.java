@@ -2,7 +2,7 @@ package com.ammob.passport.webapp.controller;
 
 import com.ammob.passport.Constants;
 import com.ammob.passport.service.RoleManager;
-import com.ammob.passport.webapp.form.SignupForm;
+import com.ammob.passport.webapp.form.UserForm;
 import com.ammob.passport.webapp.util.AuthCodeUtil;
 import com.ammob.passport.webapp.util.RequestUtil;
 import com.ammob.passport.webapp.util.SecurityContext;
@@ -62,8 +62,8 @@ public class SignupController extends BaseFormController {
 
 	@ModelAttribute
 	@RequestMapping(method = RequestMethod.GET)
-	public SignupForm showForm() {
-		return new SignupForm(true);
+	public UserForm showForm() {
+		return new UserForm(true);
 	}
 
 	@ModelAttribute
@@ -71,41 +71,43 @@ public class SignupController extends BaseFormController {
 	public ModelAndView showBindForm(HttpServletRequest request, WebRequest webRequest) {
 		Connection<?> connection = ProviderSignInUtils.getConnection(webRequest);
 		if (connection != null) {
-			SignupForm signupForm = SignupForm.fromProviderUser(connection.fetchUserProfile());
-			signupForm.setAvataUrl(connection.getImageUrl());
-			signupForm.setProviderId(StringUtils.capitalize(connection.getKey().getProviderId()));
-			saveMessage(request, getText("user.bound", signupForm.getUsername(),  request.getLocale()));
-			saveMessage(request, getText("user.bound.tip", signupForm.getProviderId(),  request.getLocale()));
-			return new ModelAndView("bind", "signupForm",  signupForm);
+			UserForm userForm = UserForm.fromProviderUserProfile(connection.fetchUserProfile());
+			userForm.setAvataUrl(connection.getImageUrl());
+			userForm.setProviderId(StringUtils.capitalize(connection.getKey().getProviderId()));
+			saveMessage(request, getText("user.bound", userForm.getUsername(),  request.getLocale()));
+			saveMessage(request, getText("user.bound.tip", userForm.getProviderId(),  request.getLocale()));
+			return new ModelAndView("bind", "userForm",  userForm);
 		}
 		saveError(request, getText("bind.error", "",  request.getLocale()));
 		return new ModelAndView("redirect:/");
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, params =  {"bind", "step!=1"})
-	public String onBindSubmit(SignupForm signupForm, BindingResult errors,
+	public String onBindSubmit(UserForm userForm, BindingResult errors,
 			WebRequest webRequest, HttpServletRequest request, HttpServletResponse response)
 					throws Exception {
 		try {
-			if(StringUtils.hasText(signupForm.getConfirmPassword())) { // New User, Signup !
-				onSubmit(signupForm, errors, request, response);
+			if(StringUtils.hasText(userForm.getConfirmPassword())) { // New User, Signup !
+				onSubmit(userForm, errors, request, response);
 			} else {
-				SecurityContext.addCasSignin(centralAuthenticationService, ticketGrantingTicketCookieGenerator, signupForm.getUsername(), signupForm.getPassword(), false, false, response);
+				SecurityContext.addCasSignin(centralAuthenticationService, ticketGrantingTicketCookieGenerator, userForm.getUsername(), userForm.getPassword(), false, false, response);
 			}
-			ProviderSignInUtils.handlePostSignUp(signupForm.getUsername(), webRequest);
+			ProviderSignInUtils.handlePostSignUp(userForm.getUsername(), webRequest);
 			return "redirect:/";
 		} catch (Exception e) {
-			saveError(request, getText("bind.error.signup", new Object[] {},  request.getLocale()));
+			e.fillInStackTrace();
+			log.warn(e.getMessage());
+			saveError(request, getText("bind.error.signup", request.getLocale()));
 			return "signup";
 		}
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public String onSubmit(SignupForm signupForm, BindingResult errors,
+	public String onSubmit(UserForm userForm, BindingResult errors,
 			HttpServletRequest request, HttpServletResponse response)
 					throws Exception {
 		if (validator != null) { // validator is null during testing
-			validator.validate(signupForm, errors);
+			validator.validate(userForm, errors);
 			if(request.getParameter(Constants.SECURITY_SUPERVISION_CODE) == null) {// don't validate when supervision
 				if(!validateCaptcha(request)) {
 					errors.rejectValue("captcha", "errors.captcha", new Object[] {}, "captcha error");
@@ -117,42 +119,43 @@ public class SignupController extends BaseFormController {
 		}
 		Locale locale = request.getLocale();
 		// Set the default user role on this new user
-		signupForm.addRole(roleManager.getRole(Constants.USER_ROLE));
+		userForm.addRole(roleManager.getRole(Constants.USER_ROLE));
 		try {
-			this.getUserManager().savePerson(signupForm);
+			this.getUserManager().savePerson(userForm);
 		} catch (UserExistsException e) {
 			if(e.isContainsType(StateEnum.USERNAME_EXISTENCE)) 
-				errors.rejectValue("username", "errors.existing.user", new Object[] { signupForm.getUsername()}, "duplicate user");
+				errors.rejectValue("username", "errors.existing.user", new Object[] { userForm.getUsername()}, "duplicate user");
 			if(e.isContainsType(StateEnum.EMAIL_EXISTENCE))
-				errors.rejectValue("email", "errors.existing.email", new Object[] {signupForm.getEmail() }, "duplicate user email");
-			signupForm.setPassword(signupForm.getConfirmPassword());// redisplay the unencrypted passwords
+				errors.rejectValue("email", "errors.existing.email", new Object[] {userForm.getEmail() }, "duplicate user email");
+			userForm.setPassword(userForm.getConfirmPassword());// redisplay the unencrypted passwords
 			return "signup";
 		} catch (Exception e) {
 			log.warn(e.getMessage());
 			response.sendError(HttpServletResponse.SC_FORBIDDEN);
 			return null;
 		}
-		saveMessage(request, getText("user.registered", signupForm.getUsername(), locale));
+		saveMessage(request, getText("user.registered", userForm.getUsername(), locale));
 		request.getSession().setAttribute(Constants.REGISTERED, Boolean.TRUE);
 		// log user in automatically
 		UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-				signupForm.getUsername(), signupForm.getConfirmPassword(), signupForm.getAuthorities());
-		auth.setDetails(signupForm);
+				userForm.getUsername(), userForm.getConfirmPassword(), userForm.getAuthorities());
+		auth.setDetails(userForm);
 		SecurityContextHolder.getContext().setAuthentication(auth);
 		// cas
-		SecurityContext.addCasSignin(centralAuthenticationService, ticketGrantingTicketCookieGenerator, signupForm.getUsername(), signupForm.getConfirmPassword(), true, false, response);
+		SecurityContext.addCasSignin(centralAuthenticationService, ticketGrantingTicketCookieGenerator, userForm.getUsername(), userForm.getConfirmPassword(), true, false, response);
 		   
 		// Send user an e-mail
 		if (log.isDebugEnabled()) {
-			log.debug("Sending user '" + signupForm.getUsername() + "' an account information e-mail");
+			log.debug("Sending user '" + userForm.getUsername() + "' an account information e-mail");
 		}
 		// Send an account information e-mail
 		message.setSubject(getText("signup.email.subject", locale));
 		try {
-			sendUserMessage(signupForm, getText("signup.email.message", locale), RequestUtil.getAppURL(request) + "/hint?" + AuthCodeUtil.wrap(signupForm.getUsername()) + "&activation");
+			RequestUtil.setCookie(response, Constants.STATES_EMAIL_VERIFIED, Long.toString(System.currentTimeMillis()), "/");
+			sendUserMessage(userForm, getText("signup.email.message", locale), RequestUtil.getAppURL(request) + "/hint?" + AuthCodeUtil.wrap(userForm.getUsername()) + "&activation");
 		} catch (MailException me) {
 			saveError(request, me.getMostSpecificCause().getMessage());
 		}
-	   return getRedirectView("/login", signupForm.getService());
+	   return getRedirectView("/login", userForm.getService());
 	}
 }

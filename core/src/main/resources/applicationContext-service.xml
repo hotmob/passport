@@ -77,64 +77,6 @@
         <property name="defaultRole" value="ROLE_USER" />
     </bean>
     
-    <bean id="odmManager" class="org.springframework.ldap.odm.core.impl.OdmManagerImplFactoryBean">
-        <property name="converterManager" ref="converterManager" />
-        <property name="contextSource" ref="contextSource" />
-        <property name="managedClasses">
-            <set>
-                <value>com.ammob.passport.model.User</value>
-            </set>
-        </property>
-    </bean>
-    
-    <bean id="fromStringConverter" class="org.springframework.ldap.odm.typeconversion.impl.converters.FromStringConverter" />
-    <bean id="toStringConverter" class="org.springframework.ldap.odm.typeconversion.impl.converters.ToStringConverter" />
-
-    <bean id="converterManager" class="org.springframework.ldap.odm.typeconversion.impl.ConverterManagerFactoryBean">
-        <property name="converterConfig">
-            <set>
-                <bean class="org.springframework.ldap.odm.typeconversion.impl.ConverterManagerFactoryBean$ConverterConfig">
-                    <property name="fromClasses">
-                         <set> 
-                             <value>java.lang.String</value>
-                         </set>
-                     </property>
-                     <property name="toClasses">
-                         <set>
-                             <value>java.lang.Byte</value>
-                             <value>java.lang.Short</value>
-                             <value>java.lang.Integer</value>
-                             <value>java.lang.Long</value>
-                             <value>java.lang.Float</value>
-                             <value>java.lang.Double</value>
-                             <value>java.lang.Boolean</value>
-                         </set>
-                    </property>
-                    <property name="converter" ref="fromStringConverter" />
-                </bean>
-                <bean class="org.springframework.ldap.odm.typeconversion.impl.ConverterManagerFactoryBean$ConverterConfig">
-                    <property name="fromClasses">
-                        <set>
-                             <value>java.lang.Byte</value>
-                             <value>java.lang.Short</value>
-                             <value>java.lang.Integer</value>
-                             <value>java.lang.Long</value>
-                             <value>java.lang.Float</value>
-                             <value>java.lang.Double</value>
-                             <value>java.lang.Boolean</value>
-                         </set> 
-                     </property>
-                     <property name="toClasses">
-                         <set> 
-                             <value>java.lang.String</value>
-                         </set>
-                    </property>
-                    <property name="converter" ref="toStringConverter" />
-                </bean>
-            </set>
-        </property>
-    </bean>
-    
     <!--
         | Whereas CredentialsToPrincipalResolvers identify who it is some Credentials might authenticate, 
         | AuthenticationHandlers actually authenticate credentials.  Here we declare the AuthenticationHandlers that

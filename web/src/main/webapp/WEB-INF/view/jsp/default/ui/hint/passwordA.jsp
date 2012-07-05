@@ -17,7 +17,7 @@
     </ol>
 </div>
 <div>
-    <form:form id="hintForm" commandName="hintForm" method="post" action="hint" onsubmit="return validateHintForm(this)">
+    <form:form id="userForm" commandName="userForm" method="post" action="hint" onsubmit="return validateUserForm(this)">
         <ul>
             <li>
                 <label class="desc" for="username"><fmt:message key="label.username" /><fmt:message key="label.double.colon" /></label>
@@ -40,13 +40,15 @@
             <li class="btn_con">
                 <form:hidden path="password" value="hidden"/>
                 <form:hidden path="confirmPassword" value="hidden"/>
+                <form:hidden path="email" value="hidden@766.com"/>
+                <form:hidden path="enabled" value="true"/>
 	            <form:hidden path="step"/>
 	            <input type="submit" class="btn btn-info" name="save" value="<fmt:message key="label.flows.step.next" />"  tabindex="3" />
             </li>
         </ul>
     </form:form>
     <c:set var="scripts" scope="request">
-        <v:javascript formName="hintForm" staticJavascript="false"/>
+        <v:javascript formName="userForm" staticJavascript="false"/>
         <script type="text/javascript" src="<c:url value='${appConfig["resourcesUri"]}statics/scripts/validator.jsp' />"></script>
     </c:set>
 </div>

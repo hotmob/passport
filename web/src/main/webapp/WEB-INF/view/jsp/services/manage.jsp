@@ -1,11 +1,15 @@
-<%@include file="includes/top.jsp"%>
-
+<%@ include file="/WEB-INF/view/jsp/common/taglibs.jsp"%>
+<head>
+<title><fmt:message key="service.manager" /></title>
+<meta name="menu" content="AdminMenu" />
+</head>
+<div class="span10">
     <c:if test="${fn:length(services) eq 0}">
-        <div id="msg" class="errors"><p><spring:message code="management.services.service.warn" arguments="${defaultServiceUrl}" /></p></div>
+        <div id="msg" class="alert alert-error fade in"><p><spring:message code="management.services.service.warn" arguments="${defaultServiceUrl}" /></p></div>
     </c:if>
 
 	<c:if test="${not empty param.status}">
-		<div id="msg" class="success"><spring:message code="management.services.status.${param.status}" arguments="${param.serviceName}" /></div>
+		<div id="msg" class="alert alert-success fade in"><spring:message code="management.services.status.${param.status}" arguments="${param.serviceName}" /></div>
 	</c:if>
 
       <table cellspacing="0" id="headerTable" class="headerTable">
@@ -44,12 +48,12 @@
 			<td class="ac td4"><img src="../images/services/${service.allowedToProxy}.gif" alt="${service.allowedToProxy ? 'Allowed to Proxy' : 'Not Allowed to Proxy'}" /></td>
 			<td class="ac td5"><img src="../images/services/${service.ssoEnabled}.gif" alt="${service.ssoEnabled ? 'SSO Enabled' : 'SSO Disabled'}" /></td>
 
-			<td class="td6" id="edit${status.index}"><a href="edit.html?id=${service.id}" class="edit"><spring:message code="management.services.manage.action.edit" /></a></td>
+			<td class="td6" id="edit${status.index}"><a href="/manager/service/edit?id=${service.id}" class="edit"><spring:message code="management.services.manage.action.edit" /></a></td>
 			<td class="td7" id="delete${status.index}"><a href="#" class="del" onclick="swapButtonsForConfirm('${status.index}','${service.id}'); return false;"><spring:message code="management.services.manage.action.delete" /></a></td>
 		</tr>
 		</c:forEach>
 			</tbody>
 		</table>
 	</div>
-<div class="add"><a href="add.html"><span style="text-transform: lowercase;"><spring:message code="addServiceView" /></span></a></div>	  
-<%@include file="includes/bottom.jsp" %>
+<div class="add"><a href="add"><span style="text-transform: lowercase;"><spring:message code="addServiceView" /></span></a></div>
+</div>

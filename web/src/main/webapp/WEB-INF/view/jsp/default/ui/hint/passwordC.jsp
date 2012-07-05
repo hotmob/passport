@@ -19,7 +19,7 @@
 </div>
 <div>
     <c:set var="actionUrl">hint?<%=request.getQueryString()%></c:set>
-    <form:form id="hintForm" commandName="hintForm" method="post" action="${actionUrl}" onsubmit="return validateHintForm(this)">
+    <form:form id="userForm" commandName="userForm" method="post" action="${actionUrl}" onsubmit="return validateUserForm(this)">
         <ul style="padding:30px 0 0;">
            <c:if test="${not empty errorMessages}">
                <li>
@@ -28,7 +28,7 @@
 	       </c:if>
            <c:if test="${errorMessages == null}">
 	            <li>
-	               <label><fmt:message key="label.username" /><fmt:message key="label.double.colon" /></label><c:out value="${hintForm.username}" />
+	               <label><fmt:message key="label.username" /><fmt:message key="label.double.colon" /></label><c:out value="${userForm.username}" />
 	            </li>
 	            <li>
                     <label class="desc" for="password"><fmt:message key="label.password"/><fmt:message key="label.double.colon"/></label>
@@ -60,13 +60,15 @@
                     <form:hidden path="step"/>
                     <form:hidden path="version" />
                     <form:hidden path="oldPassword" />
+                    <form:hidden path="email" />
+                    <form:hidden path="enabled" value="true"/>
                     <input type="submit" class="btn btn-success" name="save" value="<fmt:message key="label.flows.step.next" />" tabindex="4" />
                 </li>
              </c:if>
         </ul>
     </form:form>
     <c:set var="scripts" scope="request">
-        <v:javascript formName="hintForm" staticJavascript="false"/>
+        <v:javascript formName="userForm" staticJavascript="false"/>
         <script type="text/javascript" src="<c:url value='${appConfig["resourcesUri"]}statics/scripts/validator.jsp' />"></script>
     </c:set>
 </div>

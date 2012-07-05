@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+
 import java.io.Serializable;
 
 /**
@@ -37,11 +38,13 @@ public class Role extends BaseObject implements Serializable, GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    
     @Column(length = 20)
     private String name;
+    
     @Column(length = 64)
     private String description;
-
+    
     /**
      * Default constructor - creates a new instance with no values set.
      */

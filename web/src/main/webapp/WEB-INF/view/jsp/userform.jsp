@@ -39,79 +39,76 @@
 		<form:hidden path="id" />
 		<form:hidden path="version" />
 		<input type="hidden" name="from" value="<c:out value="${param.from}"/>" />
-
 		<c:if test="${cookieLogin == 'true'}">
 			<form:hidden path="password" />
 			<form:hidden path="confirmPassword" />
 		</c:if>
-
 		<c:if test="${empty user.version}">
 			<input type="hidden" name="encryptPass" value="true" />
 		</c:if>
 
 		<spring:bind path="user.username">
-			<fieldset
-				class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
+			<fieldset class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
+				<appfuse:label styleClass="control-label" key="user.username" />
+				<div class="controls">
+					<form:input path="username" id="username" readonly="${fn:contains(user.state, STATES_EMAIL_VERIFIED)}" />
+					<form:errors path="username" cssClass="help-inline" />
+				</div>
+			</fieldset>
 		</spring:bind>
-		<appfuse:label styleClass="control-label" key="user.username" />
-		<div class="controls">
-			<form:input path="username" id="username" />
-			<form:errors path="username" cssClass="help-inline" />
-		</div>
-		</fieldset>
+		
 		<c:if test="${cookieLogin != 'true'}">
 			<spring:bind path="user.password">
-				<fieldset
-					class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
+				<fieldset class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
+					<appfuse:label styleClass="control-label" key="user.password" />
+					<div class="controls">
+						<form:password path="password" id="password" showPassword="true" />
+						<form:errors path="password" cssClass="help-inline" />
+					</div>
+				</fieldset>
 			</spring:bind>
-			<appfuse:label styleClass="control-label" key="user.password" />
-			<div class="controls">
-				<form:password path="password" id="password" showPassword="true" />
-				<form:errors path="password" cssClass="help-inline" />
-			</div>
-			</fieldset>
 			<spring:bind path="user.confirmPassword">
-				<fieldset
-					class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
+				<fieldset class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
+					<appfuse:label styleClass="control-label" key="user.confirmPassword" />
+					<div class="controls">
+						<form:password path="confirmPassword" id="confirmPassword" showPassword="true" />
+						<form:errors path="confirmPassword" cssClass="help-inline" />
+					</div>
+				</fieldset>
 			</spring:bind>
-			<appfuse:label styleClass="control-label" key="user.confirmPassword" />
-			<div class="controls">
-				<form:password path="confirmPassword" id="confirmPassword"
-					showPassword="true" />
-				<form:errors path="confirmPassword" cssClass="help-inline" />
-			</div>
-			</fieldset>
 		</c:if>
+		
 		<spring:bind path="user.firstName">
-			<fieldset
-				class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
+			<fieldset class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
+				<appfuse:label styleClass="control-label" key="user.firstName" />
+				<div class="controls">
+					<form:input path="firstName" id="firstName" maxlength="50" />
+					<form:errors path="firstName" cssClass="help-inline" />
+				</div>
+			</fieldset>
 		</spring:bind>
-		<appfuse:label styleClass="control-label" key="user.firstName" />
-		<div class="controls">
-			<form:input path="firstName" id="firstName" maxlength="50" />
-			<form:errors path="firstName" cssClass="help-inline" />
-		</div>
-		</fieldset>
+
 		<spring:bind path="user.lastName">
-			<fieldset
-				class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
+			<fieldset class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
+				<appfuse:label styleClass="control-label" key="user.lastName" />
+				<div class="controls">
+					<form:input path="lastName" id="lastName" maxlength="50" />
+					<form:errors path="lastName" cssClass="help-inline" />
+				</div>
+			</fieldset>
 		</spring:bind>
-		<appfuse:label styleClass="control-label" key="user.lastName" />
-		<div class="controls">
-			<form:input path="lastName" id="lastName" maxlength="50" />
-			<form:errors path="lastName" cssClass="help-inline" />
-		</div>
-		</fieldset>
+
 		<spring:bind path="user.email">
-			<fieldset
-				class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
+			<fieldset class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
+				<appfuse:label styleClass="control-label" key="user.email" />
+				<div class="controls">
+					<appfuse:constants />
+					<form:input path="email" id="email"  readonly="${fn:contains(user.state, STATES_EMAIL_VERIFIED)}" />
+					<form:errors path="email" cssClass="help-inline" />
+				</div>
+			</fieldset>
 		</spring:bind>
-		<appfuse:label styleClass="control-label" key="user.email" />
-		<div class="controls">
-			<form:input path="email" id="email" />
-			<form:errors path="email" cssClass="help-inline" />
-		</div>
-		</fieldset>
+		
 		<fieldset class="control-group">
 			<appfuse:label styleClass="control-label" key="user.phoneNumber" />
 			<div class="controls">
@@ -167,10 +164,10 @@
 				<fieldset class="control-group">
 					<label class="control-label"><fmt:message key="userProfile.accountSettings" /></label>
 					<div class="controls">
-						<label class="checkbox inline"><form:checkbox path="enabled" id="enabled" /><fmt:message key="user.enabled" /></label>
-						<label class="checkbox inline"><form:checkbox path="accountExpired" id="accountExpired" /><fmt:message key="user.accountExpired" /></label>
-						<label class="checkbox inline"> <form:checkbox path="accountLocked" id="accountLocked" /><fmt:message key="user.accountLocked" /></label>
-						<label class="checkbox inline"> <form:checkbox path="credentialsExpired" id="credentialsExpired" /> <fmt:message key="user.credentialsExpired" /></label>
+						<div class="checkbox inline"><form:checkbox path="enabled" id="enabled" /><fmt:message key="user.enabled" /></div>
+						<div class="checkbox inline"><form:checkbox path="accountExpired" id="accountExpired" /><fmt:message key="user.accountExpired" /></div>
+						<div class="checkbox inline"><form:checkbox path="accountLocked" id="accountLocked" /><fmt:message key="user.accountLocked" /></div>
+						<div class="checkbox inline"><form:checkbox path="credentialsExpired" id="credentialsExpired" /><fmt:message key="user.credentialsExpired" /></div>
 					</div>
 				</fieldset>
 				<fieldset class="control-group">
@@ -178,7 +175,7 @@
 					<div class="controls">
 						<select id="userRoles" name="userRoles" multiple="true">
 							<c:forEach items="${availableRoles}" var="role">
-								<option value="${role.value}"  <c:if test="${fn:contains(user.roles, role.label)}"><c:out value="selected"/></c:if>>${role.label}</option>
+								<option value="${role.value}"  <c:if test="${fn:contains(user.roles, role.value)}"><c:out value="selected"/></c:if>>${role.label}</option>
 							</c:forEach>
 						</select>
 					</div>
@@ -202,11 +199,11 @@
 			</c:when>
 		</c:choose>
 		<fieldset class="form-actions">
-			<input type="submit" class="btn btn-primary" name="save" onclick="bCancel=false" value="<fmt:message key="button.save"/>" />
+			<input type="submit" class="btn btn-primary btn-large" name="save" onclick="bCancel=false" value="<fmt:message key="button.save"/>" />
 			<c:if test="${param.from == 'list' and param.method != 'Add'}">
-				<input type="submit" class="btn" name="delete" onclick="bCancel=true;return confirmDelete('user')" value="<fmt:message key="button.delete"/>" />
+				<input type="submit" class="btn btn-danger btn-large" name="delete" onclick="bCancel=true;return confirmDelete('user')" value="<fmt:message key="button.delete"/>" />
 			</c:if>
-			<input type="submit" class="btn" name="cancel" onclick="bCancel=true" value="<fmt:message key="button.cancel"/>" />
+			<input type="submit" class="btn btn-large" name="cancel" onclick="bCancel=true" value="<fmt:message key="button.cancel"/>" />
 		</fieldset>
 	</form:form>
 </div>

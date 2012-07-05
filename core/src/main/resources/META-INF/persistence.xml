@@ -6,25 +6,11 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <class>com.ammob.passport.model.User</class>
         <class>com.ammob.passport.model.Role</class>
-        
-        <!-- 
-        Adding more <class>f.q.c.Name</class> elements here is not required.  
-        The annotated classes will still be detected, as can be observed in the 
-        following log output:
-        
-        INFO [main] Ejb3Configuration.scanForClasses(652) | found EJB3 Entity bean: com.mycompany.model.Person
-        
-        That being said, it will still work if you do add your <class> 
-        declarations here for clarity, simply as a way to explicitly see all the 
-        classes that are mapped as persistent entities.  Do whatever blows your 
-        skirt up. -->
-       
-        <!-- <class>org.jasig.cas.services.AbstractRegisteredService</class>
-        <class>org.jasig.cas.services.RegexRegisteredService</class>
-        <class>org.jasig.cas.services.RegisteredServiceImpl</class>-->
+        <class>org.jasig.cas.services.RegisteredServiceImpl</class>
         <class>org.jasig.cas.ticket.TicketGrantingTicketImpl</class>
         <class>org.jasig.cas.ticket.ServiceTicketImpl</class>
         <class>org.jasig.cas.ticket.registry.support.JpaLockingStrategy$Lock</class>
-        <exclude-unlisted-classes/>
+        <exclude-unlisted-classes>
+        </exclude-unlisted-classes>
     </persistence-unit>
 </persistence>

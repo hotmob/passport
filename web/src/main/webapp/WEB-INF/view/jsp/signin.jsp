@@ -5,7 +5,7 @@
 <meta name="menu" content="Login" />
 </head>
 <body id="login">
-    <div class="main wrapper">
+	<div class="main wrapper">
         <div class="sidebar">
             <div class="side_bg1"></div>
         </div>
@@ -41,8 +41,8 @@
                             <input type="hidden" name="lt" value="${loginTicket}" />
                             <input type="hidden" name="execution" value="${flowExecutionKey}" />
                             <input type="hidden" name="_eventId" value="submit" />
-                            <input type="submit" class="btn btn-primary" name="login" value="<fmt:message key="login.heading" />" tabindex="4"/>
-                            <input type="button" class="btn btn-toolbar" name="signup" value="<fmt:message key="signup.heading" />" tabindex="5" onclick="javascript:getRedirect('/signup', 'service');"/>
+                            <input type="submit" class="btn btn-warning first-child left" name="login" value="<fmt:message key="login.heading" />" tabindex="4"/>
+                            <input type="button" class="btn right" name="signup" value="<fmt:message key="signup.heading" />" tabindex="5" onclick="javascript:getRedirect('/signup', 'service');"/>
                             <%-- <fieldset class="form-actions">
                                 <input type="submit" class="btn btn-primary" name="login" value="<fmt:message key='button.login'/>" tabindex="4"/>
                                 <input class="btn_log" name="submit" accesskey="l" value="" tabindex="4" type="submit" />

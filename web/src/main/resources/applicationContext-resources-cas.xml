@@ -76,13 +76,13 @@
 	<!-- Ticket Registry -->
 	<bean id="ticketRegistry" class="org.jasig.cas.ticket.registry.JpaTicketRegistry" />
     <!--Quartz -->
-    <!-- TICKET REGISTRY CLEANER -->
+    <!-- TICKET REGISTRY CLEANER 
     <bean id="ticketRegistryCleaner" class="org.jasig.cas.ticket.registry.support.DefaultTicketRegistryCleaner" p:ticketRegistry-ref="ticketRegistry" p:lock-ref="cleanerLock" />
 	<bean id="cleanerLock" class="org.jasig.cas.ticket.registry.support.JpaLockingStrategy" p:uniqueId="${host.name}" p:applicationId="cas-ticket-registry-cleaner" />
 	<bean id="ticketRegistryCleanerJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"
 		p:targetObject-ref="ticketRegistryCleaner" p:targetMethod="clean" />
 	<bean id="periodicTicketRegistryCleanerTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean" p:jobDetail-ref="ticketRegistryCleanerJobDetail" 
-	    p:startDelay="20000" p:repeatInterval="1800000" />
+	    p:startDelay="20000" p:repeatInterval="1800000" />-->
 
     <!-- ********************************************** uniqueIdGenerators.xml ********************************************** -->
     <!-- ID Generators -->
@@ -164,14 +164,6 @@
 			</list>
 		</property>
     </bean>
-
-	<bean id="authenticationUserDetailsService" class="org.springframework.security.cas.userdetails.GrantedAuthorityFromAssertionAttributesUserDetailsService">
-		<constructor-arg>
-			<array>
-				<value>role</value>
-			</array>
-		</constructor-arg>
-	</bean>
 
     <bean id="serviceRegistryDao" class="org.jasig.cas.services.InMemoryServiceRegistryDaoImpl">
         <property name="registeredServices">

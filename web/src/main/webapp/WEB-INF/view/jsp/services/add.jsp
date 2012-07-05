@@ -1,6 +1,20 @@
-<%@include file="includes/top.jsp"%>
+<%@ include file="/WEB-INF/view/jsp/common/taglibs.jsp"%>
+<head>
+<title><fmt:message key="service.add" /></title>
+<meta name="menu" content="AdminMenu" />
+</head>
+<div class="span10">
+    <h2><spring:message code="${pageTitle}" /></h2>
+    <br />
+    <div id="search">
+        <form method="get" action="${ctx}/admin/users" id="searchForm" class="form-search">
+            <input type="text" size="20" name="q" id="query" value="${param.q}"
+                   placeholder="Enter search terms..." class="input-medium search-query"/>
+            <input type="submit" value="<fmt:message key="button.search"/>" class="btn"/>
+        </form>
+    </div>
 
-<form:form action="${registeredService.id ge 0 ? 'edit.html' : 'add.html'}?id=${fn:escapeXml(param.id)}" cssClass="v" cssStyle="width:75%;" commandName="${commandName}">
+<form:form action="${registeredService.id ge 0 ? 'edit' : 'add'}?id=${fn:escapeXml(param.id)}" cssClass="v" cssStyle="width:75%;" commandName="${commandName}">
 
 		<c:if test="${not empty successMessage}">
 			<div id="msg" class="info">${successMessage}</div>
@@ -11,9 +25,8 @@
 			<spring:message code="application.errors.global" />
 		</div>
 		</spring:hasBindErrors>
-	<fieldset class="repeat"><legend><spring:message code="${pageTitle}" /></legend>
+	<fieldset class="repeat"><legend></legend>
 	<div class="fieldset-inner">
-		<p class="instructions"><spring:message code="management.services.add.instructions" /></p>
 		<span class="oneField" style="display:block; margin:5px 0;">
 			<label for="name" class="preField"><spring:message code="management.services.add.property.name" /> </label>
 			<form:input path="name" size="51" maxlength="50" cssClass="required" cssErrorClass="error" />
@@ -87,7 +100,7 @@
 		</div>
 	</fieldset>
 	<div class="actions">
-		<button type="submit" class="primaryAction" id="submit-wf_FormGardenDemonst" value="Save Changes"><spring:message code="management.services.add.button.save" /></button> or <a href="manage.html" style="color:#b00;"><spring:message code="management.services.add.button.cancel" /></a>
+		<button type="submit" class="primaryAction" id="submit-wf_FormGardenDemonst" value="Save Changes"><spring:message code="management.services.add.button.save" /></button> or <a href="manage" style="color:#b00;"><spring:message code="management.services.add.button.cancel" /></a>
 	</div>
 </form:form>
-<%@include file="includes/bottom.jsp" %>
+</div>

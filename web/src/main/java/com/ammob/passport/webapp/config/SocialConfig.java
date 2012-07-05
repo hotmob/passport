@@ -74,8 +74,8 @@ public class SocialConfig {
 				environment.getProperty("weibo.consumerSecret")));
 		registry.addConnectionFactory(new TxwbConnectionFactory(environment.getProperty("tencent.consumerKey"),
 				environment.getProperty("tencent.consumerSecret")));
-		registry.addConnectionFactory(new RenrenConnectionFactory(environment.getProperty("tencent.consumerKey"),
-				environment.getProperty("tencent.consumerSecret")));
+		registry.addConnectionFactory(new RenrenConnectionFactory(environment.getProperty("renren.consumerKey"),
+				environment.getProperty("renren.consumerSecret")));
 		return registry;
 	}
 

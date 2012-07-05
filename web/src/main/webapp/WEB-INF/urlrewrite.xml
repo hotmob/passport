@@ -7,7 +7,23 @@
         <from>^/admin/user/(.*)\$</from>
         <to type="forward">/app/admin/userform?id=$1&amp;from=list</to>
     </rule>
-    <!-- old passport rest service rule . -->
+    <!-- old passport rest service rules . -->
+    <rule match-type="regex">
+        <from>/services/manage.html(.*)</from>
+        <to type="forward">/app/manager/service/manage$1</to>
+    </rule>
+    <rule match-type="regex">
+        <from>/v1/users/(.*)/(.*)/(.*)</from>
+        <to type="forward">/services/api/users/$1?_type=json</to>
+    </rule>
+    <rule match-type="regex">
+        <from>/v1/orders/user</from>
+        <to type="forward">/services/api/users</to>
+    </rule>
+    <rule>
+        <from>/v1/users/**/**</from>
+        <to type="forward">/services/api/users/$1?_type=json</to>
+    </rule>
     <rule>
         <from>/v1/users/**</from>
         <to type="forward">/services/api/users/$1?_type=json</to>
@@ -20,6 +36,8 @@
         <from>/v1/tickets/**</from>
         <to type="forward">/services/api/tickets/$1</to>
     </rule>
+    <!-- old passport rest service rules end . -->
+       
     <!-- The following fixes a CSS bug in CXF. -->
     <rule match-type="regex">
         <from>^/services//(.*)$</from>

@@ -2,7 +2,7 @@ package com.ammob.passport.webapp.controller;
 
 import com.ammob.passport.Constants;
 import com.ammob.passport.model.Address;
-import com.ammob.passport.webapp.form.SignupForm;
+import com.ammob.passport.webapp.form.UserForm;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class SignupControllerTest extends BaseControllerTestCase {
         address.setCountry("USA");
         address.setPostalCode("80210");
 
-        SignupForm user = new SignupForm(true);
+        UserForm user = new UserForm(true);
         user.setAddress(address);
         String time = String.valueOf(System.currentTimeMillis()).substring(2);
         user.setUsername("self".concat(time));

@@ -7,17 +7,12 @@ import org.compass.annotations.Searchable;
 import org.compass.annotations.SearchableComponent;
 import org.compass.annotations.SearchableId;
 import org.compass.annotations.SearchableProperty;
-import org.springframework.ldap.core.DistinguishedName;
-import org.springframework.ldap.odm.annotations.Attribute;
-import org.springframework.ldap.odm.annotations.Entry;
-import org.springframework.ldap.odm.annotations.Attribute.Type;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.ldap.userdetails.LdapUserDetails;
 import org.springframework.util.StringUtils;
 
 import com.ammob.passport.Constants;
 
-import javax.naming.Name;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -55,7 +50,6 @@ import java.util.Set;
 @Table(name = "app_user")
 @Searchable
 @XmlRootElement
-@Entry(objectClasses={"userDetails", "inetOrgPerson", "top"})
 @JsonIgnoreProperties(value={ "password" }) 
 public class User extends BaseObject implements Serializable, LdapUserDetails {
 	
@@ -64,104 +58,70 @@ public class User extends BaseObject implements Serializable, LdapUserDetails {
     @Id
     @SearchableId
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @org.springframework.ldap.odm.annotations.Transient
     private Long id;
     @SearchableProperty
     @Column(nullable = false, length = 50, unique = true)
-    @Attribute(name="cn", syntax="1.3.6.1.4.1.1466.115.121.1.15")
     private String username;                    	// required
     @Column(nullable = false)
     @XmlTransient
-    @Attribute(name="userPassword", syntax="1.3.6.1.4.1.1466.115.121.1.40", type=Type.BINARY)
     private byte[] password;                  		// required
     @SearchableProperty
     @Column(name = "first_name", nullable = false, length = 50)
-    @Attribute(name="sn", syntax="1.3.6.1.4.1.1466.115.121.1.15")
     private String firstName;                   		// required
     @SearchableProperty
     @Column(name = "last_name", nullable = false, length = 50)
-    @Attribute(name="givenName", syntax="1.3.6.1.4.1.1466.115.121.1.15")
     private String lastName;                    		// required
     @SearchableProperty
     @Column(nullable = false, unique = true)
-    @Attribute(name="mail", syntax="1.3.6.1.4.1.1466.115.121.1.26")
     private String email;                       	    // required; unique
     @SearchableProperty
     @Column(name = "phone_number")
-    @Attribute(name="telephoneNumber", syntax="1.3.6.1.4.1.1466.115.121.1.50")
     private String phoneNumber;
     @SearchableProperty
-    @org.springframework.ldap.odm.annotations.Transient
     private String website;
     @Embedded
     @SearchableComponent
-    @org.springframework.ldap.odm.annotations.Transient
     private Address address = new Address();
     @Version
-    @org.springframework.ldap.odm.annotations.Transient
     private Integer version;
     @JoinTable(
             name = "user_role",
             joinColumns = { @JoinColumn(name = "user_id") },
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     @ManyToMany(fetch = FetchType.EAGER)
-    @org.springframework.ldap.odm.annotations.Transient
     private Set<Role> roles = new HashSet<Role>();
     @Column(name = "account_enabled")
-    @org.springframework.ldap.odm.annotations.Transient
     private boolean enabled;
     @Column(name = "account_expired", nullable = false)
-    @org.springframework.ldap.odm.annotations.Transient
     private boolean accountExpired;
     @Column(name = "account_locked", nullable = false)
-    @org.springframework.ldap.odm.annotations.Transient
     private boolean accountLocked;
     @Column(name = "credentials_expired", nullable = false)
-    @org.springframework.ldap.odm.annotations.Transient
     private boolean credentialsExpired;
     @Transient 
     @XmlTransient
-    @org.springframework.ldap.odm.annotations.Transient
     private String confirmPassword;
     @Column(name = "password_hint")
     @XmlTransient
-    @org.springframework.ldap.odm.annotations.Transient
     private String passwordHint;
     
-    @Transient
-    @org.springframework.ldap.odm.annotations.Id
-	private Name dn;                  					// DN
 	@Transient
-    @org.springframework.ldap.odm.annotations.Transient
 	private String displayName;                   // 昵称, 显示名
 	@Transient
-	@Attribute(name="description", syntax="1.3.6.1.4.1.1466.115.121.1.15")
 	private String description;                 		// 用户描述
 	@Transient
-	@org.springframework.ldap.odm.annotations.Transient
 	private String regTime;                      	// 注册时间
 	@Transient
-	@org.springframework.ldap.odm.annotations.Transient
 	private String uuid;                           		// UUID
 	@Transient
-	@org.springframework.ldap.odm.annotations.Transient
 	private String avataUrl;
 	@Transient
-	@org.springframework.ldap.odm.annotations.Transient
 	private Set<String> state = new HashSet<String>(); // 状态, 1: 邮箱已验证
-	@Transient
-	@Attribute(name="objectClass", syntax="1.3.6.1.4.1.1466.115.121.1.38")
-	private List<String> objectClass=new ArrayList<String>();
-	@Transient
-	@Attribute(name="seeAlso", syntax="1.3.6.1.4.1.1466.115.121.1.12")
-	private List<String> seeAlso=new ArrayList<String>();
     // PPolicy data
 	@Transient
-	@org.springframework.ldap.odm.annotations.Transient
     private int timeBeforeExpiration = Integer.MAX_VALUE;
 
 	@Transient
-	@org.springframework.ldap.odm.annotations.Transient
     private int graceLoginsRemaining = Integer.MAX_VALUE;
 
 	/**
@@ -477,32 +437,6 @@ public class User extends BaseObject implements Serializable, LdapUserDetails {
 		this.avataUrl = avataUrl;
 	}
 
-	public String getDn() {
-		if(dn == null)
-			return null;
-		return dn.toString();
-	}
-
-	public void setDn(String dn) {
-		this.dn=new DistinguishedName(dn);
-	}
-	
-	public Iterator<String> getObjectClassIterator() {
-		return Collections.unmodifiableList(objectClass).iterator();
-	}
-	
-	public void addSeeAlso(String seeAlso) {
-		this.seeAlso.add(seeAlso);
-	}
-
-	public void removeSeeAlso(String seeAlso) {
-		this.seeAlso.remove(seeAlso);
-	}
-
-	public Iterator<String> getSeeAlsoIterator() {
-		return seeAlso.iterator();
-	}
-
 	public void setTimeBeforeExpiration(int timeBeforeExpiration) {
 		this.timeBeforeExpiration = timeBeforeExpiration;
 	}
@@ -517,5 +451,10 @@ public class User extends BaseObject implements Serializable, LdapUserDetails {
 	
     public int getGraceLoginsRemaining() {
 		return graceLoginsRemaining;
+	}
+
+	@Override
+	public String getDn() {
+		return null;
 	}
 }

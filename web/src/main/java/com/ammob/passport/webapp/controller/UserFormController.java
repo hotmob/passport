@@ -2,6 +2,8 @@ package com.ammob.passport.webapp.controller;
 
 import org.apache.commons.lang.StringUtils;
 import com.ammob.passport.Constants;
+import com.ammob.passport.enumerate.StateEnum;
+import com.ammob.passport.exception.UserExistsException;
 import com.ammob.passport.model.Role;
 import com.ammob.passport.model.User;
 import com.ammob.passport.service.RoleManager;
@@ -81,26 +83,31 @@ public class UserFormController extends BaseFormController {
                         user.addRole(roleManager.getRole(roleName));
                     }
                 }
-            } else {// if user is not an admin then load roles from the database (or any other user properties that should not be editable by users without admin role) 
-                User cleanUser = null;;
-                try {
-                	cleanUser = getUserManager().getUserByUsername(request.getRemoteUser());
-    			} catch (UsernameNotFoundException e) {
-    				log.warn("Error : User is not found ! [ " + request.getRemoteUser() + " ]");
-    			}
-                user.setRoles(cleanUser.getRoles());
             }
-            Integer originalVersion = user.getVersion();
+            // if user is not an admin then load roles from the database (or any other user properties that should not be editable by users without admin role) 
+            User cleanUser = null;;
+            try {
+            	cleanUser = getUserManager().getUserByUsername(request.getRemoteUser());
+			} catch (UsernameNotFoundException e) {
+				log.warn("Error : User is not found ! [ " + request.getRemoteUser() + " ]");
+			}
+            user.setRoles(cleanUser.getRoles());
             try {
                 getUserManager().savePerson(user);
             } catch (AccessDeniedException ade) { // thrown by UserSecurityAdvice configured in aop:advisor userManagerSecurity
                 log.warn(ade.getMessage());
                 response.sendError(HttpServletResponse.SC_FORBIDDEN);
                 return null;
+            }  catch (UserExistsException e) {
+            	for(StateEnum state : e.getTypes()) {
+            		if(state.equals(StateEnum.USERNAME_EXISTENCE))
+            			errors.rejectValue("username", "errors.existing.user", new Object[]{user.getUsername()}, "duplicate user");
+            		if(state.equals(StateEnum.EMAIL_EXISTENCE))
+            			errors.rejectValue("email", "errors.existing.email", new Object[]{user.getEmail()}, "duplicate email");
+            	}
+                return "userform";
             } catch (Exception e) {
-                errors.rejectValue("username", "errors.existing.user", new Object[]{user.getUsername()}, "duplicate user");
-                user.setPassword(user.getConfirmPassword()); // redisplay the unencrypted passwords
-                user.setVersion(originalVersion);  // reset the version # to what was passed in
+                e.fillInStackTrace();
                 return "userform";
             }
             if (!StringUtils.equals(request.getParameter("from"), "list")) {
@@ -137,7 +144,6 @@ public class UserFormController extends BaseFormController {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN);
                 log.warn("User '" + request.getRemoteUser() + "' is trying to edit user with id '" +
                         request.getParameter("id") + "'");
-
                 throw new AccessDeniedException("You do not have permission to modify other users.");
             }
         }
@@ -153,10 +159,8 @@ public class UserFormController extends BaseFormController {
 
             if (ctx.getAuthentication() != null) {
                 Authentication auth = ctx.getAuthentication();
-
                 if (resolver.isRememberMe(auth)) {
                     request.getSession().setAttribute("cookieLogin", "true");
-
                     // add warning message
                     saveMessage(request, getText("userProfile.cookieLogin", request.getLocale()));
                 }

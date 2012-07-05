@@ -13,6 +13,13 @@
             <Item name="ActiveUsers" title="mainMenu.activeUsers" page="/admin/activeUsers"/>
             <Item name="ReloadContext" title="menu.admin.reload" page="/admin/reload"/>
             <Item name="FileUpload" title="menu.selectFile" page="/fileupload"/>
+            <Item name="ServiceManager" title="service.manager" page="/manager/service/manage"/>
+        </Menu>
+        <Menu name="EmployeeMenu" title="menu.employee" description="Employee Menu" roles="ROLE_EMPLOYEES" >
+            <Item name="ViewUsers" title="menu.employee.lan" page="/login?service=http://lan.youyy.com"/>
+            <Item name="ViewUsers" title="menu.employee.doc" page="/login?service=http://lan.youyy.com:8090"/>
+            <Item name="ViewUsers" title="menu.employee.task" page="/login?service=http://lan.youyy.com:8080"/>
+            <Item name="ViewUsers" title="menu.employee.pub" page="/login?service=http://pub.766.com"/>
         </Menu>
         <Menu name="Logout" title="user.logout" page="/logout" roles="ROLE_ADMIN,ROLE_USER"/>
     </Menus>

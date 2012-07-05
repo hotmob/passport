@@ -2,7 +2,7 @@ package com.ammob.passport.service;
 
 import com.ammob.passport.model.Role;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Business Service Interface to handle communication between web and
@@ -14,7 +14,7 @@ public interface RoleManager extends GenericManager<Role, Long> {
     /**
      * {@inheritDoc}
      */
-    List<Role> getRoles(Role role);
+	Set<Role> getRoles();
 
     /**
      * {@inheritDoc}

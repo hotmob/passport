@@ -6,7 +6,7 @@
 </head>
 <body id="hint" />
 <div class="main wrapper">
-    <spring:bind path="hintForm.*">
+    <spring:bind path="userForm.*">
         <c:if test="${not empty status.errorMessages}">
             <div class="alert alert-error fade in">
                 <a href="#" data-dismiss="alert" class="close">&times;</a>
@@ -18,16 +18,16 @@
     </spring:bind>
     <div class="hint_con">
         <c:choose>
-            <c:when test="${hintForm.getStep() eq 0}">
+            <c:when test="${userForm.getStep() eq 0}">
                 <%@ include file="default/ui/hint/passwordA.jsp"%>
             </c:when>
-            <c:when test="${hintForm.getStep() eq 1}">
+            <c:when test="${userForm.getStep() eq 1}">
                 <%@ include file="default/ui/hint/passwordB.jsp"%>
             </c:when>
-            <c:when test="${hintForm.getStep() eq 2}">
+            <c:when test="${userForm.getStep() eq 2}">
                 <%@ include file="default/ui/hint/passwordC.jsp"%>
             </c:when>
-            <c:when test="${hintForm.getStep() eq 3}">
+            <c:when test="${userForm.getStep() eq 3}">
                 <%@ include file="default/ui/hint/passwordD.jsp"%>
             </c:when>
             <c:otherwise>

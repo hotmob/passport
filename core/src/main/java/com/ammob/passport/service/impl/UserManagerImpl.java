@@ -1,7 +1,9 @@
 package com.ammob.passport.service.impl;
 
+import com.ammob.passport.Constants;
 import com.ammob.passport.dao.UserDao;
 import com.ammob.passport.mapper.PersonMapper;
+import com.ammob.passport.model.Role;
 import com.ammob.passport.model.User;
 import com.ammob.passport.service.UserManager;
 import com.ammob.passport.service.UserService;
@@ -151,6 +153,7 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
     	User user = null;
 		try {
 			user = (User) ldapUserDetailsManager.loadUserByUsername(username);
+			user.getRoles().add(new Role(Constants.USER_ROLE)); // 2012-07-12 FIXME
 		} catch (Exception e) {
 			log.warn("LDAP not found username : " + username);
 		}
@@ -229,17 +232,34 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
             	throw new UserExistsException(user.getUsername() + " is exists ! ", StateEnum.USERNAME_EXISTENCE);
             if(this.getPersonAttributes(user.getEmail()) != null)
             	throw new UserExistsException(user.getEmail() + " is exists ! ", StateEnum.EMAIL_EXISTENCE);
+            user.getRoles().remove(new Role(Constants.USER_ROLE)); // 2012-07-12 FIXME
             ldapUserDetailsManager.createUser(user);
+            user.getRoles().add(new Role(Constants.USER_ROLE)); // 2012-07-12 FIXME
         } else {// Existing user, check password in DB
         	String currentPassword = new String((byte[]) this.getPersonAttributes(user.getUsername()).getAttributeValue(AttributeEnum.USER_PASSWORD.getValue()));
             if (!currentPassword.equals(user.getPassword()) && passwordEncoder != null) {
             	user.setPassword("{MD5}" + passwordEncoder.encodePassword(user.getPassword(), null));
             }
+            IPersonAttributes ipa = this.getPersonAttributes(user.getEmail());
+            if(ipa != null && !ipa.getAttributeValue(AttributeEnum.USER_USERNAME.getValue()).equals(user.getUsername()))
+            	throw new UserExistsException(user.getEmail() + " is exists ! ", StateEnum.EMAIL_EXISTENCE);
+            user.getRoles().remove(new Role(Constants.USER_ROLE)); // 2012-07-12 FIXME
             ldapUserDetailsManager.updateUser(user);
+            user.getRoles().add(new Role(Constants.USER_ROLE)); // 2012-07-12 FIXME
         }
         return user;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+	public User creatUser(String username, String password, String email) throws UserExistsException {
+		User user = new User(username);
+		user.setPassword(password);
+		user.setEmail(email);
+		return savePerson(user);
+	}
+	
     /**
      * {@inheritDoc}
      */
@@ -260,4 +280,5 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
     private LdapUserDetailsManager ldapUserDetailsManager;
 	@Autowired
 	private LdapTemplate ldapTemplate;
+
 }

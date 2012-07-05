@@ -35,16 +35,17 @@
     </bean>
 
     <bean id="persistenceUnitManager" class="org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager">
+        <property name="defaultDataSource" ref="dataSource"/>
+        <property name="defaultPersistenceUnitName" value="ApplicationEntityManager">
         <property name="persistenceXmlLocations">
             <list>
                 <value>classpath:META-INF/persistence.xml</value>
             </list>
         </property>
-        <property name="defaultDataSource" ref="dataSource"/>
     </bean>
 
     <!-- Needed so the @PersistenceUnit annotation is recognized -->
-    <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/>
+	<bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
 
     <!-- Transaction manager for a single EntityManagerFactory (alternative to JTA) -->
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">

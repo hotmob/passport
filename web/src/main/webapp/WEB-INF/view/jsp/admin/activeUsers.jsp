@@ -11,7 +11,7 @@
 
     <p><fmt:message key="activeUsers.message"/></p>
 
-    <input type="button" onclick="location.href='../mainMenu'" value="<fmt:message key="button.done"/>" class="btn"/>
+    <input type="button" onclick="location.href='../home'" value="<fmt:message key="button.done"/>" class="btn"/>
 
     <display:table name="applicationScope.userNames" id="user" cellspacing="0" cellpadding="0"
                    defaultsort="1" class="table table-condensed" pagesize="50" requestURI="">

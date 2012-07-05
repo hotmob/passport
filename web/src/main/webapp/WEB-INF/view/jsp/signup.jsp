@@ -8,7 +8,7 @@
 <div class="main wrapper">
 	<div class="separator"></div>
 	<div class="reg_con">
-		<form:form  id="signupForm" commandName="signupForm" method="post" onsubmit="return validateSignupForm(this)">
+		<form:form  id="userForm" commandName="userForm" method="post" onsubmit="return validateUserForm(this)">
 			<h3 class="reg_tit"></h3>
 			<ul>
 				<li>
@@ -60,12 +60,12 @@
 				<li class="btn_con">
 				    <form:hidden path="service" value="" />
 					<input type="submit" class="btn btn-success" name="save" value="<fmt:message key="signup.heading" />" tabindex="6" />
-					<fmt:message key="signup.help.exist.user.tipinfo"/>&nbsp;<a id="cancelUri" href="/login" ><fmt:message key="signup.help.exist.user.login"/></a>
+					<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<fmt:message key="signup.help.exist.user.tipinfo"/>&nbsp;<a id="cancelUri" href="/login" ><fmt:message key="signup.help.exist.user.login"/></a></div>
 				</li>
 			</ul>
 		</form:form>
 		<c:set var="scripts" scope="request">
-			<v:javascript formName="signupForm" staticJavascript="false"/>
+			<v:javascript formName="userForm" staticJavascript="false"/>
 			<script type="text/javascript" src="<c:url value='${appConfig["resourcesUri"]}statics/scripts/validator.jsp' />"></script>
 		</c:set>
 	</div>

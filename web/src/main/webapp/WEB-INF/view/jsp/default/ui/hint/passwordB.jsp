@@ -17,12 +17,9 @@
     </ol>
 </div>
 <div>
-    <%-- <form:form id="hintForm" commandName="hintForm" method="post" action="hint" onsubmit="return validateHintForm(this)">
-	    <div class="send_success_tips"><fmt:message key="hint.password.email.send.success" /></div>
-	    <div class="send_success"><fmt:message key="hint.password.email.send.success.tipinfo"><fmt:param value="${hintForm.email}" /></fmt:message></div> --%>
 	    <ul style="padding:30px 0 0;">
                 <li class="alert alert-success  fade in" style="margin-right: 28px;">
-                    <fmt:message key="hint.password.email.send.success.tipinfo" ><fmt:param value="${hintForm.email}" /></fmt:message>
+                    <fmt:message key="hint.password.email.send.success.tipinfo" ><fmt:param value="${userForm.email}" /></fmt:message>
                 </li>
         </ul>
 	    <div class="send_helps">

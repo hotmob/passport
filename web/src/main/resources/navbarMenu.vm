@@ -1,10 +1,9 @@
-﻿#macro( displayCssMenu $menu )
+#macro( displayCssMenu $menu )
   #if ($displayer.isAllowed($menu))
     #if ($count) #set ($count = $count + 1) #else #set ($count = 0) #end
     ## set menu title
     #set ($title = $displayer.getMessage($menu.title))
     #if (!$menu.url) #set ($url="javascript:void(0)") #else #set ($url=$menu.url) #end
-
     ## create a single menu item
     #if ($menu.components.size() == 0)
         <li class="#if ($menu.name == $currentMenu)active#end">

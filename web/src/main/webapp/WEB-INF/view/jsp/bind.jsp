@@ -8,13 +8,13 @@
 <div class="main wrapper">
     <div class="separator"></div>
     <div class="reg_con">
-        <form:form  id="signupForm" commandName="signupForm" method="post" onsubmit="return validateSignupForm(this)">
+        <form:form  id="userForm" commandName="userForm" method="post" onsubmit="return validateUserForm(this)">
 	        <div class="userinfo">
 	            <dl>
 	                <dd class="avatar">
 	                   <c:choose>
-	                       <c:when test="${not empty signupForm.avataUrl}">
-	                           <img src="${signupForm.avataUrl}">
+	                       <c:when test="${not empty userForm.avataUrl}">
+	                           <img src="${userForm.avataUrl}">
 	                       </c:when>
 	                       <c:when test="${not empty avataUrl}">
                                <img src="${avataUrl}">
@@ -24,8 +24,8 @@
 	                       </c:otherwise>
 	                   </c:choose>
 	                </dd>
-	                <dt>Hi, ${signupForm.firstName}${signupForm.lastName}</dt>
-	                <dd><fmt:message key="bind.message"><fmt:param value="${signupForm.providerId}" /></fmt:message></dd>
+	                <dt>Hi, ${userForm.firstName}${userForm.lastName}</dt>
+	                <dd><fmt:message key="bind.message"><fmt:param value="${userForm.providerId}" /></fmt:message></dd>
 	                <dd><fmt:message key="bind.showMore"/></dd>
 	            </dl>
 	        </div>
@@ -55,7 +55,7 @@
             </ul>
         </form:form>
         <c:set var="scripts" scope="request">
-            <v:javascript formName="signupForm" staticJavascript="false"/>
+            <v:javascript formName="userForm" staticJavascript="false"/>
             <script type="text/javascript" src="<c:url value='${appConfig["resourcesUri"]}statics/scripts/validator.jsp' />"></script>
         </c:set>
     </div>

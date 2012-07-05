@@ -4,24 +4,26 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import com.ammob.passport.Constants;
 import com.ammob.passport.enumerate.AttributeEnum;
 import com.ammob.passport.model.User;
 
-import org.jasig.services.persondir.IPersonAttributes;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.jasig.services.persondir.IPersonAttributes;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.*;
 
 public class UserManagerTest extends BaseManagerTestCase {
+	
     private Log log = LogFactory.getLog(UserManagerTest.class);
+    
     @Autowired
     private UserManager mgr;
     @Autowired
     private RoleManager roleManager;
-    
+	
     private User user;
 
     @Test
@@ -34,10 +36,10 @@ public class UserManagerTest extends BaseManagerTestCase {
 
     @Test
     public void testSaveUser() throws Exception {
-        user = mgr.getUserByUsername("mupeng");
+        user = mgr.getUser("-1");
         user.setPhoneNumber("303-555-1212");
         log.debug("saving user with updated phone number: " + user);
-        user = mgr.savePerson(user);
+        user = mgr.saveUser(user);
         assertEquals("303-555-1212", user.getPhoneNumber());
         assertTrue(user.getRoles().size() > 0);
     }

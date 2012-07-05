@@ -8,6 +8,8 @@
     <menu:displayMenu name="MainMenu"/>
     <menu:displayMenu name="UserMenu"/>
     <menu:displayMenu name="AdminMenu"/>
+    <menu:displayMenu name="EmployeeMenu"/>
+    <li class="divider-vertical"></li>
     <menu:displayMenu name="Logout"/>
 </ul>
 </menu:useMenuDisplayer>

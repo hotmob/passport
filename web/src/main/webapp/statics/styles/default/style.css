@@ -22,8 +22,9 @@ a:hover{ color:#ff6600; text-decoration:underline;}
 .clear { clear:both; height:0px; font-size:0; overflow:hidden;}
 .color_dark{ color:#898989}
 .wrapper{ width:960px; margin:60px auto; text-align:left; }
-.footer{ line-height:28px; color:#555; text-align:center; clear:both; padding:15px 0; border-top:1px solid #e7e7e7; width:900px; margin:30px auto;}
+.footer{ color:#555; text-align:center; clear:both; padding:15px 0; border-top:1px solid #e7e7e7; width:900px; margin:30px auto;}
 .footer a{color:#555}
+.footer p{line-height:22px;}
  
  /* ===login=== */
 .sidebar{ width:592px; float:left; margin-top:20px}
@@ -34,19 +35,18 @@ a:hover{ color:#ff6600; text-decoration:underline;}
 .login ul li{ clear:both; padding:15px 0 15px 0px; height:27px; line-height:26px; overflow:hidden}
 .login label,.login input{ float:left; }
 .login label{ width:75px; text-align:right; font-size:14px; line-height:34px;}
-	
 .plubic_input1{ float:left; width:180px; height:24px; padding:2px 4px; line-height:24px; color:#aaa; overflow:hidden; display:inline; border:1px solid #ddd; border-top:1px solid #aaa; border-left:1px solid #aaa; font-size:12px;}
 .plubic_input2{ width:78px; height:24px; padding:2px 4px; line-height:24px; color:#aaa; overflow:hidden; border:1px solid #ddd; border-top:1px solid #aaa; border-left:1px solid #aaa; font-size:16px; font-family:Arial, Helvetica, sans-serif; }
 .plubic_input_on{ color:#444; }
 .text_password{ font-family:Arial}
 .error_tips{position:absolute; color:red; left:105px; top:150px; *top:140px}
 
-.login .checkbox{ padding-left:94px; }
+.login .checkbox{ padding-left:94px; _padding-left:61px;}
 .login .checkbox a{ color:#55769f}
 .login .checkbox input{ margin:7px 0 0 15px; *margin:2px 0 0 10px; display:inline; }
 .login .checkbox label.checkbox{ text-align:left; padding-left:5px; width:110px; color:#555; font-size:12px; line-height:26px;}
-.login ul li.btn_login{ padding:0 0 0 75px; height:60px }
-
+.login .checkbox input#rememberMe{ width:auto; border:0 none;}
+.login ul li.btn_login{ padding:0 0 0 75px; _padding-left:45px; +padding-left:50px; height:60px;}
 .login_cooperate{ padding:10px 0 0 8px; border-top:1px solid #e8e8e8; margin:0 12px;}
 .login_cooperate h4{ font-weight:100; padding:0 0 10px;}
 .login_cooperate ul li{ width:32px; height:32px; float:left; margin:0 10px 0 0; display:inline;background-repeat:no-repeat;}	
@@ -60,11 +60,11 @@ a:hover{ color:#ff6600; text-decoration:underline;}
 .reg_con label{ width:84px; text-align:right; font-size:14px; line-height:30px;}
 .reg_tips{ padding:2px 0 0 10px; float:left; width:380px;}
 .avilid {float:left; height:26px; line-height:26px; padding:0 0 0 2px; width:100px;}
-.input_checkbox { margin:9px 6px 0 0; *margin:4px 6px 0 -5px; display:inline; }
+.input_checkbox { margin:9px 6px 0 0; *margin:4px 6px 0 -5px; display:inline; width:auto; border:0 none;}
 .reg_con .btn_con{padding-left:184px;}
 .reg_con .btn_con a{ color:#54759e}
 .btn_reg2{ width:103px; height:34px; background:url(../../images/btn.gif) no-repeat 0 -68px; margin:0 15px 0 0; padding:0; border:0; cursor:pointer;}
-.reg_con .checkbox{ width:300px; text-align:left; font-size:12px;}
+.reg_con .checkbox{ width:300px; text-align:left; font-size:12px; padding-left:20px; margin:-7px;}
 .reg_con .checkbox a{ color:#54759e}
 .reg_con .service_con{padding-left:184px; height:200px; padding-top:0}
 .service_txt{border:1px solid #aaa; border-bottom:1px solid #ddd; border-right:1px solid #ddd; background:#f6f6f6;width:400px; height:200px; overflow-y:scroll; padding:5px;}
@@ -137,3 +137,8 @@ a:hover{ color:#ff6600; text-decoration:underline;}
 
 .avatar {background: url(../../images/userface.gif) no-repeat; border: 1px solid #D3D3D3; display: block; margin-right: 10px; padding: 2px;float: left;overflow: hidden;}
 .avatar img { display: block; height: 72px; width: 72px; }
+.container-fluid .row-fluid .span3,
+.container-fluid .row-fluid .span7{ width:650px; float:none; margin:0 auto;}
+.container-fluid .row-fluid .span7 .control-label{ width:200px;}
+.container-fluid .row-fluid .span7 .controls{ width:300px;}
+.container-fluid .row-fluid .span7 .form-actions{ padding-left:72px;}

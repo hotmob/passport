@@ -39,6 +39,10 @@
 				<prop key="/proxy">proxyController</prop>
 				<prop key="/proxyValidate">proxyValidateController</prop>
 				<prop key="/samlValidate">samlValidateController</prop>
+				<prop key="/manager/viewStatistics">viewStatisticsController</prop>
+				<prop key="/manager/service/add">addRegisteredServiceSimpleFormController</prop>
+				<prop key="/manager/service/edit">editRegisteredServiceSimpleFormController</prop>
+				<prop key="/manager/service/manage">manageRegisteredServicesMultiActionController</prop>
 			</props>
 		</property>
 	</bean>
@@ -93,6 +97,7 @@
     
     <webflow:flow-registry id="flowRegistry" flow-builder-services="flowBuilderServices">
         <webflow:flow-location path="/WEB-INF/login-webflow.xml" id="login" />
+        <webflow:flow-location path="/WEB-INF/login-webflow.xml" id="/login" />
     </webflow:flow-registry>
     
     <webflow:flow-builder-services id="flowBuilderServices" view-factory-creator="viewFactoryCreator" expression-parser="expressionParser" />

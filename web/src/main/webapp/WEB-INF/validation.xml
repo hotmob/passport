@@ -47,41 +47,7 @@
                 <arg key="address.province"/>
             </field>
         </form>
-        <form name="hintForm">
-            <field property="username" depends="required">
-                <arg key="login.tipinfo" position="0" />
-            </field>
-            <field property="password" depends="maxlength,minlength,mask">
-                <arg key="user.password" position="0" />
-                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false"/>
-                <arg name="minlength" key="${var:minlength}" position="1" resource="false"/>
-                <var>
-                    <var-name>minlength</var-name>
-                    <var-value>6</var-value>
-                </var>      
-                <var>
-                    <var-name>maxlength</var-name>
-                    <var-value>30</var-value>
-                </var>
-                <var>
-                    <var-name>mask</var-name>
-                    <var-value>^[a-zA-Z0-9]*$</var-value>
-                </var>
-            </field>
-            <field property="confirmPassword" depends="twofields">
-                <msg name="twofields" key="errors.twofields"/>
-                <arg key="user.confirmPassword" />
-                <arg key="user.password" position="1"/>
-                <var>
-                    <var-name>secondProperty</var-name>
-                    <var-value>password</var-value>
-                </var>
-            </field>
-            <field property="captcha" depends="required">
-                <arg key="label.captcha"/>
-            </field>
-        </form>
-        <form name="signupForm">
+        <form name="userForm">
             <field property="username" depends="required,minlength,maxlength,mask">
                 <arg key="user.username" position="0" />
                 <arg name="maxlength" key="${var:maxlength}" position="1" resource="false"/>
@@ -96,7 +62,7 @@
                 </var>
                 <var>
                     <var-name>mask</var-name>
-                    <var-value>^[a-z][a-zA-Z0-9]+$</var-value>
+                    <var-value>^[a-zA-Z][a-zA-Z0-9]+$</var-value>
                 </var>
             </field>
             <field property="password" depends="required,maxlength,minlength,mask">
@@ -154,7 +120,7 @@
 				</var>
 				<var>
                     <var-name>mask</var-name>
-                    <var-value>^[a-z][a-zA-Z0-9]+$</var-value>
+                    <var-value>^[a-zA-Z][a-zA-Z0-9]+$</var-value>
                 </var>
             </field>
             <field property="password" depends="required,maxlength,minlength,mask">

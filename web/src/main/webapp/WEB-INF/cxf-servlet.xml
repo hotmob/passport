@@ -12,11 +12,25 @@
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
 
     <bean id="jsonProvider" class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
+    <bean id="ipAddressInInterceptor" class="com.ammob.passport.webapp.interceptor.IpAddressInInterceptor">
+        <property name="allowedList">
+            <list>
+                <value>192.168</value>
+                <value>120.33.33</value>
+                <value>10.10</value>
+                <value>127.0</value>
+                <value>218.66.36.119</value>
+            </list>
+        </property>
+    </bean>
 
     <jaxws:endpoint id="userService" implementor="#userManager" address="/UserService"/>
     <!-- Add new endpoints for additional services you'd like to expose -->
     
     <jaxrs:server address="/api">
+        <jaxrs:inInterceptors>
+            <ref bean="ipAddressInInterceptor" />
+        </jaxrs:inInterceptors>
         <jaxrs:features>
             <cxf:logging/>
         </jaxrs:features>
@@ -34,5 +48,4 @@
             <entry key="feed" value="application/atom+xml"/>
         </jaxrs:extensionMappings>
     </jaxrs:server>
-
 </beans>
