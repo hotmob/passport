@@ -29,25 +29,15 @@ import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
- * This class represents the basic "user" object in AppFuse that allows for authentication
- * and user management.  It implements Acegi Security's UserDetails interface.
- *
- * @author <a href="mailto:matt@raibledesigns.com">Matt Raible</a>
- *         Updated by Dan Kibler (dan@getrolling.com)
- *         Extended to implement Acegi UserDetails interface
- *         by David Carter david@carter.net
+ * This class represents the basic "user" object that allows for authentication and user management.  It implements Acegi Security's UserDetails interface.
  */
 @Entity
-@Table(name = "app_user")
+@Table(name = "users")
 @Searchable
 @XmlRootElement
 @JsonIgnoreProperties(value={ "password" }) 
@@ -64,7 +54,7 @@ public class User extends BaseObject implements Serializable, LdapUserDetails {
     private String username;                    	// required
     @Column(nullable = false)
     @XmlTransient
-    private byte[] password;                  		// required
+    private String password;                  		// required
     @SearchableProperty
     @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;                   		// required
@@ -260,7 +250,7 @@ public class User extends BaseObject implements Serializable, LdapUserDetails {
     }
 
     public void setPassword(String password) {
-        this.password = password.getBytes();
+        this.password = password;
     }
 
     public void setConfirmPassword(String confirmPassword) {

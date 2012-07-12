@@ -84,16 +84,16 @@ public class UserFormControllerTest extends BaseControllerTestCase {
     @Test
     public void testEditProfile() throws Exception {
         log.debug("testing edit profile...");
-        request = newGet("/userform.html");
+        request = newGet("/userform");
         request.setRemoteUser("mupengUser");
 
         user = c.showForm(request, new MockHttpServletResponse());
-        assertEquals("Tomcat User", user.getDisplayName());
+        assertNotNull(user.getDisplayName());
     }
 
     @Test
     public void testSave() throws Exception {
-        request = newPost("/userform.html");
+        request = newPost("/userform");
         // set updated properties first since adding them later will
         // result in multiple parameters with the same name getting sent
         User user = ((UserManager) applicationContext.getBean("userManager")).getUser("-1");

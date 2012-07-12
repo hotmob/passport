@@ -1,11 +1,14 @@
 package com.ammob.passport.webapp.controller;
 
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ammob.passport.Constants;
 import com.ammob.passport.model.User;
 import com.ammob.passport.service.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ldap.control.PagedResult;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,12 +35,16 @@ public class UserController {
         this.mgr = userManager;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public ModelAndView handleRequest(@RequestParam(required = false, value = "q") String query) throws Exception {
-    	System.out.println("query : " + query);
-    	List<User> users = null;
+    @SuppressWarnings("unchecked")
+	@RequestMapping(method = RequestMethod.GET)
+    public ModelAndView handleRequest(@RequestParam(required = false, value = "q") String query, @RequestParam(required = false, value = "prcookie") String cookie) throws Exception {
+    	System.out.println("query : " + query + ", cookie : " +  cookie == null ? new byte[0] : cookie);
+    	List<User> users = new ArrayList<User>();
 		try {
-			users = mgr.search(query);
+			PagedResult pr = mgr.getPersons(20, cookie == null ? new byte[0] : cookie.getBytes());
+			cookie =URLEncoder.encode(new String(pr.getCookie().getCookie()), "UTF-8");
+			System.out.println(pr.getCookie().getCookie().length + ", " + cookie);
+			users.addAll(pr.getResultList());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

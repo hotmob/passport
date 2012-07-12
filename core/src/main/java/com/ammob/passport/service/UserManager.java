@@ -5,10 +5,12 @@ import com.ammob.passport.model.User;
 import com.ammob.passport.exception.UserExistsException;
 
 import org.jasig.services.persondir.IPersonAttributes;
+import org.springframework.ldap.control.PagedResult;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 
+import javax.naming.NamingException;
 
 /**
  * Business Service Interface to handle communication between web and
@@ -86,6 +88,15 @@ public interface UserManager extends GenericManager<User, Long> {
      * @return a list of matches, or all if no searchTerm.
      */
     List<User> search(String searchTerm);
+    
+    /**
+     * Search a user for search terms page result.
+     * @param searchTerm the search terms.
+     * @param pagesize result list.
+     * @param cookie result cookie.
+     * @return a list of matches, or all if no searchTerm.
+     */
+    PagedResult getPersons(int pageSize, byte[] cookie) throws NamingException;
     
     /**
      * Changes the password for the current user. The username is obtained from the security context.

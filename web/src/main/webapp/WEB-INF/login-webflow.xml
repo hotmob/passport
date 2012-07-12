@@ -11,20 +11,20 @@
     </on-start>
 	
 	<decision-state id="ticketGrantingTicketExistsCheck">
-		<if test="flowScope.ticketGrantingTicketId neq null" then="hasServiceCheck" else="gatewayRequestCheck" />
+		<if test="flowScope.ticketGrantingTicketId != null" then="hasServiceCheck" else="gatewayRequestCheck" />
 	</decision-state>
     
-	<decision-state id="gatewayRequestCheck">
-		<if test="externalContext.requestParameterMap['gateway'] neq '' &amp;&amp; externalContext.requestParameterMap['gateway'] neq null &amp;&amp; flowScope.service neq null" then="gatewayServicesManagementCheck" else="generateLoginTicket" />
-	</decision-state>
+    <decision-state id="gatewayRequestCheck">
+        <if test="requestParameters.gateway != '' and requestParameters.gateway != null and flowScope.service != null" then="gatewayServicesManagementCheck" else="generateLoginTicket" />
+    </decision-state>
 	
 	<decision-state id="hasServiceCheck">
 		<if test="flowScope.service != null" then="renewRequestCheck" else="viewGenericLoginSuccess" />
 	</decision-state>
 	
-	<decision-state id="renewRequestCheck">
-		<if test="externalContext.requestParameterMap['renew'] neq '' &amp;&amp; externalContext.requestParameterMap['renew'] neq null" then="generateLoginTicket" else="generateServiceTicket" />
-	</decision-state>
+    <decision-state id="renewRequestCheck">
+        <if test="requestParameters.renew != '' and requestParameters.renew != null" then="generateLoginTicket" else="generateServiceTicket" />
+    </decision-state>
 	
 	<!-- 
 		The "warn" action makes the determination of whether to redirect directly to the requested
@@ -42,7 +42,46 @@
 		<transition on="error" to="generateLoginTicket" />
 	</action-state>
 	 -->
-	
+	 
+	<!-- LPPE transitions begin here: You will also need to move over the 'lppe-configuration.xml' 
+		file from the 'unused-spring-configuration' folder to the 'spring-configuration' folder so CAS can pick up the definition for the bean 'passwordPolicyAction'. -->
+    <action-state id="passwordPolicyCheck">
+        <evaluate expression="passwordPolicyAction" />
+        <transition on="showWarning" to="passwordServiceCheck" />
+        <transition on="success" to="sendTicketGrantingTicket" />
+        <transition on="error" to="viewLoginForm" />
+    </action-state>
+
+    <action-state id="passwordServiceCheck">
+        <evaluate expression="sendTicketGrantingTicketAction" />
+        <transition to="passwordPostCheck" />
+    </action-state>
+
+    <decision-state id="passwordPostCheck">
+        <if test="flowScope.service != null" then="warnPassRedirect" else="pwdWarningPostView" />
+    </decision-state>
+
+    <action-state id="warnPassRedirect">
+        <evaluate expression="generateServiceTicketAction" />
+        <transition on="success" to="pwdWarningPostView" />
+        <transition on="error" to="generateLoginTicket" />
+        <transition on="gateway" to="gatewayServicesManagementCheck" />
+    </action-state>
+
+    <end-state id="pwdWarningAbstractView">
+        <on-entry>
+            <set name="flowScope.passwordPolicyUrl" value="passwordPolicyAction.getPasswordPolicyUrl()" />
+        </on-entry>
+    </end-state>
+    <end-state id="pwdWarningPostView" view="casWarnPassView" parent="#pwdWarningAbstractView" />
+    <end-state id="casExpiredPassView" view="casExpiredPassView" parent="#pwdWarningAbstractView" />
+    <end-state id="casMustChangePassView" view="casMustChangePassView" parent="#pwdWarningAbstractView" />
+    <end-state id="casAccountDisabledView" view="casAccountDisabledView" />
+    <end-state id="casAccountLockedView" view="casAccountLockedView" />
+    <end-state id="casBadHoursView" view="casBadHoursView" />
+    <end-state id="casBadWorkstationView" view="casBadWorkstationView" />
+    <!-- LPPE transitions end here... -->
+    
 	<action-state id="generateLoginTicket">
         <evaluate expression="generateLoginTicketAction.generate(flowRequestContext)" />
 		<transition on="generated" to="viewLoginForm" />
@@ -67,6 +106,12 @@
 		<transition on="warn" to="warn" />
 		<transition on="success" to="sendTicketGrantingTicket" />
 		<transition on="error" to="generateLoginTicket" />
+		<transition on="accountDisabled" to="casAccountDisabledView" />
+        <transition on="mustChangePassword" to="casMustChangePassView" />
+        <transition on="accountLocked" to="casAccountLockedView" />
+        <transition on="badHours" to="casBadHoursView" />
+        <transition on="badWorkstation" to="casBadWorkstationView" />
+        <transition on="passwordExpired" to="casExpiredPassView" />
 	</action-state>
 	
 	<action-state id="sendTicketGrantingTicket">
@@ -75,7 +120,7 @@
 	</action-state>
 
 	<decision-state id="serviceCheck">
-		<if test="flowScope.service neq null" then="generateServiceTicket" else="viewGenericLoginSuccess" />
+		<if test="flowScope.service != null" then="generateServiceTicket" else="viewGenericLoginSuccess" />
 	</decision-state>
 	
 	<action-state id="generateServiceTicket">
@@ -96,7 +141,7 @@
     </action-state>
 
     <decision-state id="postRedirectDecision">
-        <if test="requestScope.response.responseType.name() eq 'POST'" then="postView" else="redirectView" />
+        <if test="requestScope.response.responseType.name() == 'POST'" then="postView" else="redirectView" />
     </decision-state>
 
 	<!-- 

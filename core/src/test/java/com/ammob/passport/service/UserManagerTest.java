@@ -12,6 +12,7 @@ import com.ammob.passport.model.User;
 import org.junit.Test;
 import org.jasig.services.persondir.IPersonAttributes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ldap.control.PagedResult;
 
 import static org.junit.Assert.*;
 
@@ -90,4 +91,32 @@ public class UserManagerTest extends BaseManagerTestCase {
     	for(User user : users)
     		System.out.println(user);
     }
+    
+    @SuppressWarnings("unchecked")
+	@Test
+    public void testGetPersons() throws Exception {
+    	PagedResult pr = mgr.getPersons(20, null);
+    	List<User> users = pr.getResultList();
+    	for(User user : users)
+    		System.out.print(user.getUsername() + ", ");
+    	for(byte bb : pr.getCookie().getCookie())
+    		System.out.print(bb + " ");
+    	System.out.println("");
+    	pr = mgr.getPersons(20, pr.getCookie().getCookie());
+    	users = pr.getResultList();
+    	for(User user : users)
+    		System.out.print(user.getUsername() + ", ");
+    	System.out.println("");
+    	for(byte bb : pr.getCookie().getCookie())
+    		System.out.print(bb + " ");
+    }
+    public static void main(String[] args) {
+		byte[] dd = {36,0,0,0,0,0,0,0};
+		String ddd = new String(dd);
+		System.out.println("dd = " + ddd);
+		byte [] oo = "$".getBytes();
+		for(byte o : oo)
+			System.out.println(o + ", ");
+		
+	}
 }

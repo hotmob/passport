@@ -6,7 +6,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd"
        default-lazy-init="true">
-
+        
     <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
     
     <!-- EntityManagerFactory -->
@@ -36,7 +36,7 @@
 
     <bean id="persistenceUnitManager" class="org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager">
         <property name="defaultDataSource" ref="dataSource"/>
-        <property name="defaultPersistenceUnitName" value="ApplicationEntityManager">
+        <property name="defaultPersistenceUnitName" value="ApplicationEntityManager" />
         <property name="persistenceXmlLocations">
             <list>
                 <value>classpath:META-INF/persistence.xml</value>
@@ -93,6 +93,12 @@
                     <property name="name" value="jpa" />
                     <property name="injectEntityLifecycleListener" value="true" />
                     <property name="entityManagerFactory" ref="entityManagerFactory" />
+                    <property name="entitiesLocator">
+                        <bean class="com.ammob.passport.compass.gps.device.jpa.entities.HibernateJpaEntitiesLocator" />
+				    </property>
+				    <property name="lifecycleInjector">
+				        <bean class="com.ammob.passport.compass.gps.device.jpa.lifecycle.HibernateJpaEntityLifecycleInjector" />
+                    </property>
                 </bean>
             </list>
         </property>

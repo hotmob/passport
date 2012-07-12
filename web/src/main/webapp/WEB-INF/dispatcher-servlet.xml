@@ -43,6 +43,7 @@
 				<prop key="/manager/service/add">addRegisteredServiceSimpleFormController</prop>
 				<prop key="/manager/service/edit">editRegisteredServiceSimpleFormController</prop>
 				<prop key="/manager/service/manage">manageRegisteredServicesMultiActionController</prop>
+				<prop key="/status">healthCheckController</prop>
 			</props>
 		</property>
 	</bean>

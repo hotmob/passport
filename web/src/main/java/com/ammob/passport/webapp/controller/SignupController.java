@@ -106,6 +106,7 @@ public class SignupController extends BaseFormController {
 	public String onSubmit(UserForm userForm, BindingResult errors,
 			HttpServletRequest request, HttpServletResponse response)
 					throws Exception {
+		log.info("---->" + userForm.getService());
 		if (validator != null) { // validator is null during testing
 			validator.validate(userForm, errors);
 			if(request.getParameter(Constants.SECURITY_SUPERVISION_CODE) == null) {// don't validate when supervision

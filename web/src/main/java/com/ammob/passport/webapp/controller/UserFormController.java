@@ -107,7 +107,8 @@ public class UserFormController extends BaseFormController {
             	}
                 return "userform";
             } catch (Exception e) {
-                e.fillInStackTrace();
+                e.printStackTrace();
+                saveError(request, "Error : " + e.getMessage());
                 return "userform";
             }
             if (!StringUtils.equals(request.getParameter("from"), "list")) {

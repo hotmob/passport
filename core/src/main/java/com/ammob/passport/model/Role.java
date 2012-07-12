@@ -24,7 +24,7 @@ import java.io.Serializable;
  *         by David Carter david@carter.net
  */
 @Entity
-@Table(name = "role")
+@Table(name = "roles")
 @NamedQueries({
         @NamedQuery(
                 name = "findRoleByName",

@@ -18,6 +18,7 @@ import org.jasig.services.persondir.support.NamedPersonImpl;
 import org.jasig.services.persondir.support.ldap.LdapPersonAttributeDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.ldap.control.PagedResult;
 import org.springframework.ldap.control.PagedResultsCookie;
@@ -26,7 +27,6 @@ import org.springframework.ldap.core.CollectingNameClassPairCallbackHandler;
 import org.springframework.ldap.core.ContextMapperCallbackHandler;
 import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.core.Authentication;
@@ -34,10 +34,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import javax.jws.WebService;
+import javax.naming.NamingException;
 import javax.naming.directory.SearchControls;
+import javax.naming.ldap.Control;
+import javax.naming.ldap.PagedResultsResponseControl;
 
 import java.util.HashMap;
 import java.util.List;
@@ -165,29 +167,39 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
 	public List<User> search(String searchTerm) {
-    	List<User> results = super.search(searchTerm, User.class);
-        if (!StringUtils.hasText(searchTerm)) {
-			try {
-				PagedResultsCookie cookie = new PagedResultsCookie(null);
-				results.addAll(getPagePersons(20, cookie).getResultList());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-        }
-    	return results;
+    	return super.search(searchTerm, User.class);
     }
-    
-    private PagedResult getPagePersons(int pageSize, PagedResultsCookie cookie) {
+	
+    /**
+     * {@inheritDoc}
+     */
+	public PagedResult getPersons(int pageSize, byte[] cookie) throws NamingException {
     	SearchControls searchControls = new SearchControls();
-    	EqualsFilter filter = new EqualsFilter("objectclass", "inetOrgPerson");
     	searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    	PagedResultsDirContextProcessor requestControl = new PagedResultsDirContextProcessor(pageSize,cookie);
+    	PagedResultsDirContextProcessor requestControl = new PagedResultsDirContextProcessor(pageSize, new PagedResultsCookie(cookie));
     	CollectingNameClassPairCallbackHandler handler = new ContextMapperCallbackHandler(new PersonMapper()); 
-    	ldapTemplate.search(DistinguishedName.EMPTY_PATH, filter.encode(), searchControls, handler, requestControl);
-    	return new PagedResult(handler.getList(),requestControl.getCookie());
+    	ldapTemplate.search(new DistinguishedName("ou=users"), "(objectclass=inetOrgPerson)", searchControls, handler, requestControl);
+    	try {
+			return new PagedResult(handler.getList(), new PagedResultsCookie(parseControls(new Control[] { requestControl.createRequestControl() })));
+		} catch (NamingException e) {
+			throw e;
+		}
     }
+	
+	private static byte[] parseControls(Control[] controls) throws NamingException {
+		byte[] cookie = null;
+		if (controls != null) {
+			for (int i = 0; i < controls.length; i++) {
+				if (controls[i] instanceof PagedResultsResponseControl) {
+					PagedResultsResponseControl prrc = (PagedResultsResponseControl) controls[i];
+					cookie = prrc.getCookie();
+					System.out.println(">>Next Page \n");
+				}
+			}
+		}
+		return (cookie == null) ? new byte[0] : cookie;
+	}
 
     /**
      * generate ldap query map seed.
@@ -208,7 +220,13 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
 	public IPersonAttributes getPersonAttributes(String identifying) {
 		final Set<IPersonAttributes> people = personAttributeRepository.getPeopleWithMultivaluedAttributes(
 				MultivaluedPersonAttributeUtils.toMultivaluedMap(generateQuerySeed(identifying, identifying)));
-        IPersonAttributes person = DataAccessUtils.singleResult(people);
+        IPersonAttributes person = null;
+		try {
+			person = DataAccessUtils.singleResult(people);
+		} catch (IncorrectResultSizeDataAccessException e) {
+			log.warn("User " + identifying + ", query result size = " + people.size() + ", warn !!!!");
+			person = people.iterator().next();
+		}
         if (person == null) {
             return null;
         }

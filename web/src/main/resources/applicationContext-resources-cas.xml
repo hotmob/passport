@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:p="http://www.springframework.org/schema/p" 
-    xmlns:aop="http://www.springframework.org/schema/aop" 
-    xmlns:util="http://www.springframework.org/schema/util"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans 
-                        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
-                        http://www.springframework.org/schema/util 
-                        http://www.springframework.org/schema/util/spring-util-3.0.xsd
-                        http://www.springframework.org/schema/aop 
-                        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
     <aop:aspectj-autoproxy />
     <bean id="servicesManager" class="org.jasig.cas.services.DefaultServicesManagerImpl" >
@@ -40,8 +38,8 @@
     <bean id="scheduler" class="com.ammob.passport.webapp.spring.AutowiringSchedulerFactoryBean" />
 
     <!-- ********************************************** argumentExtractorsConfiguration.xml ********************************************** -->
-    <bean id="casArgumentExtractor" class="org.jasig.cas.web.support.CasArgumentExtractor" p:httpClient-ref="httpClient" />
-    <bean id="samlArgumentExtractor" class="org.jasig.cas.web.support.SamlArgumentExtractor" p:httpClient-ref="httpClient" />
+    <bean id="casArgumentExtractor" class="org.jasig.cas.web.support.CasArgumentExtractor" p:httpClient-ref="httpClient" p:disableSingleSignOut="${slo.callbacks.disabled:false}" />
+    <bean id="samlArgumentExtractor" class="org.jasig.cas.web.support.SamlArgumentExtractor" p:httpClient-ref="httpClient" p:disableSingleSignOut="${slo.callbacks.disabled:false}" />
     <util:list id="argumentExtractors">
         <ref bean="casArgumentExtractor" />
         <ref bean="samlArgumentExtractor" />
@@ -49,24 +47,18 @@
 
     <!-- ********************************************** ticketExpirationPolicies.xml ********************************************** -->
     <!-- Expiration policies -->
-    <bean id="serviceTicketExpirationPolicy" class="org.jasig.cas.ticket.support.MultiTimeUseOrTimeoutExpirationPolicy">
-        <!-- This argument is the number of times that a ticket can be used before its considered expired. -->
-        <constructor-arg index="0" value="1" />
-        <!-- This argument is the time a ticket can exist before its considered expired. -->
-        <constructor-arg index="1" value="10000" />
-    </bean>
+    <util:constant id="SECONDS" static-field="java.util.concurrent.TimeUnit.SECONDS"/>
+    <bean id="serviceTicketExpirationPolicy" class="org.jasig.cas.ticket.support.MultiTimeUseOrTimeoutExpirationPolicy"
+          c:numberOfUses="1" c:timeToKill="${st.timeToKillInSeconds:10}" c:timeUnit-ref="SECONDS"/>
+
 	<bean id="grantingTicketExpirationPolicy" class="org.jasig.cas.ticket.support.RememberMeDelegatingExpirationPolicy">
 		<property name="sessionExpirationPolicy">
-			<bean class="org.jasig.cas.ticket.support.TimeoutExpirationPolicy">
-				<constructor-arg index="0" value="7200000" /><!-- 2 Hour -->
-			</bean>
+			<bean class="org.jasig.cas.ticket.support.TimeoutExpirationPolicy" c:timeToKillInMilliSeconds="${tgt.timeToKillInSeconds:7200}" /><!-- 2 Hour -->
 		</property>
 		<property name="rememberMeExpirationPolicy">
-			<bean class="org.jasig.cas.ticket.support.TimeoutExpirationPolicy">
-				<constructor-arg index="0" value="604800000" /><!-- 7 Days -->
-			</bean>
+			<bean class="org.jasig.cas.ticket.support.TimeoutExpirationPolicy" c:timeToKillInMilliSeconds="${tgt.timeToKillInSeconds:604800}" /><!-- 7 Days -->
 		</property>
-</bean>
+    </bean>
 
     <!-- ********************************************** ticketGrantingTicketCookieGenerator.xml ********************************************** -->
     <bean id="ticketGrantingTicketCookieGenerator" class="org.jasig.cas.web.support.CookieRetrievingCookieGenerator" p:cookieDomain="${cas.cookise.domainname}"
@@ -142,18 +134,20 @@
         <property name="authenticationHandlers">
             <list>
                 <bean class="org.jasig.cas.authentication.handler.support.HttpBasedServiceCredentialsAuthenticationHandler" p:httpClient-ref="httpClient" />
-                <bean class="org.jasig.cas.adaptors.ldap.BindLdapAuthenticationHandler" >
-					<!-- <property name="passwordEncoder">
-						<bean class="org.jasig.cas.authentication.handler.DefaultPasswordEncoder">
-							<constructor-arg value="MD5" />
-						</bean>
-					</property> -->
-                    <property name="contextSource" ref="contextSource" />
-                    <property name="searchContextSource" ref="pooledContextSource" />
-                    <property name="filter" value="(|(mail=%u)(cn=%u))" />
-                    <property name="searchBase" value="${ldap.users.search.dn}" />
-                    <property name="ignorePartialResultException" value="yes" />
-                </bean>
+				<bean class="org.jasig.cas.adaptors.ldap.BindLdapAuthenticationHandler" 
+				        p:filter="(|(mail=%u)(cn=%u))" p:searchBase="${ldap.users.search.dn}" p:contextSource-ref="contextSource" 
+				        p:searchContextSource-ref="pooledContextSource" p:ignorePartialResultException="yes">
+					<property name="ldapErrorDefinitions">
+						<list>
+							<bean class="org.jasig.cas.adaptors.ldap.LdapErrorDefinition" p:ldapPattern="data 530" p:type="badHours" />
+							<bean class="org.jasig.cas.adaptors.ldap.LdapErrorDefinition" p:ldapPattern="data 533" p:type="accountDisabled" />
+							<bean class="org.jasig.cas.adaptors.ldap.LdapErrorDefinition" p:ldapPattern="data 773" p:type="mustChangePassword" />
+							<bean class="org.jasig.cas.adaptors.ldap.LdapErrorDefinition" p:ldapPattern="data 775" p:type="accountLocked" />
+							<bean class="org.jasig.cas.adaptors.ldap.LdapErrorDefinition" p:ldapPattern="data 531" p:type="badWorkstation" />
+							<bean class="org.jasig.cas.adaptors.ldap.LdapErrorDefinition" p:ldapPattern="data (701|532)" p:type="passwordExpired" />
+						</list>
+					</property>
+				</bean>
                 <bean class="com.ammob.passport.authentication.handler.CustomAuthenticationHandler" />
             </list>
         </property>
@@ -174,8 +168,44 @@
                         <property name="description" value="Allows HTTP(S) and IMAP(S) protocols" />
                         <property name="serviceId" value="^(https?|imaps?)://.*" />
                         <property name="evaluationOrder" value="10000001" />
+                        <property name="allowedAttributes">
+						    <list>
+				                <value>username</value>
+				                <value>password</value>
+				                <value>firstName</value>
+				                <value>lastName</value>
+				                <value>displayName</value>
+				                <value>description</value>
+				                <value>avataUrl</value>
+				                <value>email</value>
+				                <value>state</value>
+				                <value>phoneNumber</value>
+				                <value>uuid</value>
+				                <value>authorities</value>
+				                <value>regTime</value>
+				                <value>address.country</value>
+				                <value>address.province</value>
+				                <value>address.city</value>
+				                <value>address.postalAddress</value>
+				                <value>address.postalCode</value>
+						    </list>             
+					    </property>
                     </bean>
             </list>
         </property>
     </bean>
+	<bean id="healthCheckMonitor" class="org.jasig.cas.monitor.HealthCheckMonitor">
+		<property name="monitors">
+			<list>
+				<bean class="org.jasig.cas.monitor.MemoryMonitor"
+					p:freeMemoryWarnThreshold="10" />
+				<!-- NOTE The following ticket registries support SessionMonitor: * DefaultTicketRegistry 
+					* JpaTicketRegistry Remove this monitor if you use an unsupported registry. -->
+				<bean class="org.jasig.cas.monitor.SessionMonitor"
+					p:ticketRegistry-ref="ticketRegistry"
+					p:serviceTicketCountWarnThreshold="5000"
+					p:sessionCountWarnThreshold="100000" />
+			</list>
+		</property>
+	</bean>
 </beans>
