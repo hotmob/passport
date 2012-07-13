@@ -41,7 +41,7 @@ public class UserController {
     	System.out.println("query : " + query + ", cookie : " +  cookie == null ? new byte[0] : cookie);
     	List<User> users = new ArrayList<User>();
 		try {
-			PagedResult pr = mgr.getPersons(20, cookie == null ? new byte[0] : cookie.getBytes());
+			PagedResult pr = mgr.getPersons(25, cookie == null ? new byte[0] : cookie.getBytes());
 			cookie =URLEncoder.encode(new String(pr.getCookie().getCookie()), "UTF-8");
 			System.out.println(pr.getCookie().getCookie().length + ", " + cookie);
 			users.addAll(pr.getResultList());

@@ -21,7 +21,6 @@
     <form method="get" >
         <input type="hidden" name="prcookie" id="cookie"  value="${param.prcookie}" />
         <input type="submit" class="btn right" value="<fmt:message key="button.next"/>"/>
-        <input type="button" onclick="location.href='<c:url value="?next=true&prcookie=${param.prcookie}"/>'" class="btn right" value="<fmt:message key="button.next"/>2"/>
     </form>
     
     <display:table name="userList" cellspacing="0" cellpadding="0" requestURI="" defaultsort="1" id="users" pagesize="25" class="table table-condensed" export="true">

@@ -106,7 +106,6 @@ public class SignupController extends BaseFormController {
 	public String onSubmit(UserForm userForm, BindingResult errors,
 			HttpServletRequest request, HttpServletResponse response)
 					throws Exception {
-		log.info("---->" + userForm.getService());
 		if (validator != null) { // validator is null during testing
 			validator.validate(userForm, errors);
 			if(request.getParameter(Constants.SECURITY_SUPERVISION_CODE) == null) {// don't validate when supervision
@@ -157,6 +156,6 @@ public class SignupController extends BaseFormController {
 		} catch (MailException me) {
 			saveError(request, me.getMostSpecificCause().getMessage());
 		}
-	   return getRedirectView("/login", userForm.getService());
+	    return getRedirectView("/login", request.getParameter("service"));
 	}
 }

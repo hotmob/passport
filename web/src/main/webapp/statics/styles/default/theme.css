@@ -49,10 +49,10 @@ th.sorted a,th.sortable a {
 	display: block;
 }
 .table th.order1 a {
-	background-image: url("../images/arrow_down.png");
+	background-image: url("../../images/arrow_down.png");
 }
 .table th.order2 a {
-	background-image: url("../images/arrow_up.png");
+	background-image: url("../../images/arrow_up.png");
 }
 .table th.sorted a,.table th.sortable a {
 	background-position: right;
@@ -67,16 +67,16 @@ div.exportlinks span {
 	background-position: 1px 2px;
 }
 span.csv {
-	background-image: url("../images/ico_file_csv.png");
+	background-image: url("../../images/ico_file_csv.png");
 }
 span.excel {
-	background-image: url("../images/ico_file_excel.png");
+	background-image: url("../../images/ico_file_excel.png");
 }
 span.pdf {
-	background-image: url("../images/ico_file_pdf.png");
+	background-image: url("../../images/ico_file_pdf.png");
 }
 span.xml {
-	background-image: url("../images/ico_file_xml.png");
+	background-image: url("../../images/ico_file_xml.png");
 }
 span.export {
 	cursor: pointer;

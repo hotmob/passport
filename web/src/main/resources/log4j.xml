@@ -19,24 +19,31 @@
     </logger>
 
     <logger name="org.springframework.social">
-        <level value="INFO"/>
+        <level value="WARN"/>
     </logger>
     
-    <!-- 3rdparty Loggers -->
     <logger name="org.springframework.core">
-        <level value="INFO" />
+        <level value="WARN" />
     </logger>
     
     <logger name="org.springframework.beans">
-        <level value="INFO" />
+        <level value="WARN" />
     </logger>
     
     <logger name="org.springframework.context">
-        <level value="INFO" />
+        <level value="WARN" />
     </logger>
 
     <logger name="org.springframework.web">
-        <level value="INFO" />
+        <level value="WARN" />
+    </logger>
+    
+    <logger name="org.springframework.ldap">
+        <level value="WARN" />
+    </logger>
+    
+    <logger name="org.springframework">
+        <level value="ERROR"/>
     </logger>
     
     <logger name="org.apache">
@@ -67,21 +74,13 @@
     <!--logger name="org.hibernate.SQL">
         <level value="DEBUG"/>
     </logger-->
-
-    <logger name="org.springframework">
-        <level value="WARN"/>
-    </logger>
-   
-    <logger name="org.springframework.orm">
-        <level value="INFO"/>
-    </logger>
     
     <logger name="com.ammob.passport">
         <level value="INFO"/>
     </logger>
 
     <root>
-        <level value="WARN"/>
+        <level value="FATAL"/>
         <appender-ref ref="CONSOLE"/>
     </root>
 
