@@ -1,12 +1,12 @@
 package com.ammob.passport.webapp.controller;
 
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.ammob.passport.Constants;
 import com.ammob.passport.model.User;
 import com.ammob.passport.service.UserManager;
+import com.ammob.passport.util.StringUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.control.PagedResult;
 import org.springframework.stereotype.Controller;
@@ -35,19 +35,24 @@ public class UserController {
         this.mgr = userManager;
     }
 
-    @SuppressWarnings("unchecked")
 	@RequestMapping(method = RequestMethod.GET)
-    public ModelAndView handleRequest(@RequestParam(required = false, value = "q") String query, @RequestParam(required = false, value = "prcookie") String cookie) throws Exception {
-    	System.out.println("query : " + query + ", cookie : " +  cookie == null ? new byte[0] : cookie);
-    	List<User> users = new ArrayList<User>();
-		try {
-			PagedResult pr = mgr.getPersons(25, cookie == null ? new byte[0] : cookie.getBytes());
-			cookie =URLEncoder.encode(new String(pr.getCookie().getCookie()), "UTF-8");
-			System.out.println(pr.getCookie().getCookie().length + ", " + cookie);
-			users.addAll(pr.getResultList());
-		} catch (Exception e) {
-			e.printStackTrace();
+    public ModelAndView handleRequest(@RequestParam(required = false, value = "q") String query, @RequestParam(required = false, value = "c") String current) throws Exception {
+    	ModelAndView mav = new ModelAndView("admin/userList");
+		if(StringUtil.hasText(query)){
+			List<User> users = mgr.search(query);
+			try {users.add(mgr.getUserByUsername(query));} catch (Exception e) {}
+			mav.addObject(Constants.USER_LIST, users);
+		} else {
+			int _current = 0;
+			try {_current = Integer.parseInt(current);} catch (Exception e) {}
+			try {
+				PagedResult pr = mgr.getPersons(_current, 20);
+				mav.addObject(Constants.USER_LIST, pr.getResultList());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			mav.addObject("c", _current + 1);
 		}
-        return new ModelAndView("admin/userList", Constants.USER_LIST, users);
+        return mav;
     }
 }

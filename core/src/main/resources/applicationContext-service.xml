@@ -22,23 +22,24 @@
         <property name="contextSource" ref="contextSource"/>
     </bean>
     
+    <bean id="userDetailsMapper" class="com.ammob.passport.mapper.PersonMapper" />
+    
     <bean id="ldapUserDetailsManager" class="org.springframework.security.ldap.userdetails.LdapUserDetailsManager">
         <constructor-arg ref="contextSource" />
         <property name="groupSearchBase" value="${ldap.groups.search.dn}" />
+        <property name="userDetailsMapper" ref="userDetailsMapper" />
         <property name="usernameMapper">
         	<bean class="org.springframework.security.ldap.DefaultLdapUsernameToDnMapper">
         		<constructor-arg index="0" value="${ldap.users.search.dn}" />
         		<constructor-arg index="1" value="cn" />
         	</bean>
         </property>
-        <property name="userDetailsMapper">
-            <bean class="com.ammob.passport.mapper.PersonMapper" />
-        </property>
         <property name="attributesToRetrieve">
 			<list>
 				<value>cn</value>
 				<value>userPassword</value>
 				<value>sn</value>
+				<value>uid</value>
 				<value>givenName</value>
 				<value>displayName</value>
 				<value>description</value>
@@ -61,6 +62,7 @@
     <bean id="ldapUserDetailsService" class="org.springframework.security.ldap.userdetails.LdapUserDetailsService">
 	    <constructor-arg ref="ldapUserSearch" />
 	    <constructor-arg ref="ldapAuthoritiesPopulator" />
+	    <property name="userDetailsMapper" ref="userDetailsMapper" />
     </bean>
     
     <bean id="ldapUserSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
@@ -100,6 +102,7 @@
                 <entry key="cn" value="username" />
                 <entry key="userPassword" value="password" />
                 <entry key="sn" value="firstName" />
+                <entry key="uid" value="identity" />
                 <entry key="givenName" value="lastName" />
                 <entry key="displayName" value="displayName" />
                 <entry key="description" value="description" />

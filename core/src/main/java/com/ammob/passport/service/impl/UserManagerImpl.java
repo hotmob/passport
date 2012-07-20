@@ -2,7 +2,6 @@ package com.ammob.passport.service.impl;
 
 import com.ammob.passport.Constants;
 import com.ammob.passport.dao.UserDao;
-import com.ammob.passport.mapper.PersonMapper;
 import com.ammob.passport.model.Role;
 import com.ammob.passport.model.User;
 import com.ammob.passport.service.UserManager;
@@ -22,11 +21,11 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.ldap.control.PagedResult;
 import org.springframework.ldap.control.PagedResultsCookie;
-import org.springframework.ldap.control.PagedResultsDirContextProcessor;
-import org.springframework.ldap.core.CollectingNameClassPairCallbackHandler;
-import org.springframework.ldap.core.ContextMapperCallbackHandler;
-import org.springframework.ldap.core.DistinguishedName;
+import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.filter.AndFilter;
+import org.springframework.ldap.filter.EqualsFilter;
+import org.springframework.ldap.filter.LikeFilter;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.core.Authentication;
@@ -36,11 +35,19 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
 import org.springframework.stereotype.Service;
 
 import javax.jws.WebService;
+import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
+import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.PagedResultsControl;
 import javax.naming.ldap.PagedResultsResponseControl;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -174,18 +181,53 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
     /**
      * {@inheritDoc}
      */
-	public PagedResult getPersons(int pageSize, byte[] cookie) throws NamingException {
-    	SearchControls searchControls = new SearchControls();
-    	searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    	PagedResultsDirContextProcessor requestControl = new PagedResultsDirContextProcessor(pageSize, new PagedResultsCookie(cookie));
-    	CollectingNameClassPairCallbackHandler handler = new ContextMapperCallbackHandler(new PersonMapper()); 
-    	ldapTemplate.search(new DistinguishedName("ou=users"), "(objectclass=inetOrgPerson)", searchControls, handler, requestControl);
-    	try {
-			return new PagedResult(handler.getList(), new PagedResultsCookie(parseControls(new Control[] { requestControl.createRequestControl() })));
-		} catch (NamingException e) {
-			throw e;
+	public PagedResult getPersons(int current, int pageSize)
+			throws NamingException {
+		SearchControls searchControls = new SearchControls();
+		// 返回属性
+		byte[] cookie = null; 
+		List<User> result = new ArrayList<User>();
+		String[] returnAttrs = { "cn", "mail" };
+		searchControls.setReturningAttributes(returnAttrs);
+		searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+		ContextSource contextSource = ldapTemplate.getContextSource();
+		DirContext ctx = contextSource.getReadWriteContext();
+		LdapContext lCtx = (LdapContext) ctx;
+		try {
+			lCtx.setRequestControls(new Control[] { new PagedResultsControl(
+					pageSize, Control.CRITICAL) });
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-    }
+		int tmppage = 0;
+		do {  
+			AndFilter andF = new AndFilter();
+			andF.and(new EqualsFilter("objectclass", "person")).and(new LikeFilter("cn", "*"));
+			List<User> resultList = new ArrayList<User>();
+			NamingEnumeration<SearchResult> results = lCtx.search("", andF.toString(), searchControls);
+			while (results != null && results.hasMoreElements()) {
+				SearchResult sr = results.next();
+				Attributes attrs = sr.getAttributes();
+				User user = new User(attrs.get("cn").get().toString());
+				user.setEmail(attrs.get("mail").get().toString());
+				user.setDisplayName(attrs.get("mail").get().toString());
+				resultList.add(user);
+			}
+			cookie = parseControls(lCtx.getResponseControls());
+			try {
+				lCtx.setRequestControls(new Control[] { new PagedResultsControl(pageSize, cookie, Control.CRITICAL) });
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if(tmppage >= current) {
+				result.addAll(resultList);
+				break;
+			}
+			tmppage++;
+		} while ((cookie != null) && (cookie.length != 0));  
+		lCtx.close();
+		return new PagedResult(result, new PagedResultsCookie(cookie));
+	}
 	
 	private static byte[] parseControls(Control[] controls) throws NamingException {
 		byte[] cookie = null;
@@ -194,7 +236,6 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
 				if (controls[i] instanceof PagedResultsResponseControl) {
 					PagedResultsResponseControl prrc = (PagedResultsResponseControl) controls[i];
 					cookie = prrc.getCookie();
-					System.out.println(">>Next Page \n");
 				}
 			}
 		}

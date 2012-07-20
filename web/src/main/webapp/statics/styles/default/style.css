@@ -125,7 +125,7 @@ a:hover{ color:#ff6600; text-decoration:underline;}
 .logined dt span{ color:#9b9b9b;}
 .logined .pic{ float:left; padding-right:12px;}
 .login_manage{ padding:24px 8px; border-bottom:1px solid #e8e8e8; margin:0 12px;}
-.login_manage h4{ padding:30px 8px; font-weight:100; margin-bottom:-40px;}
+.login_manage h4{ padding:30px 8px; font-weight:100; margin-bottom:-40px; +padding:25px 8px; +margin-bottom:-30px;}
 .login_record{ padding:15px 28px 0; line-height:18px;}
 .login_record h4{ font-weight:100; margin-bottom:5px;}
 
@@ -136,9 +136,17 @@ a:hover{ color:#ff6600; text-decoration:underline;}
 .oauth_facebook button { background:url(../../images/oauth/facebook.png) no-repeat; cursor:pointer; width: 32px; height: 32px; border: none;}
 
 .avatar {background: url(../../images/userface.gif) no-repeat; border: 1px solid #D3D3D3; display: block; margin-right: 10px; padding: 2px;float: left;overflow: hidden;}
-.avatar img { display: block; height: 72px; width: 72px; }
-.container-fluid .row-fluid .span3,
-.container-fluid .row-fluid .span7{ width:650px; float:none; margin:0 auto;}
-.container-fluid .row-fluid .span7 .control-label{ width:200px;}
-.container-fluid .row-fluid .span7 .controls{ width:300px;}
-.container-fluid .row-fluid .span7 .form-actions{ padding-left:72px;}
+.avatar img { display: inline-block; height: 72px;}
+
+/* ie hack 201-07-12 (zhengbiao) */
+html .navbar .nav li { _float: left;}
+html .navbar .nav li a { _color: #999999; _float: none; _line-height: 22px; _padding: 9px 10px; _text-decoration: none; _display: block;}
+.login_manage h4{ _padding:10px 8px;}
+html .navbar .brand { _color: #000000; _float: right; _font-weight: bold; _margin-left: 20px; _padding-left: 0; _padding-right: 0;}
+html .btn{ +padding-bottom: 0; +line-height:20px; _width: auto;}
+.login .checkbox input{ margin:2px 0 0 10px\9;}
+html .container-fluid .row-fluid .span3,
+html .container-fluid .row-fluid .span7{ width:650px; float:none; margin:0 auto;}
+html .container-fluid .row-fluid .span7 .control-label{ width:200px;}
+html .container-fluid .row-fluid .span7 .controls{ width:300px; +width:380px; +text-align:left;}
+html .container-fluid .row-fluid .span7 .form-actions{ padding-left:72px;

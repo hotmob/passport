@@ -95,14 +95,14 @@ public class UserManagerTest extends BaseManagerTestCase {
     @SuppressWarnings("unchecked")
 	@Test
     public void testGetPersons() throws Exception {
-    	PagedResult pr = mgr.getPersons(20, null);
+    	PagedResult pr = mgr.getPersons(0, 20);
     	List<User> users = pr.getResultList();
     	for(User user : users)
     		System.out.print(user.getUsername() + ", ");
     	for(byte bb : pr.getCookie().getCookie())
     		System.out.print(bb + " ");
     	System.out.println("");
-    	pr = mgr.getPersons(20, pr.getCookie().getCookie());
+    	pr = mgr.getPersons(2, 20);
     	users = pr.getResultList();
     	for(User user : users)
     		System.out.print(user.getUsername() + ", ");
@@ -110,13 +110,4 @@ public class UserManagerTest extends BaseManagerTestCase {
     	for(byte bb : pr.getCookie().getCookie())
     		System.out.print(bb + " ");
     }
-    public static void main(String[] args) {
-		byte[] dd = {36,0,0,0,0,0,0,0};
-		String ddd = new String(dd);
-		System.out.println("dd = " + ddd);
-		byte [] oo = "$".getBytes();
-		for(byte o : oo)
-			System.out.println(o + ", ");
-		
-	}
 }

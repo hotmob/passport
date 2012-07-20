@@ -1,11 +1,11 @@
 package com.ammob.passport.webapp.listener;
 
-import com.ammob.passport.model.User;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 import javax.servlet.ServletContext;
@@ -42,7 +42,7 @@ public class UserCounterListener implements ServletContextListener, HttpSessionA
     public static final String EVENT_KEY = HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
     private transient ServletContext servletContext;
     private int counter;
-    private Set<User> users;
+    private Set<UserDetails> users;
 
     /**
      * Initialize the context
@@ -83,11 +83,11 @@ public class UserCounterListener implements ServletContextListener, HttpSessionA
     }
 
     @SuppressWarnings("unchecked")
-    synchronized void addUsername(User user) {
-        users = (Set<User>) servletContext.getAttribute(USERS_KEY);
+    synchronized void addUsername(UserDetails user) {
+        users = (Set<UserDetails>) servletContext.getAttribute(USERS_KEY);
 
         if (users == null) {
-            users = new LinkedHashSet<User>();
+            users = new LinkedHashSet<UserDetails>();
         }
 
         if (!users.contains(user)) {
@@ -98,8 +98,8 @@ public class UserCounterListener implements ServletContextListener, HttpSessionA
     }
 
     @SuppressWarnings("unchecked")
-    synchronized void removeUsername(User user) {
-        users = (Set<User>) servletContext.getAttribute(USERS_KEY);
+    synchronized void removeUsername(UserDetails user) {
+        users = (Set<UserDetails>) servletContext.getAttribute(USERS_KEY);
 
         if (users != null) {
             users.remove(user);
@@ -118,8 +118,8 @@ public class UserCounterListener implements ServletContextListener, HttpSessionA
     public void attributeAdded(HttpSessionBindingEvent event) {
         if (event.getName().equals(EVENT_KEY) && !isAnonymous()) {
             SecurityContext securityContext = (SecurityContext) event.getValue();
-            if (securityContext.getAuthentication().getPrincipal() instanceof User) {
-                User user = (User) securityContext.getAuthentication().getPrincipal();
+            if (securityContext.getAuthentication().getPrincipal() instanceof UserDetails) {
+            	UserDetails user = (UserDetails) securityContext.getAuthentication().getPrincipal();
                 addUsername(user);
             }
         }
@@ -147,8 +147,8 @@ public class UserCounterListener implements ServletContextListener, HttpSessionA
         if (event.getName().equals(EVENT_KEY) && !isAnonymous()) {
             SecurityContext securityContext = (SecurityContext) event.getValue();
             Authentication auth = securityContext.getAuthentication();
-            if (auth != null && (auth.getPrincipal() instanceof User)) {
-                User user = (User) auth.getPrincipal();
+            if (auth != null && (auth.getPrincipal() instanceof UserDetails)) {
+            	UserDetails user = (UserDetails) auth.getPrincipal();
                 removeUsername(user);
             }
         }
@@ -165,8 +165,8 @@ public class UserCounterListener implements ServletContextListener, HttpSessionA
         if (event.getName().equals(EVENT_KEY) && !isAnonymous()) {
             final SecurityContext securityContext = (SecurityContext) event.getValue();
             if (securityContext.getAuthentication() != null
-                    && securityContext.getAuthentication().getPrincipal() instanceof User) {
-                final User user = (User) securityContext.getAuthentication().getPrincipal();
+                    && securityContext.getAuthentication().getPrincipal() instanceof UserDetails) {
+                final UserDetails user = (UserDetails) securityContext.getAuthentication().getPrincipal();
                 addUsername(user);
             }
         }

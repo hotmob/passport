@@ -41,7 +41,8 @@
                     <h4><fmt:message key="mainMenu.message"/></h4>
                 </div>
                 <div class="login_record">
-	                <p><a href="<c:url value='/userform'/>"><fmt:message key="menu.user"/></a></p>
+	                <p><a href="<c:url value='/userform'/>"><fmt:message key="menu.user" /></a></p>
+	                <p><a href="<c:url value='/userform?from=realauth'/>"><fmt:message key="menu.real.auth" /></a></p>
 	                <p><a href="/logout"><fmt:message key="user.logout"/></a></p>
                 </div>
                 <div class="clear"></div>

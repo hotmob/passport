@@ -1,6 +1,6 @@
 <%@ include file="/WEB-INF/view/jsp/common/taglibs.jsp"%>
 <h2>Runtime Statistics</h2>
-<table width="800">
+<table>
     <thead>
         <tr>
             <th>Property</th>
@@ -42,7 +42,7 @@
 <br /><br />
 
 <h2>Ticket Registry Statistics</h2>
-<table width="800">
+<table>
     <thead>
         <tr>
             <th>Property</th>

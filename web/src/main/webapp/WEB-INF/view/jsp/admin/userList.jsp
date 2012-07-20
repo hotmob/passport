@@ -4,6 +4,7 @@
     <title><fmt:message key="userList.title"/></title>
     <meta name="menu" content="AdminMenu"/>
 </head>
+<body id="userList"/>
 
 <div class="span10">
     <h2><fmt:message key="userList.heading"/></h2>
@@ -19,12 +20,12 @@
     <input type="button" onclick="location.href='<c:url value="/home"/>'" class="btn right" value="<fmt:message key="button.done"/>"/>
     <input type="button" onclick="location.href='<c:url value="/userform?method=Add&from=list"/>'"  class="btn right"  value="<fmt:message key="button.add"/>"/>
     <form method="get" >
-        <input type="hidden" name="prcookie" id="cookie"  value="${param.prcookie}" />
+        <input type="hidden" name="c" id="currentPage"  value="${c}" />
         <input type="submit" class="btn right" value="<fmt:message key="button.next"/>"/>
     </form>
     
     <display:table name="userList" cellspacing="0" cellpadding="0" requestURI="" defaultsort="1" id="users" pagesize="25" class="table table-condensed" export="true">
-        <display:column property="username" escapeXml="true" sortable="true" titleKey="user.username" style="width: 25%" url="/userform?from=list" paramId="id" paramProperty="id"/>
+        <display:column property="username" escapeXml="true" sortable="true" titleKey="user.username" style="width: 25%" url="/userform?from=list" paramId="id" paramProperty="username"/>
         <display:column property="displayName" escapeXml="true" sortable="true" titleKey="activeUsers.displayName" style="width: 34%"/>
         <display:column property="email" sortable="true" titleKey="user.email" style="width: 25%" autolink="true" media="html"/>
         <display:column property="email" titleKey="user.email" media="csv xml excel pdf"/>

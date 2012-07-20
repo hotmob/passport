@@ -5,11 +5,10 @@
     <meta name="menu" content="AdminMenu"/>
 </head>
 
-<div class="span3">
+<div class="span10">
     <h2><fmt:message key="upload.heading"/></h2>
     <p><fmt:message key="upload.message"/></p>
-</div>
-<div class="span7">
+    
     <spring:bind path="fileUpload.*">
         <c:if test="${not empty status.errorMessages}">
         <div class="alert alert-error fade in">
@@ -50,6 +49,6 @@
     </form:form>
 </div>
 <c:set var="scripts" scope="request">
-<v:javascript formName="fileUpload" staticJavascript="false"/>
-<script type="text/javascript" src="<c:url value="/scripts/validator.jsp"/>"></script>
+    <v:javascript formName="fileUpload" staticJavascript="false"/>
+    <script type="text/javascript" src="<c:url value='${appConfig["resourcesUri"]}statics/scripts/validator.jsp' />"></script>
 </c:set>

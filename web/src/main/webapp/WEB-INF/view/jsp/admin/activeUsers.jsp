@@ -9,22 +9,13 @@
 <div class="span10">
     <h2><fmt:message key="activeUsers.heading"/></h2>
 
-    <p><fmt:message key="activeUsers.message"/></p>
+    <input type="button" onclick="location.href='../home'" value="<fmt:message key="button.done"/>" class="btn right"/>
 
-    <input type="button" onclick="location.href='../home'" value="<fmt:message key="button.done"/>" class="btn"/>
-
-    <display:table name="applicationScope.userNames" id="user" cellspacing="0" cellpadding="0"
-                   defaultsort="1" class="table table-condensed" pagesize="50" requestURI="">
-        <display:column property="username" escapeXml="true" style="width: 30%" titleKey="user.username"
-                        sortable="true"/>
-        <display:column titleKey="activeUsers.displayName" sortable="true">
-            <c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
-            <c:if test="${not empty user.email}">
-                <a href="mailto:<c:out value="${user.email}"/>">
-                    <img src="<c:url value="/images/iconEmail.gif"/>"
-                         alt="<fmt:message key="icon.email"/>" class="icon"/></a>
-            </c:if>
-        </display:column>
+    <display:table name="applicationScope.userNames" id="user" cellspacing="0" cellpadding="0" defaultsort="1" class="table table-condensed" pagesize="50" requestURI="">
+        <display:column property="username" escapeXml="true" sortable="true" titleKey="user.username" style="width: 25%" url="/userform?from=list" paramId="id" paramProperty="username"/>
+        <display:column property="displayName" escapeXml="true" sortable="true" titleKey="activeUsers.displayName" style="width: 34%"/>
+        <display:column property="email" sortable="true" titleKey="user.email" style="width: 25%" autolink="true" media="html"/>
+        <display:column property="email" titleKey="user.email" media="csv xml excel pdf"/>
 
         <display:setProperty name="paging.banner.item_name" value="user"/>
         <display:setProperty name="paging.banner.items_name" value="users"/>

@@ -96,7 +96,7 @@ public interface UserManager extends GenericManager<User, Long> {
      * @param cookie result cookie.
      * @return a list of matches, or all if no searchTerm.
      */
-    PagedResult getPersons(int pageSize, byte[] cookie) throws NamingException;
+    PagedResult getPersons(int current, int pageSize) throws NamingException;
     
     /**
      * Changes the password for the current user. The username is obtained from the security context.

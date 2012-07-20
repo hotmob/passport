@@ -8,7 +8,7 @@ import org.compass.annotations.SearchableComponent;
 import org.compass.annotations.SearchableId;
 import org.compass.annotations.SearchableProperty;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.ldap.userdetails.LdapUserDetails;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 
 import com.ammob.passport.Constants;
@@ -28,6 +28,7 @@ import javax.persistence.Transient;
 import javax.persistence.Version;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -41,7 +42,7 @@ import java.util.Set;
 @Searchable
 @XmlRootElement
 @JsonIgnoreProperties(value={ "password" }) 
-public class User extends BaseObject implements Serializable, LdapUserDetails {
+public class User extends BaseObject implements Serializable, UserDetails {
 	
     private static final long serialVersionUID = 3832626162173359411L;
  
@@ -94,7 +95,6 @@ public class User extends BaseObject implements Serializable, LdapUserDetails {
     @Column(name = "password_hint")
     @XmlTransient
     private String passwordHint;
-    
 	@Transient
 	private String displayName;                   // 昵称, 显示名
 	@Transient
@@ -106,11 +106,12 @@ public class User extends BaseObject implements Serializable, LdapUserDetails {
 	@Transient
 	private String avataUrl;
 	@Transient
+	private String identity;							// uid, 身份证号码
+	@Transient
 	private Set<String> state = new HashSet<String>(); // 状态, 1: 邮箱已验证
     // PPolicy data
 	@Transient
     private int timeBeforeExpiration = Integer.MAX_VALUE;
-
 	@Transient
     private int graceLoginsRemaining = Integer.MAX_VALUE;
 
@@ -427,6 +428,14 @@ public class User extends BaseObject implements Serializable, LdapUserDetails {
 		this.avataUrl = avataUrl;
 	}
 
+	public String getIdentity() {
+		return identity;
+	}
+
+	public void setIdentity(String identity) {
+		this.identity = identity;
+	}
+
 	public void setTimeBeforeExpiration(int timeBeforeExpiration) {
 		this.timeBeforeExpiration = timeBeforeExpiration;
 	}
@@ -441,10 +450,5 @@ public class User extends BaseObject implements Serializable, LdapUserDetails {
 	
     public int getGraceLoginsRemaining() {
 		return graceLoginsRemaining;
-	}
-
-	@Override
-	public String getDn() {
-		return null;
 	}
 }

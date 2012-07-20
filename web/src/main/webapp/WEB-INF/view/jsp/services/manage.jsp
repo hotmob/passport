@@ -2,6 +2,39 @@
 <head>
 <title><fmt:message key="service.manager" /></title>
 <meta name="menu" content="AdminMenu" />
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="<c:url value='${appConfig["resourcesUri"]}statics/scripts/cas.js'/>"></script>
+
+  <style type="text/css">
+  #nav-main #${pageTitle} span {
+      background:#fff;
+      color: #000;
+  }
+@media screen {
+    div#container {width:100%; min-width:952px; margin:0; padding:0;}
+    table#headerTable {width:100%; min-width:952px; background:#999; margin:0; padding:0; border:0; border-collapse:collapse;}
+    div.tableWrapper {width:100%; min-width:952px; max-height:250px; overflow:auto; overflow-x:hidden;}
+        table#scrollTable {width:100%; min-width:935px;}
+            table#scrollTable thead {display:none;}
+                table#headerTable th, table#scrollTable td {padding:0 5px; border:0;}
+                table#scrollTable td { border-bottom:1px solid #eee;}
+                table#headerTable th {height:38px; border:0 !important;}
+
+                th.th1, td.td1 {width:200px; overflow:hidden;}
+                th.th2, td.td2 {overflow:hidden;}
+                th.th3, td.td3 {width:150px}
+                th.th4, td.td4 {width:150px}
+                th.th5, td.td5 {width:150px}
+                th.th6, td.td6 {width:70px; text-align:right !important;}
+                th.th7, td.td7 {width:102px; text-align:right !important;}
+                td.td7 {width:85px;}
+
+                .hint {margin-left:9.5em; margin-bottom:1em; line-height:1.5;}
+                .actions {margin:1.5em 0;}
+                #allowedAttributes {height:150px;}
+                }
+}
+</style>
 </head>
 <div class="span10">
     <c:if test="${fn:length(services) eq 0}">
@@ -12,7 +45,7 @@
 		<div id="msg" class="alert alert-success fade in"><spring:message code="management.services.status.${param.status}" arguments="${param.serviceName}" /></div>
 	</c:if>
 
-      <table cellspacing="0" id="headerTable" class="headerTable">
+      <table id="headerTable" class="headerTable">
 			<tr>
 				<th class="th1"><spring:message code="management.services.manage.label.name" /></th>
 				<th class="th2"><spring:message code="management.services.manage.label.serviceUrl" /></th>
@@ -26,7 +59,7 @@
 	
 	
 	<div id="tableWrapper" class="tableWrapper">
-		<table cellspacing="0" id="scrollTable" class="scrollTable highlight large">
+		<table id="scrollTable" class="scrollTable highlight large">
          <thead>
 			<tr>
 				<th><spring:message code="management.services.manage.label.name" /></th>

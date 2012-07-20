@@ -53,10 +53,10 @@
 
 	<bean id="grantingTicketExpirationPolicy" class="org.jasig.cas.ticket.support.RememberMeDelegatingExpirationPolicy">
 		<property name="sessionExpirationPolicy">
-			<bean class="org.jasig.cas.ticket.support.TimeoutExpirationPolicy" c:timeToKillInMilliSeconds="${tgt.timeToKillInSeconds:7200}" /><!-- 2 Hour -->
+			<bean class="org.jasig.cas.ticket.support.TimeoutExpirationPolicy" c:timeToKillInMilliSeconds="${tgt.timeToKillInSeconds:7200000}" /><!-- 2 Hour -->
 		</property>
 		<property name="rememberMeExpirationPolicy">
-			<bean class="org.jasig.cas.ticket.support.TimeoutExpirationPolicy" c:timeToKillInMilliSeconds="${tgt.timeToKillInSeconds:604800}" /><!-- 7 Days -->
+			<bean class="org.jasig.cas.ticket.support.TimeoutExpirationPolicy" c:timeToKillInMilliSeconds="${tgt.timeToKillInSeconds:604800000}" /><!-- 7 Days -->
 		</property>
     </bean>
 
@@ -182,6 +182,7 @@
 				                <value>phoneNumber</value>
 				                <value>uuid</value>
 				                <value>authorities</value>
+				                <value>identity</value>
 				                <value>regTime</value>
 				                <value>address.country</value>
 				                <value>address.province</value>
