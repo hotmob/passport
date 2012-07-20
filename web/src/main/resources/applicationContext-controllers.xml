@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+    
+<bean id="proxyValidateController" class="org.jasig.cas.web.ServiceValidateController"
+        p:centralAuthenticationService-ref="centralAuthenticationService"
+        p:proxyHandler-ref="proxy20Handler"
+        p:argumentExtractor-ref="casArgumentExtractor" />
+
+    <bean id="serviceValidateController" class="org.jasig.cas.web.ServiceValidateController"
+        p:validationSpecificationClass="org.jasig.cas.validation.Cas20WithoutProxyingValidationSpecification"
+        p:centralAuthenticationService-ref="centralAuthenticationService"
+        p:proxyHandler-ref="proxy20Handler"
+        p:argumentExtractor-ref="casArgumentExtractor" />
+    
+    <bean id="samlValidateController" class="org.jasig.cas.web.ServiceValidateController"
+        p:validationSpecificationClass="org.jasig.cas.validation.Cas20WithoutProxyingValidationSpecification"
+        p:centralAuthenticationService-ref="centralAuthenticationService"
+        p:proxyHandler-ref="proxy20Handler"
+        p:argumentExtractor-ref="samlArgumentExtractor"
+        p:successView="casSamlServiceSuccessView"
+        p:failureView="casSamlServiceFailureView" />
+
+    <bean id="legacyValidateController" class="org.jasig.cas.web.ServiceValidateController"
+        p:proxyHandler-ref="proxy10Handler"
+        p:successView="cas1ServiceSuccessView"
+        p:failureView="cas1ServiceFailureView"
+        p:validationSpecificationClass="org.jasig.cas.validation.Cas10ProtocolValidationSpecification"
+        p:centralAuthenticationService-ref="centralAuthenticationService"
+        p:argumentExtractor-ref="casArgumentExtractor" />
+
+    <bean id="proxyController" class="org.jasig.cas.web.ProxyController"
+        p:centralAuthenticationService-ref="centralAuthenticationService" />
+
+    <bean id="viewStatisticsController" class="org.jasig.cas.web.StatisticsController"
+        p:casTicketSuffix="${host.name}">
+        <constructor-arg index="0" ref="ticketRegistry" />
+    </bean>
+
+    <bean id="logoutController" class="org.jasig.cas.web.LogoutController"
+        p:centralAuthenticationService-ref="centralAuthenticationService"
+        p:logoutView="casLogoutView"
+        p:warnCookieGenerator-ref="warnCookieGenerator"
+        p:ticketGrantingTicketCookieGenerator-ref="ticketGrantingTicketCookieGenerator" />
+    
+    <bean id="initialFlowSetupAction" class="org.jasig.cas.web.flow.InitialFlowSetupAction"
+        p:argumentExtractors-ref="argumentExtractors"
+        p:warnCookieGenerator-ref="warnCookieGenerator"
+        p:ticketGrantingTicketCookieGenerator-ref="ticketGrantingTicketCookieGenerator" />
+    
+    <bean id="authenticationViaFormAction" class="org.jasig.cas.web.flow.AuthenticationViaFormAction"
+        p:centralAuthenticationService-ref="centralAuthenticationService"
+        p:warnCookieGenerator-ref="warnCookieGenerator" />
+    
+    <bean id="generateServiceTicketAction" class="org.jasig.cas.web.flow.GenerateServiceTicketAction"
+        p:centralAuthenticationService-ref="centralAuthenticationService" />
+        
+    <bean id="sendTicketGrantingTicketAction" class="org.jasig.cas.web.flow.SendTicketGrantingTicketAction"
+        p:centralAuthenticationService-ref="centralAuthenticationService"
+        p:ticketGrantingTicketCookieGenerator-ref="ticketGrantingTicketCookieGenerator" />
+
+    <bean id="gatewayServicesManagementCheck" class="com.ammob.passport.webapp.spring.GatewayServicesManagementCheck">
+        <constructor-arg index="0" ref="servicesManager" />
+    </bean>
+        
+    <bean id="generateLoginTicketAction" class="org.jasig.cas.web.flow.GenerateLoginTicketAction"
+        p:ticketIdGenerator-ref="loginTicketUniqueIdGenerator" />
+    
+    <bean id="addRegisteredServiceSimpleFormController" class="org.jasig.cas.services.web.RegisteredServiceSimpleFormController"
+        p:formView="addServiceView"
+        p:successView="addServiceView"
+        p:commandName="registeredService"
+        p:validator-ref="registeredServiceValidator"
+        p:sessionForm="true">
+        <constructor-arg index="0" ref="servicesManager" />
+        <constructor-arg index="1" ref="personAttributeRepository" />
+    </bean>
+    
+    <bean id="editRegisteredServiceSimpleFormController" class="org.jasig.cas.services.web.RegisteredServiceSimpleFormController"
+        p:formView="editServiceView"
+        p:successView="editServiceView"
+        p:commandName="registeredService"
+        p:validator-ref="registeredServiceValidator"
+        p:sessionForm="false">
+        <constructor-arg index="0" ref="servicesManager" />
+        <constructor-arg index="1" ref="personAttributeRepository" />
+    </bean>
+    
+    <bean id="registeredServiceValidator" class="org.jasig.cas.services.web.support.RegisteredServiceValidator"
+        p:servicesManager-ref="servicesManager" />
+    
+    <bean id="manageRegisteredServicesMultiActionController" class="org.jasig.cas.services.web.ManageRegisteredServicesMultiActionController">
+        <constructor-arg index="0" ref="servicesManager" />
+        <constructor-arg index="1" value="${cas.securityContext.serviceProperties.service}" />
+    </bean>
+
+    <bean id="messageInterpolator" class="org.jasig.cas.util.SpringAwareMessageMessageInterpolator" />
+
+    <bean id="credentialsValidator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean"
+            p:messageInterpolator-ref="messageInterpolator" />
+            
+    <bean id="healthCheckController" class="org.jasig.cas.web.HealthCheckController"
+        p:healthCheckMonitor-ref="healthCheckMonitor"/>
+</beans>
