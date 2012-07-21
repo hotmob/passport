@@ -7,6 +7,8 @@ import org.apache.commons.validator.util.ValidatorUtils;
 import org.springframework.validation.Errors;
 import org.springmodules.validation.commons.FieldChecks;
 
+import com.ammob.passport.util.IdcardUtil;
+
 
 /**
  * ValidationUtil Helper class for performing custom validations that
@@ -48,5 +50,45 @@ public class ValidationUtil {
         }
 
         return true;
+    }
+    
+    /**
+     * Validates china id card fields match.
+     * @param bean
+     * @param va
+     * @param field
+     * @param errors
+     * @return
+     */
+    public static boolean validateIdCard(Object bean, ValidatorAction va,
+    		Field field, Errors errors) {
+    	String value = extractValue(bean, field);
+    	if(!IdcardUtil.isIdcard(value)){
+            FieldChecks.rejectValue(errors, field, va);
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    /**
+     * Extracts the value of the given bean. If the bean is <code>null</code>, the returned value is also <code>null</code>.
+     * If the bean is a <code>String</code> then the bean itself is returned. In all other cases, the <code>ValidatorUtils</code>
+     * class is used to extract the bean value using the <code>Field</code> object supplied.
+     *
+     * @see ValidatorUtils#getValueAsString(Object, String)
+     */
+    protected static String extractValue(Object bean, Field field) {
+        String value = null;
+
+        if (bean == null) {
+            return null;
+        } else if (bean instanceof String) {
+            value = (String) bean;
+        } else {
+            value = ValidatorUtils.getValueAsString(bean, field.getProperty());
+        }
+
+        return value;
     }
 }

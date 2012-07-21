@@ -3,9 +3,7 @@
      "http://jakarta.apache.org/commons/dtds/validator_1_3_0.dtd">
 
 <form-validation>
-
    <global>
-
       <validator name="twofields"
          classname="com.ammob.passport.webapp.util.ValidationUtil"
          method="validateTwoFields"
@@ -61,6 +59,17 @@
                 return bValid;
             }]]>
          </javascript>
+       </validator>
+       
+       <validator name="idCard"
+         classname="com.ammob.passport.webapp.util.ValidationUtil"
+         method="validateIdCard"
+         methodParams="java.lang.Object,
+                       org.apache.commons.validator.ValidatorAction,
+                       org.apache.commons.validator.Field,
+                       org.springframework.validation.Errors"
+         depends="required"
+         msg="errors.idCard">
        </validator>
    </global>
 

@@ -216,6 +216,19 @@
 					<var-value>60</var-value>
 				</var>
             </field>
+            <field property="identity" depends="minlength,maxlength,idCard">
+                <arg key="user.identity"/>
+                <arg name="maxlength" key="${var:maxlength}" position="1" resource="false"/>
+		        <arg name="minlength" key="${var:minlength}" position="1" resource="false"/>
+		        <var>
+		            <var-name>minlength</var-name>
+					<var-value>15</var-value>
+				</var>		
+				<var>
+					<var-name>maxlength</var-name>
+					<var-value>18</var-value>
+				</var>
+            </field>
         </form>
     </formset>
 </form-validation>

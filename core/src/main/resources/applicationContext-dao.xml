@@ -36,7 +36,6 @@
 
     <bean id="persistenceUnitManager" class="org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager">
         <property name="defaultDataSource" ref="dataSource"/>
-        <property name="defaultPersistenceUnitName" value="ApplicationEntityManager" />
         <property name="persistenceXmlLocations">
             <list>
                 <value>classpath:META-INF/persistence.xml</value>

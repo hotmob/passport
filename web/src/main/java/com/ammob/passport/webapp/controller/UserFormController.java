@@ -111,11 +111,7 @@ public class UserFormController extends BaseFormController {
                 saveError(request, "Error : " + e.getMessage());
                 return "userform";
             }
-            if (!StringUtils.equals(request.getParameter("from"), "list")) {
-                saveMessage(request, getText("user.saved", user.getDisplayName(), locale));
-                // return to main Menu
-                return getCancelView();
-            } else {
+            if (StringUtils.equals(request.getParameter("from"), "list")) {
                 if (StringUtils.isBlank(request.getParameter("version"))) {
                     saveMessage(request, getText("user.added", user.getDisplayName(), locale));
                     // Send an account information e-mail
@@ -130,6 +126,12 @@ public class UserFormController extends BaseFormController {
                 } else {
                     saveMessage(request, getText("user.updated.byAdmin", user.getDisplayName(), locale));
                 }
+            } else if (StringUtils.equals(request.getParameter("from"), "realauth")) {
+            	saveMessage(request, getText("user.realauth", user.getDisplayName(), locale));
+                return getCancelView();// return to main Menu
+            } else {
+                saveMessage(request, getText("user.saved", user.getDisplayName(), locale));
+                return getCancelView();// return to main Menu
             }
         }
         return "userform";
