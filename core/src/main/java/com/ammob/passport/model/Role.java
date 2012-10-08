@@ -12,7 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-
+import javax.persistence.Transient;
 import java.io.Serializable;
 
 /**
@@ -32,17 +32,9 @@ import java.io.Serializable;
         )
 })
 public class Role extends BaseObject implements Serializable, GrantedAuthority {
-	
     private static final long serialVersionUID = 3690197650654049848L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    
-    @Column(length = 20)
     private String name;
-    
-    @Column(length = 64)
     private String description;
     
     /**
@@ -59,6 +51,8 @@ public class Role extends BaseObject implements Serializable, GrantedAuthority {
         this.name = name;
     }
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public Long getId() {
         return id;
     }
@@ -67,14 +61,17 @@ public class Role extends BaseObject implements Serializable, GrantedAuthority {
      * @return the name property (getAuthority required by Acegi's GrantedAuthority interface)
      * @see org.springframework.security.core.GrantedAuthority#getAuthority()
      */
+    @Transient
     public String getAuthority() {
         return getName();
     }
 
+    @Column(length = 20)
     public String getName() {
         return this.name;
     }
 
+    @Column(length = 64)
     public String getDescription() {
         return this.description;
     }

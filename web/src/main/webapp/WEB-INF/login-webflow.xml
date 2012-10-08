@@ -15,7 +15,7 @@
 	</decision-state>
     
     <decision-state id="gatewayRequestCheck">
-        <if test="requestParameters.gateway != '' and requestParameters.gateway != null and flowScope.service != null" then="gatewayServicesManagementCheck" else="generateLoginTicket" />
+        <if test="requestParameters.gateway != '' and requestParameters.gateway != null and flowScope.service != null" then="gatewayServicesManagementCheck" else="serviceAuthorizationCheck" />
     </decision-state>
 	
 	<decision-state id="hasServiceCheck">
@@ -23,9 +23,15 @@
 	</decision-state>
 	
     <decision-state id="renewRequestCheck">
-        <if test="requestParameters.renew != '' and requestParameters.renew != null" then="generateLoginTicket" else="generateServiceTicket" />
+        <if test="requestParameters.renew != '' and requestParameters.renew != null" then="serviceAuthorizationCheck" else="generateServiceTicket" />
     </decision-state>
-	
+    
+	<!-- Do a service authorization check early without the need to login first -->
+    <action-state id="serviceAuthorizationCheck">
+        <evaluate expression="serviceAuthorizationCheck"/>
+        <transition to="generateLoginTicket"/>
+    </action-state>
+    
 	<!-- 
 		The "warn" action makes the determination of whether to redirect directly to the requested
 		service or display the "confirmation" page to go back to the server.
@@ -42,7 +48,13 @@
 		<transition on="error" to="generateLoginTicket" />
 	</action-state>
 	 -->
-	 
+	<!-- OAuth -->
+	<action-state id="oauthAction">   
+        <evaluate expression="oauthAction" />   
+        <transition on="success" to="sendTicketGrantingTicket" />   
+        <transition on="error" to="ticketGrantingTicketExistsCheck" />  
+    </action-state> 
+    
 	<!-- LPPE transitions begin here: You will also need to move over the 'lppe-configuration.xml' 
 		file from the 'unused-spring-configuration' folder to the 'spring-configuration' folder so CAS can pick up the definition for the bean 'passwordPolicyAction'. -->
     <action-state id="passwordPolicyCheck">

@@ -9,10 +9,18 @@
         </layout>
     </appender>
     
+    <logger name="org.jasig.cas.ticket">
+        <level value="WARN"/>
+    </logger>
+    
     <logger name="net.sf.ehcache">
         <level value="ERROR"/>
     </logger>
-
+    
+	<logger name="net.sf.navigator">
+        <level value="FATAL"/>
+    </logger>
+    
     <!-- Suppress success logging from InteractiveAuthenticationSuccessEvent -->
     <logger name="org.springframework.security">
         <level value="WARN"/>
@@ -23,7 +31,7 @@
     </logger>
     
     <logger name="org.springframework.core">
-        <level value="WARN" />
+        <level value="ERROR" />
     </logger>
     
     <logger name="org.springframework.beans">
@@ -36,6 +44,10 @@
 
     <logger name="org.springframework.web">
         <level value="WARN" />
+    </logger>
+    
+    <logger name="org.springframework.webflow">
+        <level value="FATAL" />
     </logger>
     
     <logger name="org.springframework.ldap">
@@ -55,9 +67,13 @@
     </logger>
     
     <logger name="org.apache.velocity">
-        <level value="WARN"/>
+        <level value="FATAL"/>
     </logger>
-
+    
+	<logger name="org.apache.commons.validator">
+		<level value="ERROR"/>
+	</logger>
+	
     <!-- Suppress invalid warning messages from JSF -->
     <logger name="org.apache.myfaces">
         <level value="ERROR"/>

@@ -12,6 +12,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
@@ -26,7 +27,7 @@ import org.junit.Test;
 public class GrantManagerImplTest {
 
 	private final JAXRSServerFactoryBean factoryBean = new JAXRSServerFactoryBean();
-	private final String username = "hotmob";
+	private final String username = "低";
 	private final String password = "121212";
 	/**
 	 * @throws java.lang.Exception
@@ -97,12 +98,33 @@ public class GrantManagerImplTest {
         return method;
     }
 	
+	protected static HttpMethod Put(String url, NameValuePair[] nvp) throws Exception {
+		HttpClient client = new HttpClient();  
+        PutMethod method = new PutMethod(url);
+        method.setQueryString(nvp);
+        int statusCode = client.executeMethod(method);
+        if (statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED) {
+            System.err.println("Method failed: " + method.getStatusLine());
+        }
+        Cookie[] cookies = client.getState().getCookies();
+        for (Cookie cookie : cookies)
+        	System.out.println("Cookie Name = " + cookie.getName() + ", Value = " + cookie.getValue() + ", Domain = " + cookie.getDomain() + ", Path = " + cookie.getPath() + ", ExpiryDate = " + cookie.getExpiryDate());
+        return method;
+	}
+	
 	private static String getResponseHeader(HttpMethod method) {
 		return method.getResponseHeader("Location").getValue();
 	}
 	
 	private static String getResponseBody(HttpMethod method) throws IOException {
 		 byte[] responseBody = method.getResponseBody();
-		 return new String(responseBody);  
+		 return new String(responseBody);
+	}
+	
+	public static void main(String[] args) throws Exception {
+		String username = "`檰糀糖﹏♥";
+		// 测试注册
+		HttpMethod method = GrantManagerImplTest.Put("http://passport.766.com/v1/users/", new NameValuePair[] {new NameValuePair("username", username), new NameValuePair("password", username), new NameValuePair("email", username + "@163.com")});
+		System.out.println(method.getResponseBodyAsString());
 	}
 }

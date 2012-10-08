@@ -22,7 +22,7 @@
             <li>
                 <label class="desc" for="username"><fmt:message key="label.username" /><fmt:message key="label.double.colon" /></label>
                 <c:set var="tipinfo"><fmt:message key="login.tipinfo" /></c:set>
-                <form:input path="username" id="username" cssClass="plubic_input1" tipinfo="${tipinfo}" value="${tipinfo}" tabindex="1" />
+                <form:input path="username" id="username" cssClass="plubic_input1" placeholder="${tipinfo}" tabindex="1" />
                 <div class="reg_tips">
                     <form:errors id="usernameTipError" path="username" cssClass="onError" />
                 </div>

@@ -69,7 +69,7 @@ public class LocaleFilter extends OncePerRequestFilter {
             config.put(Constants.CSS_THEME, theme);
         }
 
-        chain.doFilter(request, response);
+		chain.doFilter(request, response);
 
         // Reset thread-bound LocaleContext.
         LocaleContextHolder.setLocaleContext(null);

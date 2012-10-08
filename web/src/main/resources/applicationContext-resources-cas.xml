@@ -8,7 +8,10 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
-
+		
+    <bean id="noRedirectHttpClient" class="org.jasig.cas.util.HttpClient" parent="httpClient"
+          p:followRedirects="false" />
+    
     <aop:aspectj-autoproxy />
     <bean id="servicesManager" class="org.jasig.cas.services.DefaultServicesManagerImpl" >
         <constructor-arg index="0" ref="serviceRegistryDao" />
@@ -20,7 +23,8 @@
     <bean id="serviceRegistryReloaderJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"
         p:targetObject-ref="servicesManager" p:targetMethod="reload" />
     <bean id="periodicServiceRegistryReloaderTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean"
-        p:jobDetail-ref="serviceRegistryReloaderJobDetail" p:startDelay="120000" p:repeatInterval="120000" />
+        p:jobDetail-ref="serviceRegistryReloaderJobDetail" p:startDelay="${service.registry.quartz.reloader.startDelay:120000}"
+        p:repeatInterval="${service.registry.quartz.reloader.repeatInterval:120000}"/>
     <bean id="persistentIdGenerator" class="org.jasig.cas.authentication.principal.ShibbolethCompatiblePersistentIdGenerator" p:salt="casrocks" />
     <!-- CentralAuthenticationService -->
     <bean id="centralAuthenticationService" class="org.jasig.cas.CentralAuthenticationServiceImpl"
@@ -36,10 +40,26 @@
     <bean id="validationAnnotationBeanPostProcessor" class="org.jasig.cas.util.CustomBeanValidationPostProcessor" p:afterInitialization="true" />
     <!-- The scheduler bean wires up any triggers that define scheduled tasks -->
     <bean id="scheduler" class="com.ammob.passport.webapp.spring.AutowiringSchedulerFactoryBean" />
-
+    <!-- Spring-Json View provides a JsonExceptionResolver exceptions thrown during a controller action -->
+    <bean id="jsonExceptionResolver" class="org.springframework.web.servlet.view.json.exception.JsonExceptionResolver">
+        <property name="exceptionView" value="jsonView" />
+        <property name="errorHandler">
+	        <list>
+	        	<bean class="org.springframework.web.servlet.view.json.error.HttpStatusError" p:errorCode="412"/>
+	            <bean class="org.springframework.web.servlet.view.json.error.ModelFlagError"/>
+	        </list>
+        </property>
+        <property name="exceptionHandler">
+	        <list>
+	        	<bean class="org.springframework.web.servlet.view.json.exception.ExceptionMessageExceptionHandler" />
+	            <bean class="org.springframework.web.servlet.view.json.exception.StackTraceExceptionHandler" />
+	        </list>
+        </property>
+    </bean>
+    
     <!-- ********************************************** argumentExtractorsConfiguration.xml ********************************************** -->
-    <bean id="casArgumentExtractor" class="org.jasig.cas.web.support.CasArgumentExtractor" p:httpClient-ref="httpClient" p:disableSingleSignOut="${slo.callbacks.disabled:false}" />
-    <bean id="samlArgumentExtractor" class="org.jasig.cas.web.support.SamlArgumentExtractor" p:httpClient-ref="httpClient" p:disableSingleSignOut="${slo.callbacks.disabled:false}" />
+    <bean id="casArgumentExtractor" class="org.jasig.cas.web.support.CasArgumentExtractor" p:httpClient-ref="noRedirectHttpClient" p:disableSingleSignOut="${slo.callbacks.disabled:false}" />
+    <bean id="samlArgumentExtractor" class="org.jasig.cas.web.support.SamlArgumentExtractor" p:httpClient-ref="noRedirectHttpClient" p:disableSingleSignOut="${slo.callbacks.disabled:false}" />
     <util:list id="argumentExtractors">
         <ref bean="casArgumentExtractor" />
         <ref bean="samlArgumentExtractor" />
@@ -49,7 +69,7 @@
     <!-- Expiration policies -->
     <util:constant id="SECONDS" static-field="java.util.concurrent.TimeUnit.SECONDS"/>
     <bean id="serviceTicketExpirationPolicy" class="org.jasig.cas.ticket.support.MultiTimeUseOrTimeoutExpirationPolicy"
-          c:numberOfUses="1" c:timeToKill="${st.timeToKillInSeconds:10}" c:timeUnit-ref="SECONDS"/>
+          c:numberOfUses="5" c:timeToKill="${st.timeToKillInSeconds:60}" c:timeUnit-ref="SECONDS"/>
 
 	<bean id="grantingTicketExpirationPolicy" class="org.jasig.cas.ticket.support.RememberMeDelegatingExpirationPolicy">
 		<property name="sessionExpirationPolicy">
@@ -66,10 +86,19 @@
 
     <!-- ********************************************** ticketRegistry.xml ********************************************** -->
 	<!-- Ticket Registry -->
+	<!-- <bean id="ticketRegistry" class="org.jasig.cas.ticket.registry.MemCacheTicketRegistry">
+        <constructor-arg index="0">
+            <list>
+                <value>120.33.33.197:12001</value>
+            </list>
+        </constructor-arg>
+        <constructor-arg index="1" type="int" value="604800" />
+        <constructor-arg index="2" type="int" value="300" />
+    </bean> -->
 	<bean id="ticketRegistry" class="org.jasig.cas.ticket.registry.JpaTicketRegistry" />
     <!--Quartz -->
-    <!-- TICKET REGISTRY CLEANER 
-    <bean id="ticketRegistryCleaner" class="org.jasig.cas.ticket.registry.support.DefaultTicketRegistryCleaner" p:ticketRegistry-ref="ticketRegistry" p:lock-ref="cleanerLock" />
+    <!-- TICKET REGISTRY CLEANER --> 
+    <!-- <bean id="ticketRegistryCleaner" class="org.jasig.cas.ticket.registry.support.DefaultTicketRegistryCleaner" p:ticketRegistry-ref="ticketRegistry" p:lock-ref="cleanerLock" />
 	<bean id="cleanerLock" class="org.jasig.cas.ticket.registry.support.JpaLockingStrategy" p:uniqueId="${host.name}" p:applicationId="cas-ticket-registry-cleaner" />
 	<bean id="ticketRegistryCleanerJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"
 		p:targetObject-ref="ticketRegistryCleaner" p:targetMethod="clean" />
@@ -129,6 +158,7 @@
                     <property name="contextSource" ref="contextSource" />
                     <property name="attributeRepository" ref="personAttributeRepository" />
                 </bean>
+                <bean class="org.jasig.cas.support.oauth.authentication.principal.OAuthCredentialsToPrincipalResolver" />
             </list>
         </property>
         <property name="authenticationHandlers">
@@ -149,12 +179,16 @@
 					</property>
 				</bean>
                 <bean class="com.ammob.passport.authentication.handler.CustomAuthenticationHandler" />
+                <bean class="org.jasig.cas.support.oauth.authentication.handler.support.OAuthAuthenticationHandler">
+			       <property name="configuration" ref="oauthConfig" />
+			    </bean>
             </list>
         </property>
 		<property name="authenticationMetaDataPopulators">
 			<list>
 				<bean class="org.jasig.cas.authentication.SamlAuthenticationMetaDataPopulator" />
 			    <bean class="org.jasig.cas.authentication.principal.RememberMeAuthenticationMetaDataPopulator" />
+			    <bean class="org.jasig.cas.support.oauth.authentication.OAuthAuthenticationMetaDataPopulator" />
 			</list>
 		</property>
     </bean>
@@ -166,7 +200,7 @@
                         <property name="id" value="0" />
                         <property name="name" value="HTTP and IMAP" />
                         <property name="description" value="Allows HTTP(S) and IMAP(S) protocols" />
-                        <property name="serviceId" value="^(https?|imaps?)://.*" />
+                        <property name="serviceId" value="^(https?|imaps?)://([A-Za-z0-9_-]+\.)*766\.com/.*" />
                         <property name="evaluationOrder" value="10000001" />
                         <property name="allowedAttributes">
 						    <list>
@@ -202,11 +236,36 @@
 					p:freeMemoryWarnThreshold="10" />
 				<!-- NOTE The following ticket registries support SessionMonitor: * DefaultTicketRegistry 
 					* JpaTicketRegistry Remove this monitor if you use an unsupported registry. -->
-				<bean class="org.jasig.cas.monitor.SessionMonitor"
+				<!-- <bean class="org.jasig.cas.monitor.SessionMonitor"
 					p:ticketRegistry-ref="ticketRegistry"
 					p:serviceTicketCountWarnThreshold="5000"
-					p:sessionCountWarnThreshold="100000" />
+					p:sessionCountWarnThreshold="100000" /> -->
 			</list>
 		</property>
 	</bean>
+
+	<bean id="facebook1" class="org.scribe.up.provider.impl.FacebookProvider">
+	  <property name="key" value="${facebook.clientId}" />
+	  <property name="secret" value="${facebook.clientSecret}" />
+	</bean>
+	
+    <bean id="sinaWeibo" class="com.ammob.passport.oauth.profile.weibo.WeiboProvider">  
+		<property name="key" value="${weibo.consumerKey}" />  
+		<property name="secret" value="${weibo.consumerSecret}" />  
+    </bean>
+    
+	<bean id="oauthConfig" class="org.jasig.cas.support.oauth.OAuthConfiguration">
+	  <property name="loginUrl" value="${cas.securityContext.casProcessingFilterEntryPoint.loginUrl}" />
+	  <property name="providers">
+	    <list>
+	      <ref bean="facebook1" />
+	      <ref bean="sinaWeibo" />
+	    </list>
+	  </property>
+	 </bean>
+	 
+	 <bean id="oauthAction" class="org.jasig.cas.support.oauth.web.flow.OAuthAction" >
+        <property name="centralAuthenticationService" ref="centralAuthenticationService" />
+        <property name="configuration" ref="oauthConfig" />
+    </bean>
 </beans>

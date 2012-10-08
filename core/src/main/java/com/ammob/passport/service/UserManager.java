@@ -6,7 +6,6 @@ import com.ammob.passport.exception.UserExistsException;
 
 import org.jasig.services.persondir.IPersonAttributes;
 import org.springframework.ldap.control.PagedResult;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 
@@ -49,7 +48,7 @@ public interface UserManager extends GenericManager<User, Long> {
      * @throws org.springframework.security.core.userdetails.UsernameNotFoundException
      *         exception thrown when user not found
      */
-    User getUserByUsername(String username) throws UsernameNotFoundException;
+    User getUserByUsername(String username);
     
     /**
      * Retrieves a list of all users.

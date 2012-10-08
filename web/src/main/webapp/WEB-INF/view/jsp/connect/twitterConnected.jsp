@@ -5,7 +5,7 @@
 
 <form id="disconnect" method="post">
 	<div class="formInfo">
-		<p>The Spring Social Showcase sample application is already connected to your Twitter account.
+		<p>The 766.com application is already connected to your Twitter account.
 			Click the button if you wish to disconnect.			
 	</div>
 

@@ -1,19 +1,3 @@
-// clear html element value
-$(document).ready(function(){
-	$(".plubic_input1,.plubic_input2").focus(function(){
-		$(this).addClass("plubic_input_on");
-		if($(this).val() ==$(this).attr("tipinfo")){
-			$(this).val("");
-		}
-	}).blur(function(){
-		$(this).removeClass("plubic_input_on");	
-		if($(this).val() == ""){
-			if($(this).attr("tipinfo")){
-				$(this).val($(this).attr("tipinfo"));
-			}
-		}
-	});
-});
 //write service value
 $(document).ready(function(){
 	var service = getUrlParam("service");

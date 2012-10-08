@@ -205,10 +205,10 @@ public class BaseFormController implements ServletContextAware {
 			if(StringUtils.hasText(captcha)) {
 				validCaptcha = imageCaptchaService.validateResponseForID(request.getSession().getId(), captcha);
 			} else {
-				log.warn("captcha is null !!");
+				log.debug("captcha is null !!");
 			}
 		} catch (CaptchaServiceException e) { //should not happen, may be thrown if the id is not valid
-			log.warn("captcha is error !!");
+			log.debug("captcha is error !!");
 		}
 		return validCaptcha;
 	}

@@ -53,7 +53,7 @@ public class ReloadController {
 
             messages.add("Reloading options completed successfully.");
             request.getSession().setAttribute(BaseFormController.MESSAGES_SUCESS_KEY, messages);
-
+            
             response.sendRedirect(response.encodeRedirectURL(referer));
             return null;
         } else {

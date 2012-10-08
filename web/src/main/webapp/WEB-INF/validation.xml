@@ -19,6 +19,18 @@
         </constant>
     </global>
     <formset>
+    	<form name="signin">
+             <field property="username" depends="required">
+                <arg key="user.username" position="0" />
+            </field>
+            <field property="password" depends="required,mask">
+                <arg key="user.password" position="0" />
+                <var>
+                    <var-name>mask</var-name>
+                    <var-value>^[a-zA-Z0-9]*$</var-value>
+                </var>
+            </field>
+        </form>
         <form name="fileUpload">
             <field property="name" depends="required">
                 <arg key="uploadForm.name"/>

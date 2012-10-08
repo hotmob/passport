@@ -1,6 +1,6 @@
 #macro( displayCssMenu $menu )
   #if ($displayer.isAllowed($menu))
-    #if ($count) #set ($count = $count + 1) #else #set ($count = 0) #end
+    #set ($count = $count + 1)
     ## set menu title
     #set ($title = $displayer.getMessage($menu.title))
     #if (!$menu.url) #set ($url="javascript:void(0)") #else #set ($url=$menu.url) #end
@@ -47,7 +47,7 @@
         #end
     #else
       </li>
-      #if ($count && $menu && $menu.parent && $menu.parent.components && $menu.parent.components.size() && $count == $menu.parent.components.size())
+      #if ($count == $menu.parent.components.size())
       </ul>
       #end
     #end

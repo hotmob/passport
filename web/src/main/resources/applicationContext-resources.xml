@@ -26,7 +26,7 @@
         <property name="username" value="${jdbc.username}"/>
         <property name="password" value="${jdbc.password}"/>
         <property name="maxActive" value="100"/>
-        <property name="maxWait" value="1000"/>
+        <property name="maxWait" value="3000"/>
         <property name="poolPreparedStatements" value="true"/>
         <property name="defaultAutoCommit" value="true"/>
         <property name="validationQuery" value="SELECT 1+1"/>
@@ -42,7 +42,7 @@
         <property name="baseEnvironmentProperties">
             <map>
                 <entry key="com.sun.jndi.ldap.connect.timeout" value="3000" />
-                <entry key="com.sun.jndi.ldap.read.timeout" value="3000" />
+                <entry key="com.sun.jndi.ldap.read.timeout" value="8000" />
                 <entry key="java.naming.security.authentication" value="simple" />
             </map>
         </property>

@@ -63,12 +63,18 @@ public class ValidationUtil {
     public static boolean validateIdCard(Object bean, ValidatorAction va,
     		Field field, Errors errors) {
     	String value = extractValue(bean, field);
-    	if(!IdcardUtil.isIdcard(value)){
-            FieldChecks.rejectValue(errors, field, va);
-            return false;
-        } else {
-            return true;
+        if (!GenericValidator.isBlankOrNull(value)) {
+            try {
+            	if(!IdcardUtil.isIdcard(value)){
+                    FieldChecks.rejectValue(errors, field, va);
+                    return false;
+                }
+            } catch (Exception e) {
+                FieldChecks.rejectValue(errors, field, va);
+                return false;
+            }
         }
+        return true;
     }
     
     /**

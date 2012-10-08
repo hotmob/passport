@@ -68,7 +68,6 @@
                        org.apache.commons.validator.ValidatorAction,
                        org.apache.commons.validator.Field,
                        org.springframework.validation.Errors"
-         depends="required"
          msg="errors.idCard">
        </validator>
    </global>

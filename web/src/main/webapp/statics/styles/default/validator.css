@@ -1,7 +1,7 @@
-.onShow{background:url(http://ue.766.com/project/userCenter/images/onShow.gif) no-repeat 0 center; }
-.onFocus{background: url(http://ue.766.com/project/userCenter/images/onFocus.gif) no-repeat  0 center; }
-.onError{background: url(http://ue.766.com/project/userCenter/images/onError.gif) no-repeat  0 center;}
-.onCorrect{background: url(http://ue.766.com/project/userCenter/images/onCorrect.gif) no-repeat  0 center;}
-.onLoad{background: url(http://ue.766.com/usercenter/common/images/onLoad.gif) no-repeat 3px 3px;}
+.onShow{background:url(../../images/icon/onShow.gif) no-repeat 0 center; }
+.onFocus{background: url(../../images/icon/onFocus.gif) no-repeat  0 center; }
+.onError{background: url(../../images/icon/onError.gif) no-repeat  0 center;}
+.onCorrect{background: url(../../images/icon/onCorrect.gif) no-repeat  0 center;}
+.onLoad{background: url(../../images/icon/onLoad.gif) no-repeat 3px 3px;}
 .onShow,.onError,.onFocus,.onCorrect,.onLoad{ margin-left:3px; font-size:12px; padding-left:20px; margin-top:4px; color:#666; display:block; float:left; height:16px; line-height:17px;}
 

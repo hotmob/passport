@@ -1,5 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <%@ include file="/WEB-INF/view/jsp/common/taglibs.jsp"%>
+<% pageContext.setAttribute("pageSeed", Math.random());%>
 <html lang="zh">
 	<head>
 		<%@ include file="/WEB-INF/view/jsp/common/meta.jsp" %>
@@ -11,7 +12,7 @@
 	</head>
 	<body<decorator:getProperty property="body.id" writeEntireProperty="true"/><decorator:getProperty property="body.class" writeEntireProperty="true"/>>
 	    <c:set var="currentMenu" scope="request"><decorator:getProperty property="meta.menu"/></c:set>
-	    <div class="navbar navbar-fixed-top">
+	     <div class="navbar<c:if test="${pageSeed > 0.5 }"> navbar-inverse</c:if> navbar-fixed-top">
 	        <div class="navbar-inner">
 	            <div class="container-fluid">
 	                <jsp:include page="/WEB-INF/view/jsp/common/menu.jsp"/>
@@ -19,7 +20,6 @@
 	            </div>
 	        </div>
 	    </div>
-	
 	    <div class="container-fluid">
 	        <%@ include file="/WEB-INF/view/jsp/common/messages.jsp" %>
 	        <div class="row-fluid">

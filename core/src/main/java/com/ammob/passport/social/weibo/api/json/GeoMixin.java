@@ -1,18 +1,10 @@
-/**
- * 
- */
 package com.ammob.passport.social.weibo.api.json;
 
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-/**
- * @author iday
- *
- */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@SuppressWarnings("unused")
 abstract class GeoMixin {
 	
 	@JsonCreator

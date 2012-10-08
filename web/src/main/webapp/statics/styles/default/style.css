@@ -30,12 +30,12 @@ a:hover{ color:#ff6600; text-decoration:underline;}
 .sidebar{ width:592px; float:left; margin-top:20px}
 .side_bg1{ background:url(../../images/sidebar.jpg); width:557px; height:429px; overflow:hidden; }
 .login_con{ background:url(../../images/content.gif) no-repeat; width:337px; height:395px; float:left; position:relative; margin-top:20px}
-.login_con h3{ padding:15px 0 16px 0; text-align:center; font-size:16px;}
+.login_con h3{ text-align:center; font-size:18px;}
 .login{ position:relative; height:295px;}
 .login ul li{ clear:both; padding:15px 0 15px 0px; height:27px; line-height:26px; overflow:hidden}
 .login label,.login input{ float:left; }
 .login label{ width:75px; text-align:right; font-size:14px; line-height:34px;}
-.plubic_input1{ float:left; width:180px; height:24px; padding:2px 4px; line-height:24px; color:#aaa; overflow:hidden; display:inline; border:1px solid #ddd; border-top:1px solid #aaa; border-left:1px solid #aaa; font-size:12px;}
+.plubic_input1{ float:left; width:180px; height:24px; padding:2px 4px;outline-style:none; line-height:24px; color:#aaa; overflow:hidden; display:inline; border:1px solid #ddd; border-top:1px solid #aaa; border-left:1px solid #aaa; font-size:12px;}
 .plubic_input2{ width:78px; height:24px; padding:2px 4px; line-height:24px; color:#aaa; overflow:hidden; border:1px solid #ddd; border-top:1px solid #aaa; border-left:1px solid #aaa; font-size:16px; font-family:Arial, Helvetica, sans-serif; }
 .plubic_input_on{ color:#444; }
 .text_password{ font-family:Arial}
@@ -48,7 +48,8 @@ a:hover{ color:#ff6600; text-decoration:underline;}
 .login .checkbox input#rememberMe{ width:auto; border:0 none;}
 .login ul li.btn_login{ padding:0 0 0 75px; _padding-left:45px; +padding-left:50px; height:60px;}
 .login_cooperate{ padding:10px 0 0 8px; border-top:1px solid #e8e8e8; margin:0 12px;}
-.login_cooperate h4{ font-weight:100; padding:0 0 10px;}
+.login_cooperate h4{ line-height:12px; font-size:12px;}
+.login_cooperate ul{ margin:0;}
 .login_cooperate ul li{ width:32px; height:32px; float:left; margin:0 10px 0 0; display:inline;background-repeat:no-repeat;}	
 .login_cooperate ul li a{ width:32px; height:32px; display:block;}
 
@@ -134,11 +135,13 @@ a:hover{ color:#ff6600; text-decoration:underline;}
 .oauth_twitter button { background:url(../../images/oauth/twitter.png) no-repeat; cursor:pointer; width: 32px; height: 32px; border: none;}
 .oauth_linkedin button { background:url(../../images/oauth/linkedin.png) no-repeat; cursor:pointer; width: 32px; height: 32px; border: none;}
 .oauth_facebook button { background:url(../../images/oauth/facebook.png) no-repeat; cursor:pointer; width: 32px; height: 32px; border: none;}
+.oauth_renren button { background:url(../../images/oauth/renren.png) no-repeat; cursor:pointer; width: 32px; height: 32px; border: none;}
+.oauth_google button { background:url(../../images/oauth/google.png) no-repeat; cursor:pointer; width: 32px; height: 32px; border: none;}
 
 .avatar {background: url(../../images/userface.gif) no-repeat; border: 1px solid #D3D3D3; display: block; margin-right: 10px; padding: 2px;float: left;overflow: hidden;}
 .avatar img { display: inline-block; height: 72px;}
 
-/* ie hack 201-07-12 (zhengbiao) */
+/* ie hack 2012-07-12 (zhengbiao) */
 html .navbar .nav li { _float: left;}
 html .navbar .nav li a { _color: #999999; _float: none; _line-height: 22px; _padding: 9px 10px; _text-decoration: none; _display: block;}
 .login_manage h4{ _padding:10px 8px;}
@@ -149,4 +152,19 @@ html .container-fluid .row-fluid .span3,
 html .container-fluid .row-fluid .span7{ width:650px; float:none; margin:0 auto;}
 html .container-fluid .row-fluid .span7 .control-label{ width:200px;}
 html .container-fluid .row-fluid .span7 .controls{ width:300px; +width:380px; +text-align:left;}
-html .container-fluid .row-fluid .span7 .form-actions{ padding-left:72px;
+html .container-fluid .row-fluid .span7 .form-actions{ padding-left:72px;}
+
+/* 2012-08-08 */
+html textarea:focus, html input[type="text"]:focus, html input[type="password"]:focus, html input[type="datetime"]:focus, html input[type="datetime-local"]:focus, html input[type="date"]:focus, html input[type="month"]:focus, html input[type="time"]:focus, html input[type="week"]:focus, html input[type="number"]:focus, html input[type="email"]:focus, html input[type="url"]:focus, html input[type="search"]:focus, html input[type="tel"]:focus, html input[type="color"]:focus,
+html .uneditable-input:focus{outline:0; outline:0 \9;}
+html .btn{ font-size:14px; font-weight:700; padding:6px 12px; *height:32px; *border:1px solid #ccc;}
+html .btn-warning{ background:#F1800E \9; border-bottom:1px solid #A54709 \9; *border:none;
+background-image: -moz-linear-gradient(center top , #F89406, #F1800E); 
+background-image: -webkit-gradient(linear,0 0,0 100%,from(#F89406),to(#F1800E));
+background-image: -webkit-linear-gradient(top,#F89406,#F1800E);}
+html .btn-warning:hover{ background:#F1800E; background:#F89406 \9;}
+
+/* === box === */
+#showBox {position: absolute;z-index: 200;overflow: hidden;width: 770px;left: 50%;margin-left: -385px;top: 12%;color: #fff;padding: 10px;}
+#myAlpha {position: absolute;z-index: -1;width: 1999px;height: 1999px;filter:alpha(opacity=40);opacity: 0.4;left: 0;top: 0;background-color: #000;}
+#container {padding:5px;border: 2px solid #000;background-color: #56718b;}

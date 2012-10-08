@@ -7,7 +7,7 @@
 <form id="disconnect" method="post">
 	<div class="formInfo">
 		<p>
-			Spring Social Showcase is connected to your Facebook account.
+			766.com is connected to your Facebook account.
 			Click the button if you wish to disconnect.
 		</p>		
 	</div>

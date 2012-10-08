@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import com.ammob.passport.Constants;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.format.datetime.DateFormatter;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -177,4 +178,12 @@ public final class DateUtil {
     public static Date convertStringToDate(final String strDate) throws ParseException {
         return convertStringToDate(getDatePattern(), strDate);
     }
+    
+    /**
+     * This method get system current time
+     * @return
+     */
+	public static String getCurrentTime() {
+		return new DateFormatter("dd/MM/yyyy hh:mm:ss").print(Calendar.getInstance().getTime(), Locale.getDefault());
+	}
 }

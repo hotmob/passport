@@ -28,7 +28,7 @@ public class IpAddressInInterceptor extends AbstractPhaseInterceptor<Message> {
 
 	public void handleMessage(Message message) throws Fault {
 		HttpServletRequest request = (HttpServletRequest) message.get(AbstractHTTPDestination.HTTP_REQUEST);
-		String ipAddress = request.getRemoteAddr(); // 取客户端IP地址
+		String ipAddress = getIpAddr(request); // 取客户端IP地址
 		// 先处理拒绝访问的地址
 		for (String deniedIpAddress : deniedList) {
 			if (ipAddress.startsWith(deniedIpAddress)) {
@@ -41,7 +41,6 @@ public class IpAddressInInterceptor extends AbstractPhaseInterceptor<Message> {
 			for (String allowedIpAddress : allowedList) {
 				if (ipAddress.startsWith(allowedIpAddress)) {
 					contains = true;
-					log.info("Allowed Ip Address : " + getIpAddr(request));
 					break;
 				}
 			}

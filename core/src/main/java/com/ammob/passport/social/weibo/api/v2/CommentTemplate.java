@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.ammob.passport.social.weibo.api.v2;
 
 import java.util.ArrayList;
@@ -15,10 +12,6 @@ import com.ammob.passport.social.weibo.api.Comment;
 import com.ammob.passport.social.weibo.api.CommentOperations;
 import com.ammob.passport.social.weibo.api.Weibo;
 
-/**
- * @author iday
- * 
- */
 public class CommentTemplate extends AbstractWeiboOperations implements CommentOperations {
 
 	public CommentTemplate(Weibo api, RestTemplate restTemplate,

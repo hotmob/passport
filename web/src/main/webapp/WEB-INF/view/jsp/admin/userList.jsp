@@ -25,7 +25,7 @@
     </form>
     
     <display:table name="userList" cellspacing="0" cellpadding="0" requestURI="" defaultsort="1" id="users" pagesize="25" class="table table-condensed" export="true">
-        <display:column property="username" escapeXml="true" sortable="true" titleKey="user.username" style="width: 25%" url="/userform?from=list" paramId="id" paramProperty="username"/>
+        <display:column property="username" escapeXml="true" sortable="true" titleKey="user.username" style="width: 25%" url="/userform?from=list" paramId="name" paramProperty="username"/>
         <display:column property="displayName" escapeXml="true" sortable="true" titleKey="activeUsers.displayName" style="width: 34%"/>
         <display:column property="email" sortable="true" titleKey="user.email" style="width: 25%" autolink="true" media="html"/>
         <display:column property="email" titleKey="user.email" media="csv xml excel pdf"/>

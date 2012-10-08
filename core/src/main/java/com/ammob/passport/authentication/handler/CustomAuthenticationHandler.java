@@ -6,10 +6,12 @@ import org.jasig.cas.authentication.handler.support.AbstractUsernamePasswordAuth
 import org.jasig.cas.authentication.principal.UsernamePasswordCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
 
 import com.ammob.passport.authentication.principal.InternalRememberMeUsernamePasswordCredentials;
 import com.ammob.passport.enumerate.AttributeEnum;
 import com.ammob.passport.service.UserManager;
+import com.ammob.passport.util.DateUtil;
 
 public class CustomAuthenticationHandler extends AbstractUsernamePasswordAuthenticationHandler {
 
@@ -18,20 +20,33 @@ public class CustomAuthenticationHandler extends AbstractUsernamePasswordAuthent
 	
 	@Autowired
     private PasswordEncoder passwordEncoder;
-
+	
+	@Autowired
+    private LdapUserDetailsManager ldapUserDetailsManager;
+	
 	@Override
 	protected boolean authenticateUsernamePasswordInternal(final UsernamePasswordCredentials credentials) throws AuthenticationException {
 		if(!(credentials instanceof UsernamePasswordCredentials))
 			throw new UnsupportedCredentialsException();
-		String userpassword = "";
+		
+		String _userLoginPassword = "";
 		try {
 			if((credentials instanceof InternalRememberMeUsernamePasswordCredentials) && ((InternalRememberMeUsernamePasswordCredentials) credentials).isInternal())
 				return true;
-			userpassword = new String((byte[]) userManager.getPersonAttributes(getPrincipalNameTransformer().transform(credentials.getUsername())).getAttributeValue(AttributeEnum.USER_PASSWORD.getValue()));
-			if(userpassword.equals("{MD5}" + passwordEncoder.encodePassword(credentials.getPassword(), null)))
-				return true;
+			String _userLoginName = getPrincipalNameTransformer().transform(credentials.getUsername());
+			if(ldapUserDetailsManager.userExists(_userLoginName)) {
+				try {
+					_userLoginPassword = new String((byte[]) userManager.getPersonAttributes(_userLoginName).getAttributeValue(AttributeEnum.USER_PASSWORD.getValue()));
+					if(_userLoginPassword.equals("{MD5}" + passwordEncoder.encodePassword(credentials.getPassword(), null)))
+						return true;
+				} catch (Exception e) {
+					log.warn("Username : " + credentials.getUsername() + ", Password : " + credentials.getPassword() + ", Real Password : " + _userLoginPassword + ", e : " + e);
+				}
+			} else {
+				log.info(_userLoginName + "'s userinfo is not exists, time : " + DateUtil.getCurrentTime());
+			}
 		} catch (Exception e) {
-			log.warn("Username : " + credentials.getUsername() + ", Password : " + credentials.getPassword() + ", Real Password : " + userpassword + ", e : " + e);
+			log.warn("User : " + credentials.getUsername() + ", login is fail ! e : " + e.getMessage());
 		}
 		return false;
 	}

@@ -25,6 +25,9 @@ import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
+import org.springframework.social.google.api.Google;
+import org.springframework.social.google.api.impl.GoogleTemplate;
+import org.springframework.social.google.connect.GoogleConnectionFactory;
 import org.springframework.social.linkedin.api.LinkedIn;
 import org.springframework.social.linkedin.connect.LinkedInConnectionFactory;
 
@@ -33,6 +36,7 @@ import org.springframework.social.twitter.api.impl.TwitterTemplate;
 import org.springframework.social.twitter.connect.TwitterConnectionFactory;
 import org.springframework.web.util.CookieGenerator;
 
+import com.ammob.passport.social.renren.api.Renren;
 import com.ammob.passport.social.renren.connect.RenrenConnectionFactory;
 import com.ammob.passport.social.txwb.api.Txwb;
 import com.ammob.passport.social.txwb.api.oauth1.TxwbTemplate;
@@ -76,6 +80,8 @@ public class SocialConfig {
 				environment.getProperty("tencent.consumerSecret")));
 		registry.addConnectionFactory(new RenrenConnectionFactory(environment.getProperty("renren.consumerKey"),
 				environment.getProperty("renren.consumerSecret")));
+		registry.addConnectionFactory(new GoogleConnectionFactory(environment.getProperty("google.clientId"),
+	            environment.getProperty("google.clientSecret")));
 		return registry;
 	}
 
@@ -100,44 +106,51 @@ public class SocialConfig {
 	@Bean
 	@Scope(value="request", proxyMode=ScopedProxyMode.INTERFACES)	
 	public Facebook facebook() {
-		Connection<Facebook> facebook = connectionRepository().findPrimaryConnection(Facebook.class);
-		return facebook != null ? facebook.getApi() : new FacebookTemplate();
+		Connection<Facebook> connection = connectionRepository().findPrimaryConnection(Facebook.class);
+		return connection != null ? connection.getApi() : new FacebookTemplate();
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode=ScopedProxyMode.INTERFACES)	
 	public Twitter twitter() {
-		Connection<Twitter> twitter = connectionRepository().findPrimaryConnection(Twitter.class);
-		return twitter != null ? twitter.getApi() : new TwitterTemplate();
+		Connection<Twitter> connection = connectionRepository().findPrimaryConnection(Twitter.class);
+		return connection != null ? connection.getApi() : new TwitterTemplate();
 	}
 
 	@Bean
 	@Scope(value="request", proxyMode=ScopedProxyMode.INTERFACES)	
 	public LinkedIn linkedin() {
-		Connection<LinkedIn> linkedin = connectionRepository().findPrimaryConnection(LinkedIn.class);
-		return linkedin != null ? linkedin.getApi() : null;
+		Connection<LinkedIn> connection = connectionRepository().findPrimaryConnection(LinkedIn.class);
+		return connection != null ? connection.getApi() : null;
 	}
 	
 	@Bean
 	@Scope(value="request", proxyMode=ScopedProxyMode.INTERFACES)	
 	public Weibo weibo() {
-		Connection<Weibo> weibo = connectionRepository().findPrimaryConnection(Weibo.class);
-		return weibo != null ? weibo.getApi() : new WeiboTemplate();
+		Connection<Weibo> connection = connectionRepository().findPrimaryConnection(Weibo.class);
+		return connection != null ? connection.getApi() : new WeiboTemplate();
 	}
 
 	@Bean
 	@Scope(value="request", proxyMode=ScopedProxyMode.INTERFACES)	
 	public Txwb txwb() {
-		Connection<Txwb> txwb = connectionRepository().findPrimaryConnection(Txwb.class);
-		return txwb != null ? txwb.getApi() : new TxwbTemplate();
+		Connection<Txwb> connection = connectionRepository().findPrimaryConnection(Txwb.class);
+		return connection != null ? connection.getApi() : new TxwbTemplate();
 	}
 	
-//	@Bean
-//	@Scope(value="request", proxyMode=ScopedProxyMode.INTERFACES)	
-//	public Renren renren() {
-//		Connection<Renren> renren = connectionRepository().findPrimaryConnection(Renren.class);
-//		return renren != null ? renren.getApi() : new RenrenTemplate();
-//	}
+	@Bean
+	@Scope(value="request", proxyMode=ScopedProxyMode.INTERFACES)	
+	public Renren renren() {
+		Connection<Renren> connection = connectionRepository().findPrimaryConnection(Renren.class);
+		return connection != null ? connection.getApi() : new Renren();
+	}
+	
+	@Bean
+	@Scope(value="request", proxyMode=ScopedProxyMode.INTERFACES)	
+	public Google google() {
+		Connection<Google> connection = connectionRepository().findPrimaryConnection(Google.class);
+		return connection != null ? connection.getApi() : new GoogleTemplate();
+	}
 	
 	@Bean
 	public ConnectController connectController() {

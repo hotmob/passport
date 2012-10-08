@@ -59,7 +59,7 @@ public class UserManagerTest extends BaseManagerTestCase {
         mgr.removeUser(user.getId().toString());
         mgr.removeUser(user.getUsername());
         try {
-            user = mgr.getUserByUsername("john");
+            user = mgr.getUser(user.getId().toString());
             fail("Expected 'Exception' not thrown");
         } catch (Exception e) {
             log.debug(e);

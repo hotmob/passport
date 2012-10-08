@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.ammob.passport.social.weibo.api.json;
 
 import java.util.Date;
@@ -13,10 +10,6 @@ import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import com.ammob.passport.social.weibo.api.TimelineDateDeserializer;
 import com.ammob.passport.social.weibo.api.Tweet;
 
-/**
- * @author iday
- * 
- */
 @JsonIgnoreProperties(ignoreUnknown = true)
 abstract class WeiboProfileMixin {
 
@@ -25,9 +18,9 @@ abstract class WeiboProfileMixin {
 			@JsonProperty("id") long id,
 			@JsonProperty("name") String name,
 			@JsonProperty("screen_name") String screenName,
-			@JsonProperty("url") String url,
 			@JsonProperty("profile_image_url") String imageUrl,
 			@JsonProperty("domain") String domain,
+			@JsonProperty("url") String url,
 			@JsonProperty("province") int province,
 			@JsonProperty("city") int city,
 			@JsonProperty("location") String location,

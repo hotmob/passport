@@ -12,6 +12,6 @@
     </fmt:message>
 </p>
 <p style="text-align: center; margin-top: 20px">
-    <img src="<c:url value='${appConfig["resourcesUri"]}statics/images/404.jpg'/>" alt="<fmt:message key="404.title"/>" />
+   
 </p>
 </page:applyDecorator>

@@ -57,13 +57,18 @@ public class RoleManagerImpl extends GenericManagerImpl<Role, Long> implements R
     public Role getRole(String rolename) {
     	Role role = null;
     	try {
-			role = (Role) ldapTemplate.lookup("cn=" + rolename + ",ou=groups", new RoleMapper());
+    		String _temp = null;
+    		if(rolename.startsWith("ROLE_"))
+    			_temp = rolename.substring(5);
+    		else
+    			_temp = rolename;
+			role = (Role) ldapTemplate.lookup("cn=" + _temp + ",ou=groups", new RoleMapper());
 		} catch (Exception e) {
 			role = roleDao.getRoleByName(rolename);
 		}
         return role;
     }
-
+    
     /**
      * {@inheritDoc}
      */

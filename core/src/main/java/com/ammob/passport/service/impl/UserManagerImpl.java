@@ -80,11 +80,7 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
      * {@inheritDoc}
      */
     public User getUser(String userId) {
-    	if(StringUtil.isNumeric(userId)) {
-    		return userDao.get(new Long(userId));
-    	} else {
-    		return getUserByUsername(userId);
-    	}
+    	return userDao.get(new Long(userId));
     }
 
     /**
@@ -129,13 +125,9 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
         try {
             return userDao.saveUser(user);
         } catch (DataIntegrityViolationException e) {
-            //e.printStackTrace();
-            log.warn(e.getMessage());
-            throw new UserExistsException("User '" + user.getUsername() + "' already exists!");
+            throw new UserExistsException("User '" + user.getUsername() + "' already exists! e : " + e);
         } catch (JpaSystemException e) { // needed for JPA
-            //e.printStackTrace();
-            log.warn(e.getMessage());
-            throw new UserExistsException("User '" + user.getUsername() + "' already exists!");
+            throw new UserExistsException("User '" + user.getUsername() + "' already exists! e : " + e);
         }
     }
     
@@ -159,16 +151,14 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
      * @throws UsernameNotFoundException thrown when username not found
      */
     public User getUserByUsername(String username) throws UsernameNotFoundException {
-    	User user = null;
 		try {
-			user = (User) ldapUserDetailsManager.loadUserByUsername(username);
+			User user = (User) ldapUserDetailsManager.loadUserByUsername(username);
 			user.getRoles().add(new Role(Constants.USER_ROLE)); // 2012-07-12 FIXME
+			return user;
 		} catch (Exception e) {
-			log.warn("LDAP not found username : " + username);
+			log.warn(username + ", e : " + e);
 		}
-    	if(user == null)
-    		user = (User) userDao.loadUserByUsername(username);
-    	return user;
+    	return null;
     }
 
     /**
@@ -283,7 +273,7 @@ public class UserManagerImpl extends GenericManagerImpl<User, Long> implements U
      */
     public User savePerson(User user) throws UserExistsException {
         if (user.getVersion() == null) { // New user, always encrypt
-        	log.info("Creat new user ! [ " + user.getUsername());
+        	log.debug("Creat new user ! [ " + user.getUsername());
             if (passwordEncoder != null) 
                 user.setPassword("{MD5}" + passwordEncoder.encodePassword(user.getPassword(), null));
             user.setUsername(user.getUsername().toLowerCase());// new user, lowercase userId

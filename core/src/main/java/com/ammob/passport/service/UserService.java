@@ -28,8 +28,6 @@ public interface UserService {
      * @param userId the identifier for the user
      * @return User
      */
-    @GET
-    @Path("/{id}")
     User getUser(@PathParam("id") String userId);
 
     /**
@@ -38,6 +36,8 @@ public interface UserService {
      * @param username the user's username used to login
      * @return User a populated user object
      */
+    @GET
+    @Path("/{username}")
     User getUserByUsername(@PathParam("username") String username);
 
     /**

@@ -44,6 +44,10 @@
 	                <p><a href="<c:url value='/userform'/>"><fmt:message key="menu.user" /></a></p>
 	                <p><a href="<c:url value='/userform?from=realauth'/>"><fmt:message key="menu.real.auth" /></a></p>
 	                <p><a href="/logout"><fmt:message key="user.logout"/></a></p>
+	                <p><form id="disconnect" action="/connect/weibo" method="post">
+							<button type="submit">Disconnect</button>	
+							<input type="hidden" name="_method" value="delete" />
+						</form></p>
                 </div>
                 <div class="clear"></div>
             </div>

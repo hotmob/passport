@@ -70,7 +70,7 @@
     <bean id="casAuthenticationProvider" class="org.springframework.security.cas.authentication.CasAuthenticationProvider" p:serviceProperties-ref="serviceProperties"  
         p:key="e37f4b31-0c45-11dd-bd0b-0800200c9a66" p:userDetailsService-ref="ldapUserDetailsService">
         <property name="ticketValidator">
-            <bean class="org.jasig.cas.client.validation.Saml11TicketValidator">
+            <bean class="org.jasig.cas.client.validation.Cas10TicketValidator">
                 <constructor-arg index="0" value="${cas.securityContext.ticketValidator.casServerUrlPrefix}" />
             </bean>
         </property>

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.ammob.passport.social.weibo.api.json;
 
 import java.util.Date;
@@ -14,12 +11,7 @@ import com.ammob.passport.social.weibo.api.Geo;
 import com.ammob.passport.social.weibo.api.TimelineDateDeserializer;
 import com.ammob.passport.social.weibo.api.WeiboProfile;
 
-/**
- * @author iday
- * 
- */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@SuppressWarnings("unused")
 abstract class TweetMixin {
 
 	@JsonCreator

@@ -60,15 +60,6 @@
 						</div>
 					</fieldset>
 				</spring:bind>
-				<spring:bind path="user.firstName">
-					<fieldset class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
-						<appfuse:label styleClass="control-label" key="user.firstName" />
-						<div class="controls">
-							<form:input path="firstName" id="firstName" maxlength="50" />
-							<form:errors path="firstName" cssClass="help-inline" />
-						</div>
-					</fieldset>
-				</spring:bind>
 				<spring:bind path="user.identity">
                     <fieldset class="control-group${(not empty status.errorMessage) ? ' error' : ''}">
                         <appfuse:label styleClass="control-label" key="user.identity" />

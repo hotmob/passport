@@ -30,12 +30,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
- * This class represents the basic "user" object that allows for authentication and user management.  It implements Acegi Security's UserDetails interface.
+ * This class represents the basic "user" object that allows for authentication 
+ * and user management.  It implements Acegi Security's UserDetails interface.
  */
 @Entity
 @Table(name = "users")
@@ -43,58 +46,26 @@ import java.util.Set;
 @XmlRootElement
 @JsonIgnoreProperties(value={ "password" }) 
 public class User extends BaseObject implements Serializable, UserDetails {
-	
     private static final long serialVersionUID = 3832626162173359411L;
- 
-    @Id
-    @SearchableId
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
     private Long id;
-    @SearchableProperty
-    @Column(nullable = false, length = 50, unique = true)
-    private String username;                    	// required
-    @Column(nullable = false)
-    @XmlTransient
-    private String password;                  		// required
-    @SearchableProperty
-    @Column(name = "first_name", nullable = false, length = 50)
-    private String firstName;                   		// required
-    @SearchableProperty
-    @Column(name = "last_name", nullable = false, length = 50)
-    private String lastName;                    		// required
-    @SearchableProperty
-    @Column(nullable = false, unique = true)
-    private String email;                       	    // required; unique
-    @SearchableProperty
-    @Column(name = "phone_number")
-    private String phoneNumber;
-    @SearchableProperty
-    private String website;
-    @Embedded
-    @SearchableComponent
-    private Address address = new Address();
-    @Version
-    private Integer version;
-    @JoinTable(
-            name = "user_role",
-            joinColumns = { @JoinColumn(name = "user_id") },
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Role> roles = new HashSet<Role>();
-    @Column(name = "account_enabled")
-    private boolean enabled;
-    @Column(name = "account_expired", nullable = false)
-    private boolean accountExpired;
-    @Column(name = "account_locked", nullable = false)
-    private boolean accountLocked;
-    @Column(name = "credentials_expired", nullable = false)
-    private boolean credentialsExpired;
-    @Transient 
-    @XmlTransient
+    private String username;                    // required
+    private String password;                    // required
     private String confirmPassword;
-    @Column(name = "password_hint")
-    @XmlTransient
     private String passwordHint;
+    private String firstName;                   // required
+    private String lastName;                    // required
+    private String email;                       // required; unique
+    private String phoneNumber;
+    private String website;
+    private Address address = new Address();
+    private Integer version;
+    private Set<Role> roles = new HashSet<Role>();
+    private boolean enabled;
+    private boolean accountExpired;
+    private boolean accountLocked;
+    private boolean credentialsExpired;
+
 	@Transient
 	private String displayName;                   // 昵称, 显示名
 	@Transient
@@ -129,54 +100,99 @@ public class User extends BaseObject implements Serializable, UserDetails {
         this.username = username;
     }
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SearchableId
     public Long getId() {
         return id;
     }
 
+    @Column(nullable = false, length = 50, unique = true)
+    @SearchableProperty
     public String getUsername() {
         return username;
     }
 
+    @Column(nullable = false)
+    @XmlTransient
     public String getPassword() {
-    	if(password == null)
-    		return "";
-		return new String(password);
+        return password;
     }
 
+    @Transient 
+    @XmlTransient
     public String getConfirmPassword() {
         return confirmPassword;
     }
 
+    @Column(name = "password_hint")
+    @XmlTransient
     public String getPasswordHint() {
         return passwordHint;
     }
 
+    @Column(name = "first_name", nullable = false, length = 50)
+    @SearchableProperty
     public String getFirstName() {
         return firstName;
     }
 
+    @Column(name = "last_name", nullable = false, length = 50)
+    @SearchableProperty
     public String getLastName() {
         return lastName;
     }
 
+    @Column(nullable = false, unique = true)
+    @SearchableProperty
     public String getEmail() {
         return email;
     }
-    
+
+    @Column(name = "phone_number")
+    @SearchableProperty
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
+    @SearchableProperty
     public String getWebsite() {
         return website;
     }
 
+    @Embedded
+    @SearchableComponent
     public Address getAddress() {
         return address;
     }
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_role",
+            joinColumns = { @JoinColumn(name = "user_id") },
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     public Set<Role> getRoles() {
         return roles;
+    }
+
+    /**
+     * Convert user roles to LabelValue objects for convenience.
+     *
+     * @return a list of LabelValue objects with role information
+     */
+    @Transient
+    public List<LabelValue> getRoleList() {
+        List<LabelValue> userRoles = new ArrayList<LabelValue>();
+
+        if (this.roles != null) {
+            for (Role role : roles) {
+                // convert the user's roles to LabelValue Objects
+                userRoles.add(new LabelValue(role.getName(), role.getName()));
+            }
+        }
+
+        return userRoles;
     }
 
     /**
@@ -192,20 +208,24 @@ public class User extends BaseObject implements Serializable, UserDetails {
      * @return GrantedAuthority[] an array of roles.
      * @see org.springframework.security.core.userdetails.UserDetails#getAuthorities()
      */
+    @Transient
     public Set<GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new LinkedHashSet<GrantedAuthority>();
         authorities.addAll(roles);
         return authorities;
     }
 
+    @Version
     public Integer getVersion() {
         return version;
     }
 
+    @Column(name = "account_enabled")
     public boolean isEnabled() {
         return enabled;
     }
 
+    @Column(name = "account_expired", nullable = false)
     public boolean isAccountExpired() {
         return accountExpired;
     }
@@ -214,10 +234,12 @@ public class User extends BaseObject implements Serializable, UserDetails {
      * @see org.springframework.security.core.userdetails.UserDetails#isAccountNonExpired()
      * @return true if account is still active
      */
+    @Transient
     public boolean isAccountNonExpired() {
         return !isAccountExpired();
     }
 
+    @Column(name = "account_locked", nullable = false)
     public boolean isAccountLocked() {
         return accountLocked;
     }
@@ -226,10 +248,12 @@ public class User extends BaseObject implements Serializable, UserDetails {
      * @see org.springframework.security.core.userdetails.UserDetails#isAccountNonLocked()
      * @return false if account is locked
      */
+    @Transient
     public boolean isAccountNonLocked() {
         return !isAccountLocked();
     }
 
+    @Column(name = "credentials_expired", nullable = false)
     public boolean isCredentialsExpired() {
         return credentialsExpired;
     }
@@ -238,6 +262,7 @@ public class User extends BaseObject implements Serializable, UserDetails {
      * @see org.springframework.security.core.userdetails.UserDetails#isCredentialsNonExpired()
      * @return true if credentials haven't expired
      */
+    @Transient
     public boolean isCredentialsNonExpired() {
         return !credentialsExpired;
     }
@@ -362,6 +387,7 @@ public class User extends BaseObject implements Serializable, UserDetails {
         return sb.toString();
     }
 	
+    @Transient
 	public String getDescription() {
 		return description;
 	}
@@ -370,9 +396,10 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		this.description = description;
 	}
 	
+	@Transient
 	public String getDisplayName() {
 		if(!StringUtils.hasText(displayName))
-			return firstName + " " + lastName;
+			return this.getLastName();
 		return displayName;
 	}
 	
@@ -380,6 +407,7 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		this.displayName = displayName;
 	}
 	
+	@Transient
 	public String getState() {
 		return state.toString().substring(1, state.toString().length() - 1);
 	}
@@ -399,6 +427,7 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		}
 	}
 	
+	@Transient
 	public String getRegTime() {
 		return regTime;
 	}
@@ -407,6 +436,7 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		this.regTime = regTime;
 	}
 	
+	@Transient
 	public String getUuid() {
 		return uuid;
 	}
@@ -415,6 +445,7 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		this.uuid = uuid;
 	}
 	
+	@Transient
 	public String getAvataUrl() {
 		if(!StringUtils.hasText(this.avataUrl)) {
 			if(StringUtils.hasText(this.uuid)){
@@ -427,7 +458,8 @@ public class User extends BaseObject implements Serializable, UserDetails {
 	public void setAvataUrl(String avataUrl) {
 		this.avataUrl = avataUrl;
 	}
-
+	
+	@Transient
 	public String getIdentity() {
 		return identity;
 	}
@@ -440,6 +472,7 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		this.timeBeforeExpiration = timeBeforeExpiration;
 	}
 	
+	@Transient
 	public int getTimeBeforeExpiration() {
 		return timeBeforeExpiration;
 	}
@@ -448,6 +481,7 @@ public class User extends BaseObject implements Serializable, UserDetails {
 		this.graceLoginsRemaining = graceLoginsRemaining;
 	}
 	
+	@Transient
     public int getGraceLoginsRemaining() {
 		return graceLoginsRemaining;
 	}

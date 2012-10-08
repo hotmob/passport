@@ -8,7 +8,7 @@
 <form action="<c:url value="/connect/twitter" />" method="POST">
 	<div class="formInfo">
 		<p>
-			You haven't created any connections with Twitter yet. Click the button to connect Spring Social Showcase with your Twitter account. 
+			You haven't created any connections with Twitter yet. Click the button to connect 766.com with your Twitter account. 
 			(You'll be redirected to Twitter where you'll be asked to authorize the connection.)
 		</p>
 	</div>

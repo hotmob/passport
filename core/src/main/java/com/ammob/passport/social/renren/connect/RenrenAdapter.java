@@ -6,6 +6,7 @@ package com.ammob.passport.social.renren.connect;
 import org.springframework.social.connect.ApiAdapter;
 import org.springframework.social.connect.ConnectionValues;
 import org.springframework.social.connect.UserProfile;
+import org.springframework.social.connect.UserProfileBuilder;
 
 import com.ammob.passport.social.renren.api.Renren;
 import com.ammob.passport.social.renren.api.RenrenProfile;
@@ -21,8 +22,9 @@ public class RenrenAdapter implements ApiAdapter<Renren> {
 	 */
 	@Override
 	public UserProfile fetchUserProfile(Renren Renren) {
-		// TODO Auto-generated method stub
-		return null;
+		RenrenProfile profile = Renren.getUserOperations().getUserProfile();
+		return new UserProfileBuilder().setName(profile.getName())
+				.setUsername(profile.getName()).build();
 	}
 
 	/* (non-Javadoc)
